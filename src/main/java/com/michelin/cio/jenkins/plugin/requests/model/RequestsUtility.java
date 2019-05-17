@@ -24,6 +24,9 @@
 package com.michelin.cio.jenkins.plugin.requests.model;
 
 import com.michelin.cio.jenkins.plugin.requests.action.RequestMailSender.DescriptorEmailImpl;
+
+import hudson.util.Secret;
+
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
@@ -63,11 +66,11 @@ public class RequestsUtility {
 		boolean returnStatus = false;
 		DescriptorEmailImpl descriptorEmailImpl = new DescriptorEmailImpl();
 		String username = descriptorEmailImpl.getUnlockuser();
-		String password = descriptorEmailImpl.getUnlockpassword();		
+		Secret password = descriptorEmailImpl.getUnlockpassword();		
 		URI uri = URI.create(urlString);
 		HttpHost host = new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme());
 		CredentialsProvider credsProvider = new BasicCredentialsProvider();
-		credsProvider.setCredentials(new AuthScope(uri.getHost(), uri.getPort()), new UsernamePasswordCredentials(username, password));
+		credsProvider.setCredentials(new AuthScope(uri.getHost(), uri.getPort()), new UsernamePasswordCredentials(username, password.getPlainText()));
 		AuthCache authCache = new BasicAuthCache();
 		BasicScheme basicAuth = new BasicScheme();
 		authCache.put(host, basicAuth);

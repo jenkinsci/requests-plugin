@@ -51,6 +51,7 @@ import net.sf.json.JSONObject;
 
 import hudson.tasks.Builder;
 import hudson.util.FormValidation;
+import hudson.util.Secret;
 
 
 // Option to email an admin user/group for delete request:
@@ -229,7 +230,7 @@ public class RequestMailSender extends Builder{
 		private String requestmaildomain;
 		private String requestemailhost;
 		private String unlockuser;
-		private String unlockpassword;
+		private Secret unlockpassword;
 		private boolean enableDeleteJob;
 		private boolean enableDeleteBuild;
 		private boolean enableUnlockBuild;
@@ -261,7 +262,7 @@ public class RequestMailSender extends Builder{
 			return unlockuser;
 		}
 		
-		public String getUnlockpassword() {
+		public Secret getUnlockpassword() {
 			return unlockpassword;
 		}
 		
@@ -289,7 +290,7 @@ public class RequestMailSender extends Builder{
 			this.unlockuser = unlockuser;
 		}
 		
-		public void setUnlockpassword(String unlockpassword) {
+		public void setUnlockpassword(Secret unlockpassword) {
 			this.unlockpassword = unlockpassword;
 		}
 		
