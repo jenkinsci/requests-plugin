@@ -11,7 +11,7 @@
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>requests</artifactId>
     <packaging>hpi</packaging>
-    <name>Requests</name>
+    <name>requests-plugin</name>
     <version>2.0.1</version>
     <url>http://wiki.jenkins-ci.org/display/JENKINS/Requests+Plugin</url>
    
