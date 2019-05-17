@@ -1,0 +1,89 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.jenkins-ci.plugins</groupId>
+        <artifactId>plugin</artifactId>
+        <version>2.37</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <groupId>org.jenkins-ci.plugins</groupId>
+    <artifactId>requests</artifactId>
+    <packaging>hpi</packaging>
+    <name>Requests</name>
+    <version>2.0.1</version>
+    <url>http://wiki.jenkins-ci.org/display/JENKINS/Requests+Plugin</url>
+   
+    <scm>
+       <connection>scm:svn:https://svn.jenkins-ci.org/tags/Requests-2.0.1</connection>
+       <developerConnection>scm:svn:https://svn.jenkins-ci.org/tags/Requests-2.0.1</developerConnection>
+       <url>https://svn.jenkins-ci.org/tags/Requests-2.0.1</url>
+    </scm>
+    <dependencies>
+    	
+		<!-- https://mvnrepository.com/artifact/commons-codec/commons-codec -->
+		<dependency>
+		    <groupId>commons-codec</groupId>
+		    <artifactId>commons-codec</artifactId>
+		    <version>1.8</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
+		<dependency>
+		    <groupId>org.apache.httpcomponents</groupId>
+		    <artifactId>httpclient</artifactId>
+		    <version>4.3.5</version>
+		</dependency>
+  	</dependencies>
+    <developers>
+        <developer>
+            <id>danielpetisme</id>
+            <name>Daniel Petisme</name>
+            <email>daniel.petisme@gmail.com</email>
+            <timezone>+1</timezone>
+        </developer>
+        <developer>
+            <id>johnflynn</id>
+            <name>John Flynn</name>
+            <email>john.flynn@lexmark.com</email>
+            <timezone>-5</timezone>
+        </developer>
+    </developers>
+    <build>
+    	<pluginManagement>
+    		<plugins>
+    			<plugin>
+    				<groupId>org.eclipse.m2e</groupId>
+    				<artifactId>lifecycle-mapping</artifactId>
+    				<version>1.0.0</version>
+    				<configuration>
+    					<lifecycleMappingMetadata>
+    						<pluginExecutions>
+    							<pluginExecution>
+    								<pluginExecutionFilter>
+    									<groupId>
+    										org.apache.maven.plugins
+    									</groupId>
+    									<artifactId>
+    										maven-javadoc-plugin
+    									</artifactId>
+    									<versionRange>
+    										[2.10.4,)
+    									</versionRange>
+    									<goals>
+    										<goal>javadoc</goal>
+    									</goals>
+    								</pluginExecutionFilter>
+    								<action>
+    									<ignore></ignore>
+    								</action>
+    							</pluginExecution>
+    						</pluginExecutions>
+    					</lifecycleMappingMetadata>
+    				</configuration>
+    			</plugin>
+    		</plugins>
+    	</pluginManagement>
+    </build>
+</project>

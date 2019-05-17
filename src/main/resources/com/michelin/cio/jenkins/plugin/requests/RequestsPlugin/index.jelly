@@ -1,0 +1,168 @@
+<!--
+  - The MIT License
+  -
+  - Copyright (c) 2011-2012, Manufacture Francaise des Pneumatiques Michelin, Daniel Petisme
+  - Portions Copyright 2019 Lexmark
+  -
+  - Permission is hereby granted, free of charge, to any person obtaining a copy
+  - of this software and associated documentation files (the "Software"), to deal
+  - in the Software without restriction, including without limitation the rights
+  - to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  - copies of the Software, and to permit persons to whom the Software is
+  - furnished to do so, subject to the following conditions:
+  -
+  - The above copyright notice and this permission notice shall be included in
+  - all copies or substantial portions of the Software.
+  -
+  - THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  - IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  - FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  - AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  - LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  - OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  - THE SOFTWARE.
+  -->
+  
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
+         xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt" xmlns:p="/lib/hudson/project">
+    <style>
+                #tab {
+                margin: 10px 0;
+                text-align: center;
+                border-collapse: collapse;
+                border-bottom: 1px solid #999;                
+                }
+
+                #tab th {
+                font-size: 13px;
+                font-weight: bold;
+                padding: 8px;
+                border: 1px solid #999;
+                vertical-align:text-top;
+                }
+
+                #tab td {
+                padding: 8px;
+                border-left: 1px solid #999;
+                border-right: 1px solid #999;
+                }
+
+                #tab tbody tr:hover { background: #CCD9E3; border:1px solid #999}
+               
+                .name_column{
+                padding: 3px;
+                width: 20%;
+                }                                
+                
+                #button-container{
+                width: 800px;
+                margin-bottom : 10px;
+                }
+                
+                input.button{
+                height: 25px;
+                }
+                #errors {
+                color: #CC0000;
+                font-weight: bold;
+                min-height: 16px;                
+                }                                               
+    </style>
+    <script types="text/javascript">
+    
+    function toogleAll(){
+       $$('.checkbox').each(
+          function(e){
+             e.checked = $('checkbox_reference').checked
+          }
+       );
+    }
+        </script>
+    <l:layout secured="true">
+        <st:include it="${app}" page="sidepanel.jelly"/>
+        <l:main-panel>            
+            <h1>${%requests.plugin.title}</h1>
+            <j:choose>
+                <j:when test="${not it.errors.isEmpty()}">
+                    <div id="errors">
+                        <div class="error">
+                            <strong>${%requests.plugin.errors}</strong>
+                        </div>
+                        <ul>
+                            <j:forEach var="error" items ="${it.errors}">                    
+                                <li>${error}</li>
+                            </j:forEach>
+                        </ul>
+                    </div>
+                </j:when>
+            </j:choose>
+            <j:choose>
+                <j:when test="${it.requests.isEmpty()}">
+                    <strong>${%requests.plugin.requests.empty}</strong>
+                </j:when>
+
+                <j:otherwise>
+                    <form method="POST" name="pendingRequests" action="manageRequests">
+                        <div id="button-container">
+                            <input type="submit" class="button" style="margin-left: 100px; margin-right:100px"
+                                   name="discard" value="${%requests.plugin.button.discard}"/>
+                            <input type="submit" class="button" name="apply" value="${%requests.plugin.button.apply}"/>
+                        </div>
+                        <table id="tab" cellpadding="3" cellspacing="3">
+                            <thead class="fixedHeader">
+                                <tr>
+                                    <th class="first_column">${%requests.plugin.requests.header.select}<br />                                    
+                                    <input type="checkbox" onclick="toogleAll()" id="checkbox_reference"/>
+                                    </th>
+                                    <th class="name_column">${%requests.plugin.requests.header.request}</th>                                       
+                                    <th class="name_column">${%requests.plugin.requests.header.requester}</th>
+                                    <th class="name_column">${%requests.plugin.requests.header.creationDate}</th>
+                                    <th class="name_column">${%requests.plugin.requests.header.jobMainPage}</th>
+                                    <th class="name_column">${%requests.plugin.requests.header.jobConfigFile}</th>
+                                </tr>
+                            </thead>
+                            <tbody>                                
+                                <j:forEach begin="0" end="${it.requests.size() - 1}" step="1" var="index">
+                                    <j:set var="request" value="${it.requests.get(index)}"/>
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" name="selected" value="${index}" class="checkbox"/>
+                                        </td>
+                                        <td>
+                                    ${request.message}
+                                        </td>
+                                        <td>
+                                            <j:choose>
+                                                <j:when test="${not empty request.username}">
+                                                    <a href="${rootURL}/user/${request.username}">
+                                                        <b>${request.username}</b>
+                                                    </a>
+                                                </j:when>
+                                                <j:otherwise>
+                                           ${%requestdelete.plugin.text.anonymous} 
+                                                </j:otherwise>
+                                            </j:choose>
+                                        </td>
+                                        <td>
+                                                 ${request.creationDate}   
+                                        </td>
+                                        <td>                                                   
+                                            <a href="${rootURL}/job/${request.projectFullName}">${request.projectFullName}</a>
+                                        </td>
+                                        <td>                                                   
+                                            <a href="${rootURL}/job/${request.projectFullName}/config.xml">Config file</a>
+                                        </td>
+                                    </tr>
+                                </j:forEach>
+                            </tbody>
+                        </table>
+                     </form>
+                     
+                     
+                </j:otherwise>
+            </j:choose>
+
+        </l:main-panel>
+    </l:layout>
+</j:jelly>
