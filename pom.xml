@@ -14,12 +14,12 @@
     <name>requests-plugin</name>
     <version>2.0.1</version>
     <url>http://wiki.jenkins-ci.org/display/JENKINS/Requests+Plugin</url>
-   
+    
     <scm>
-       <connection>scm:svn:https://svn.jenkins-ci.org/tags/Requests-2.0.1</connection>
-       <developerConnection>scm:svn:https://svn.jenkins-ci.org/tags/Requests-2.0.1</developerConnection>
-       <url>https://svn.jenkins-ci.org/tags/Requests-2.0.1</url>
-    </scm>
+	  <connection>scm:git:ssh://github.com/jenkinsci/requests-plugin.git</connection>
+	  <developerConnection>scm:git:ssh://git@github.com/jenkinsci/requests-plugin.git</developerConnection>
+	  <url>https://github.com/jenkinsci/requests-plugin</url>
+	</scm>
     <dependencies>
     	
 		<!-- https://mvnrepository.com/artifact/commons-codec/commons-codec -->
