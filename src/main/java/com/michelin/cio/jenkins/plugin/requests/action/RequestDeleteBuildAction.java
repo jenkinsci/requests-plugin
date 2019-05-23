@@ -71,7 +71,8 @@ public class RequestDeleteBuildAction implements Action {
     }
 
     public HttpResponse doCreateDeleteBuildRequest(StaplerRequest request, StaplerResponse response) throws IOException, ServletException, MessagingException {
-        if (isIconDisplayed()) {
+    	try {
+    	if (isIconDisplayed()) {
             LOGGER.log(FINE, "Delete Build request");
             errors.clear();
             final String username = request.getParameter("username");
@@ -94,6 +95,12 @@ public class RequestDeleteBuildAction implements Action {
             mailSender.executeEmail();
             plugin.addRequest(new DeleteBuildRequest("deleteBuild", username, projectName, projectFullName, Integer.toString(buildNumber)));                   
         }
+    	} catch (NullPointerException e) {
+
+			LOGGER.log(Level.SEVERE, "Exception: " + e.getMessage());
+
+			return null;
+		} 
 
         return new HttpRedirect(request.getContextPath() + '/' + build.getUrl());
     }

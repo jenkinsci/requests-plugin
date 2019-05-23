@@ -12,14 +12,15 @@
     <artifactId>requests</artifactId>
     <packaging>hpi</packaging>
     <name>requests-plugin</name>
-    <version>2.0.1-SNAPSHOT</version>
+    <version>2.0.1</version>
     <url>http://wiki.jenkins-ci.org/display/JENKINS/Requests+Plugin</url>
     
     <scm>
 	  <connection>scm:git:ssh://github.com/jenkinsci/requests-plugin.git</connection>
 	  <developerConnection>scm:git:ssh://git@github.com/jenkinsci/requests-plugin.git</developerConnection>
 	  <url>https://github.com/jenkinsci/requests-plugin</url>
-	</scm>
+	  <tag>requests-2.0.1</tag>
+  </scm>
     <dependencies>
     	
 		<!-- https://mvnrepository.com/artifact/commons-codec/commons-codec -->
@@ -76,7 +77,7 @@
     									</goals>
     								</pluginExecutionFilter>
     								<action>
-    									<ignore></ignore>
+    									<ignore />
     								</action>
     							</pluginExecution>
     						</pluginExecutions>

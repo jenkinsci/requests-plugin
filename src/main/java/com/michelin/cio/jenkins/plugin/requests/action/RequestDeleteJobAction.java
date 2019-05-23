@@ -51,94 +51,101 @@ import java.util.logging.Logger;
 import static java.util.logging.Level.FINE;
 
 
- // Represents the "Request for deletion" action appearing on a given job's page.
- // @author Daniel Petisme <daniel.petisme@gmail.com> <http://danielpetisme.blogspot.com/>
+// Represents the "Request for deletion" action appearing on a given job's page.
+// @author Daniel Petisme <daniel.petisme@gmail.com> <http://danielpetisme.blogspot.com/>
 
 public class RequestDeleteJobAction implements Action {
 
 	private Job<?, ?> project;
 	private transient List<String> errors = new ArrayList<String>();
-    private static final Logger LOGGER = Logger.getLogger(RequestDeleteJobAction.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(RequestDeleteJobAction.class.getName());
 
 	public RequestDeleteJobAction(Job<?, ?> target) {
-        this.project = target;
-    }
-	
+		this.project = target;
+	}
+
 	public List<String> getErrors() {
-        return errors;
-    }
-    
-    public void setErrors(String errorString) {
-    	errors.clear();
-    	errors.add(errorString);
-    }
+		return errors;
+	}
 
-    public HttpResponse doCreateDeleteJobRequest(StaplerRequest request, StaplerResponse response) throws IOException, ServletException, MessagingException {
-        if (isIconDisplayed()) {
-            LOGGER.log(FINE, "Delete Job Request");
-            errors.clear();
-            final String username = request.getParameter("username");
-            RequestsPlugin plugin = Jenkins.getInstance().getPlugin(RequestsPlugin.class);
-            String[] projectList = null;
-            String projectName = project.getFullName();
-            String projectFullName = project.getFullName();
+	public void setErrors(String errorString) {
+		errors.clear();
+		errors.add(errorString);
+	}
 
-            // Check if a folder job type:
-            if (!projectFullName.contains("/job/") && projectFullName.contains("/")) {
-            	projectList = projectFullName.split("/");
-            	projectFullName = projectList[0] + "/job/" + projectList[1];
-            }
-            
-            RequestMailSender mailSender = new RequestMailSender(project.getName(), username, "A Delete Job", project.getAbsoluteUrl());
-            mailSender.executeEmail();
-            plugin.addRequest(new DeleteJobRequest("deleteJob", username, projectName, projectFullName, ""));                   
-        }
+	public HttpResponse doCreateDeleteJobRequest(StaplerRequest request, StaplerResponse response) throws IOException, ServletException, MessagingException {
+		try {
+			if (isIconDisplayed()) {
+				LOGGER.log(FINE, "Delete Job Request");
+				errors.clear();
+				final String username = request.getParameter("username");
+				RequestsPlugin plugin = Jenkins.getInstance().getPlugin(RequestsPlugin.class);
+				String[] projectList = null;
+				String projectName = project.getFullName();
+				String projectFullName = project.getFullName();
 
-        return new HttpRedirect(request.getContextPath() + '/' + project.getUrl());
-    }
+				// Check if a folder job type:
+				if (!projectFullName.contains("/job/") && projectFullName.contains("/")) {
+					projectList = projectFullName.split("/");
+					projectFullName = projectList[0] + "/job/" + projectList[1];
+				}
 
-    public String getDisplayName() {
-        if (isIconDisplayed()) {
-            return Messages.RequestDeleteJobAction_DisplayName().toString();
-        }
-        return null;
-    }
+				RequestMailSender mailSender = new RequestMailSender(project.getName(), username, "A Delete Job", project.getAbsoluteUrl());
+				mailSender.executeEmail();
+				plugin.addRequest(new DeleteJobRequest("deleteJob", username, projectName, projectFullName, ""));                   
+			}
 
-    public String getIconFileName() {
-        if (isIconDisplayed()) {
-            return "/images/24x24/edit-delete.png";
-        }
-        return null;
-    }
+		} catch (NullPointerException e) {
+			LOGGER.log(Level.SEVERE, "[ERROR] Exception: " + e.getMessage());
 
-    public Job<?, ?> getProject() {
-        return project;
-    }
+			return null;
+		} 
 
-    public String getUrlName() {
-        return "request-delete-job";
-    }
+		return new HttpRedirect(request.getContextPath() + '/' + project.getUrl());
+	}
 
-    /**
-     * Displays the icon when the user can configure and !delete.
-     */
-    private boolean isIconDisplayed() {
-        boolean isDisplayed = false;
-        try {
-            isDisplayed = hasConfigurePermission() && !hasDeletePermission();
-        } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "Impossible to know if the icon has to be displayed", e);
-        }
+	public String getDisplayName() {
+		if (isIconDisplayed()) {
+			return Messages.RequestDeleteJobAction_DisplayName().toString();
+		}
+		return null;
+	}
 
-        return isDisplayed;
-    }
+	public String getIconFileName() {
+		if (isIconDisplayed()) {
+			return "/images/24x24/edit-delete.png";
+		}
+		return null;
+	}
 
-    private boolean hasConfigurePermission() throws IOException, ServletException {
-        return Functions.hasPermission(project, Item.CONFIGURE);
-    }
+	public Job<?, ?> getProject() {
+		return project;
+	}
 
-    private boolean hasDeletePermission() throws IOException, ServletException {
-        return Functions.hasPermission(project, Item.DELETE);
-    }
-   
+	public String getUrlName() {
+		return "request-delete-job";
+	}
+
+	/**
+	 * Displays the icon when the user can configure and !delete.
+	 */
+	private boolean isIconDisplayed() {
+		boolean isDisplayed = false;
+		try {
+			isDisplayed = hasConfigurePermission() && !hasDeletePermission();
+		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, "Impossible to know if the icon has to be displayed", e);
+		}
+
+		return isDisplayed;
+	}
+
+	private boolean hasConfigurePermission() throws IOException, ServletException {
+		return Functions.hasPermission(project, Item.CONFIGURE);
+	}
+
+	private boolean hasDeletePermission() throws IOException, ServletException {
+		return Functions.hasPermission(project, Item.DELETE);
+	}
+
 }

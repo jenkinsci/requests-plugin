@@ -28,115 +28,125 @@ import hudson.model.Item;
 import jenkins.model.Jenkins;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
-import java.util.logging.Logger;
+import org.apache.commons.lang.time.FastDateFormat;
 
 
 
- // @author Daniel Petisme <daniel.petisme@gmail.com> <http://danielpetisme.blogspot.com/>
+// @author Daniel Petisme <daniel.petisme@gmail.com> <http://danielpetisme.blogspot.com/>
 
 public abstract class Request {
+
+
+	protected String requestType;
+	protected String username;
+	protected String project;
+	protected String projectFullName;
+	protected String buildNumber;
+	protected String errorMessage;
+	private String creationDate;
 	
-	//private static final Logger LOGGER = Logger.getLogger(Request.class.getName());
-
-    protected static final SimpleDateFormat DATE_FORMATER = new SimpleDateFormat(Messages.Request_dateFormat());
-    protected String requestType;
-    protected String username;
-    protected String project;
-    protected String projectFullName;
-    protected String buildNumber;
-    protected String errorMessage;
-    private String creationDate;
+	private static final Date TODAY = Calendar.getInstance().getTime();
+	private static final FastDateFormat yymmdd = FastDateFormat.getInstance("yyMMdd");
 
 
-    public Request(String requestType, String username, String project, String projectFullName, String buildNumber) {
-        this.requestType = requestType;
-    	this.username = username;
-        this.project = project;
-        this.projectFullName = projectFullName;
-        this.buildNumber = buildNumber;
-        this.creationDate = DATE_FORMATER.format(new Date());
-    }
+	public Request(String requestType, String username, String project, String projectFullName, String buildNumber) {
+		this.requestType = requestType;
+		this.username = username;
+		this.project = project;
+		this.projectFullName = projectFullName;
+		this.buildNumber = buildNumber;
+		this.creationDate = yymmdd.format(TODAY);
+	}
 
-    public String getProject() {       
-        return project;
-    }
-    
-    public String getProjectFullName() {
-    	String[] projectList = null;
-        if (!projectFullName.contains("/job/") && projectFullName.contains("/")) {
-        	projectList = projectFullName.split("/");
-        	projectFullName = projectList[0] + "/job/" + projectList[1];
-        } 
+	public String getProject() {       
+		return project;
+	}
 
-        return projectFullName;
-    }
+	public String getProjectFullName() {
+		String[] projectList = null;
+		if (!projectFullName.contains("/job/") && projectFullName.contains("/")) {
+			projectList = projectFullName.split("/");
+			projectFullName = projectList[0] + "/job/" + projectList[1];
+		} 
 
-    public String getRequestType() {
-    	return requestType;
-    }
-    
-    public String getUsername() {
-        return username;
-    }
-    
-    public String getBuildNumber() {
-    	return buildNumber;
-    }
+		return projectFullName;
+	}
 
-    public String getCreationDate() {
-        return creationDate;
-    }
+	public String getRequestType() {
+		return requestType;
+	}
 
-    public String getErrorMessage() {
-        return errorMessage;
-    }
+	public String getUsername() {
+		return username;
+	}
 
-    public abstract String getMessage();
+	public String getBuildNumber() {
+		return buildNumber;
+	}
 
-    public boolean process(String requestType) {
-        boolean success = false;  
-        String[] projectNameList = null;
-        String searchName = projectFullName;
-        
-        // Check if a folder job type:
-        if (searchName.contains("/job/")) {
-        	projectNameList = searchName.split("/job/");
-        	searchName = projectNameList[0] + "/" + projectNameList[1];
-        }
-        
-        Item item = Jenkins.getInstance().getItemByFullName(searchName);
+	public String getCreationDate() {
+		return creationDate;
+	}
 
-        if (item != null) {
-            success = execute(item);
-        } else {
-        	if (requestType.equals("deleteJob")) {
-        		errorMessage = "The job " + projectFullName + " doesn't exist";
-        	} else {
-        		errorMessage = "The build for " + projectFullName + " doesn't exist";
-        	}            
-        }
+	public String getErrorMessage() {
+		return errorMessage;
+	}
 
-        return success;
-    }
+	public abstract String getMessage();
 
-    public abstract boolean execute(Item item);
+	public boolean process(String requestType) {
+		boolean success = false;  
+		String[] projectNameList = null;
+		String searchName = projectFullName;
+		
+		try {
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final Request other = (Request) obj;
-        if ((this.username == null) ? (other.username != null) : !this.username.equals(other.username)) {
-            return false;
-        }
-        if ((this.projectFullName == null) ? (other.projectFullName != null) : !this.projectFullName.equals(other.projectFullName)) {
-            return false;
-        }
-        return true;
-    }
+		// Check if a folder job type:
+		if (searchName.contains("/job/")) {
+			projectNameList = searchName.split("/job/");
+			searchName = projectNameList[0] + "/" + projectNameList[1];
+		}
+
+		Item item = Jenkins.getInstance().getItemByFullName(searchName);
+
+		if (item != null) {
+			success = execute(item);
+		} else {
+			if (requestType.equals("deleteJob")) {
+				errorMessage = "The job " + projectFullName + " doesn't exist";
+			} else {
+				errorMessage = "The build for " + projectFullName + " doesn't exist";
+			}            
+		}
+		
+		} catch (NullPointerException e) {
+			errorMessage = e.getMessage();
+
+			return false;
+		} 
+
+		return success;
+	}
+
+	public abstract boolean execute(Item item);
+
+/*	//@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final Request other = (Request) obj;
+		if ((this.username == null) ? (other.username != null) : !this.username.equals(other.username)) {
+			return false;
+		}
+		if ((this.projectFullName == null) ? (other.projectFullName != null) : !this.projectFullName.equals(other.projectFullName)) {
+			return false;
+		}
+		return true;
+	}*/
 }

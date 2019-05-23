@@ -122,7 +122,7 @@ public class RequestsUtility {
 			httpsURLConnection.setRequestProperty("Authorization", basicAuth);
 
 			InputStream inputStream = httpsURLConnection.getInputStream();
-			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
 			StringBuilder out = new StringBuilder();
 			String line;
 
