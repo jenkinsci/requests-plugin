@@ -16,7 +16,7 @@
     <url>http://wiki.jenkins-ci.org/display/JENKINS/Requests+Plugin</url>
     
     <scm>
-	  <connection>scm:git:ssh://github.com/jenkinsci/requests-plugin.git</connection>
+	  <connection>scm:git:git:@github.com/jenkinsci/requests-plugin.git</connection>
 	  <developerConnection>scm:git:ssh://git@github.com/jenkinsci/requests-plugin.git</developerConnection>
 	  <url>https://github.com/jenkinsci/requests-plugin</url>
 	  <tag>requests-2.0.2</tag>
