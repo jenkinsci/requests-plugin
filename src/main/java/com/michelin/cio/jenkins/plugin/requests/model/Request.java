@@ -27,7 +27,6 @@ package com.michelin.cio.jenkins.plugin.requests.model;
 import hudson.model.Item;
 import jenkins.model.Jenkins;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import org.apache.commons.lang.time.FastDateFormat;
@@ -132,7 +131,7 @@ public abstract class Request {
 
 	public abstract boolean execute(Item item);
 
-/*	//@Override
+/*	@Override
 	public boolean equals(Object obj) {
 		if (obj == null) {
 			return false;
