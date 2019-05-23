@@ -38,16 +38,16 @@
   	</dependencies>
     <developers>
         <developer>
-            <id>danielpetisme</id>
-            <name>Daniel Petisme</name>
-            <email>daniel.petisme@gmail.com</email>
-            <timezone>+1</timezone>
-        </developer>
-        <developer>
             <id>johnflynn</id>
             <name>John Flynn</name>
             <email>john.flynn@lexmark.com</email>
             <timezone>-5</timezone>
+        </developer>
+        <developer>
+            <id>danielpetisme</id>
+            <name>Daniel Petisme</name>
+            <email>daniel.petisme@gmail.com</email>
+            <timezone>+1</timezone>
         </developer>
     </developers>
     <build>
