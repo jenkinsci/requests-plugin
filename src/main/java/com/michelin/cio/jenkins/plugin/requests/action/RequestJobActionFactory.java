@@ -28,7 +28,9 @@ package com.michelin.cio.jenkins.plugin.requests.action;
 import hudson.Extension;
 import hudson.model.AbstractProject;
 import hudson.model.Action;
+import hudson.model.Job;
 import hudson.model.TransientProjectActionFactory;
+import jenkins.model.TransientActionFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -41,10 +43,10 @@ import java.util.List;
 // @author Daniel Petisme <daniel.petisme@gmail.com> <http://danielpetisme.blogspot.com/>
 
 @Extension
-public class RequestJobActionFactory extends TransientProjectActionFactory {
+public class RequestJobActionFactory extends TransientActionFactory<Job> {
 	
     @Override
-    public Collection<? extends Action> createFor(AbstractProject target) {
+    public Collection<? extends Action> createFor(Job target) {
     	RequestMailSender.DescriptorEmailImpl descriptorEmailImpl = new RequestMailSender.DescriptorEmailImpl();
         List<Action> adminActions = new ArrayList<Action>();
 
@@ -55,5 +57,10 @@ public class RequestJobActionFactory extends TransientProjectActionFactory {
 
         return adminActions;
     }
+
+	@Override
+	public Class<Job> type() {
+		return Job.class;
+	}
 
 }

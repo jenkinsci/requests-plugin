@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.logging.Level;
 import hudson.model.Run;
 import jenkins.model.Jenkins;
-import hudson.model.AbstractBuild;
 import hudson.model.Action;
 import org.kohsuke.stapler.HttpRedirect;
 import org.kohsuke.stapler.HttpResponse;
@@ -53,96 +52,108 @@ import static java.util.logging.Level.FINE;
 
 public class RequestDeleteBuildAction implements Action {
 
-	private AbstractBuild<?, ?> build;
+	private Run<?, ?> build;
 	private transient List<String> errors = new ArrayList<String>();
-    private static final Logger LOGGER = Logger.getLogger(RequestDeleteBuildAction.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(RequestDeleteBuildAction.class.getName());
 
-	public RequestDeleteBuildAction(AbstractBuild<?, ?> target) {
-        this.build = target;
-    }
-	
+	public RequestDeleteBuildAction(Run<?, ?> target) {
+		this.build = target;
+	}
+
 	public List<String> getErrors() {
-        return errors;
-    }
-    
-    public void setErrors(String errorString) {
-    	errors.clear();
-    	errors.add(errorString);
-    }
+		return errors;
+	}
 
-    public HttpResponse doCreateDeleteBuildRequest(StaplerRequest request, StaplerResponse response) throws IOException, ServletException, MessagingException {
-    	try {
-    	if (isIconDisplayed()) {
-            LOGGER.log(FINE, "Delete Build request");
-            errors.clear();
-            final String username = request.getParameter("username");
-            RequestsPlugin plugin = Jenkins.getInstance().getPlugin(RequestsPlugin.class);
-            String[] projectNameList = null;
-            String projectName = build.getProject().getDisplayName();
-            String buildName = build.getDisplayName();
-            String projectFullName = build.getProject().getFullName();
-            int buildNumber = build.getNumber();
+	public void setErrors(String errorString) {
+		errors.clear();
+		errors.add(errorString);
+	}
 
-            // Check if a folder job type:
-            if (!projectFullName.contains("/job/") && projectFullName.contains("/")) {
-            	projectNameList = projectFullName.split("/");
-            	projectFullName = projectNameList[0] + "/job/" + projectNameList[1];
-            }
-            
-            String jenkinsUrl = Jenkins.getInstance().getRootUrl();
-            String buildUrl = jenkinsUrl + build.getUrl();
-            RequestMailSender mailSender = new RequestMailSender(buildName, username, "A Delete Build", buildUrl);
-            mailSender.executeEmail();
-            plugin.addRequest(new DeleteBuildRequest("deleteBuild", username, projectName, projectFullName, Integer.toString(buildNumber)));                   
-        }
-    	} catch (NullPointerException e) {
+	public HttpResponse doCreateDeleteBuildRequest(StaplerRequest request, StaplerResponse response) throws IOException, ServletException, MessagingException {
+		try {
+			if (isIconDisplayed()) {
+				LOGGER.log(FINE, "Delete Build request");
+				errors.clear();
+				final String username = request.getParameter("username");
+				RequestsPlugin plugin = Jenkins.getInstance().getPlugin(RequestsPlugin.class);
+				String[] projectNameList = null;
+				String buildName = build.getDisplayName();
+				String projectFullName;
+				String projectName;
+				int buildNumber = build.getNumber();
+				String fullDisplayName = build.getFullDisplayName();
+				String[] namesList = null;
+
+				// Need to exract the job name:
+				if (fullDisplayName.contains(" » ")) {
+					namesList = fullDisplayName.split(" ");
+					projectFullName = namesList[0] + "/" + namesList[2];
+				} else {
+					projectFullName = fullDisplayName.split(" #")[0];
+				}
+
+				projectName = projectFullName;
+
+				// Check if a folder job type:
+				if (!projectFullName.contains("/job/") && projectFullName.contains("/")) {
+					projectNameList = projectFullName.split("/");
+					projectFullName = projectNameList[0] + "/job/" + projectNameList[1];
+				}
+
+				String jenkinsUrl = Jenkins.getInstance().getRootUrl();
+				String buildUrl = jenkinsUrl + build.getUrl();
+				RequestMailSender mailSender = new RequestMailSender(buildName, username, "A Delete Build", buildUrl);
+				mailSender.executeEmail();
+				plugin.addRequest(new DeleteBuildRequest("deleteBuild", username, projectName, projectFullName, Integer.toString(buildNumber)));                   
+			}
+		} catch (NullPointerException e) {
 
 			LOGGER.log(Level.SEVERE, "Exception: " + e.getMessage());
 
 			return null;
 		} 
 
-        return new HttpRedirect(request.getContextPath() + '/' + build.getUrl());
-    }
+		return new HttpRedirect(request.getContextPath() + '/' + build.getUrl());
+	}
 
-    public String getDisplayName() {
-        if (isIconDisplayed()) {
-            return Messages.RequestDeleteBuildAction_DisplayName().toString();
-        }
-        return null;
-    }
+	public String getDisplayName() {
+		if (isIconDisplayed()) {
+			return Messages.RequestDeleteBuildAction_DisplayName().toString();
+		}
+		return null;
+	}
 
-    public String getIconFileName() {
-        if (isIconDisplayed()) {
-            return "/images/24x24/edit-delete.png";
-        }
-        return null;
-    }
+	public String getIconFileName() {
+		if (isIconDisplayed()) {
+			return "/images/24x24/edit-delete.png";
+		}
+		return null;
+	}
 
-    public AbstractBuild<?, ?> getBuild() {
-        return build;
-    }
+	public Run<?, ?> getBuild() {
+		return build;
+	}
 
-    public String getUrlName() {
-        return "request-delete-build";
-    }
+	public String getUrlName() {
+		return "request-delete-build";
+	}
 
-    /**
-     * Displays the icon when the user can configure and !delete.
-     */
-    private boolean isIconDisplayed() {
-        boolean isDisplayed = false;
-        try {
-            isDisplayed = !hasDeletePermission();
-        } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "Impossible to know if the icon has to be displayed", e);
-        }
+	/**
+	 * Displays the icon when the user can configure and !delete.
+	 */
+	private boolean isIconDisplayed() {
+		boolean isDisplayed = false;
+		try {
+			isDisplayed = !hasDeletePermission();
+		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, "Impossible to know if the icon has to be displayed", e);
+		}
 
-        return isDisplayed;
-    }
+		return isDisplayed;
+	}
 
-    private boolean hasDeletePermission() throws IOException, ServletException {
-        return Functions.hasPermission(Run.DELETE);
-    }
-   
+	private boolean hasDeletePermission() throws IOException, ServletException {
+		return Functions.hasPermission(Run.DELETE);
+	}
+
 }

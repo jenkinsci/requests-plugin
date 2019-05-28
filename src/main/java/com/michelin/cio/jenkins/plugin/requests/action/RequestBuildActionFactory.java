@@ -27,6 +27,7 @@ package com.michelin.cio.jenkins.plugin.requests.action;
 import hudson.Extension;
 import hudson.model.AbstractBuild;
 import hudson.model.Action;
+import hudson.model.Run;
 import jenkins.model.TransientActionFactory;
 
 import java.util.ArrayList;
@@ -37,14 +38,14 @@ import java.util.List;
 // @author John Flynn <john.trixmot.flynn@gmail.com>
 
 @Extension
-public class RequestBuildActionFactory extends TransientActionFactory<AbstractBuild> {
+public class RequestBuildActionFactory extends TransientActionFactory<Run> {
 
 	
-    @Override public Class<AbstractBuild> type() {
-        return AbstractBuild.class;
+    @Override public Class<Run> type() {
+        return Run.class;
     }
 
-    public Collection<? extends Action> createFor(AbstractBuild target) {
+    public Collection<? extends Action> createFor(Run target) {
     	RequestMailSender.DescriptorEmailImpl descriptorEmailImpl = new RequestMailSender.DescriptorEmailImpl();
         List<Action> adminActions = new ArrayList<Action>();
 

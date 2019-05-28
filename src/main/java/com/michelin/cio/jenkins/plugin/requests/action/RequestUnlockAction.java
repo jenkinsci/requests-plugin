@@ -25,7 +25,6 @@ package com.michelin.cio.jenkins.plugin.requests.action;
 
 
 import hudson.Functions;
-import hudson.model.AbstractBuild;
 import hudson.model.Action;
 import hudson.model.Run;
 import jenkins.model.Jenkins;
@@ -52,9 +51,9 @@ import static java.util.logging.Level.FINE;
 public class RequestUnlockAction implements Action {
 	public static final Logger LOGGER = Logger.getLogger(RequestUnlockAction.class.getName());
 	private transient List<String> errors = new ArrayList<String>();
-	private AbstractBuild<?, ?> build;
+	private Run<?, ?> build;
 
-	public RequestUnlockAction(AbstractBuild<?, ?> target) {
+	public RequestUnlockAction(Run<?, ?> target) {
 		this.build = target;
 	}
 
@@ -72,19 +71,31 @@ public class RequestUnlockAction implements Action {
 			if (isIconDisplayed()) {
 				LOGGER.log(FINE, "Unlock Build Request");
 				errors.clear();
-				final String username = request.getParameter("username");
-				RequestsPlugin plugin = Jenkins.getInstance().getPlugin(RequestsPlugin.class);
-				String[] projectNameList = null;
-				String projectName = build.getProject().getDisplayName();
-				String buildName = build.getDisplayName();
-				String projectFullName = build.getProject().getFullName();
-				int buildNumber = build.getNumber();
-
-				// Check if a folder job type:
-				if (!projectFullName.contains("/job/") && projectFullName.contains("/")) {
-					projectNameList = projectFullName.split("/");
-					projectFullName = projectNameList[0] + "/job/" + projectNameList[1];
-				}
+	            final String username = request.getParameter("username");
+	            RequestsPlugin plugin = Jenkins.getInstance().getPlugin(RequestsPlugin.class);
+	            String[] projectNameList = null;
+	            String buildName = build.getDisplayName();
+	            String projectFullName;
+	            String projectName;
+	            int buildNumber = build.getNumber();
+	            String fullDisplayName = build.getFullDisplayName();
+	            String[] namesList = null;
+	            
+	            // Need to exract the job name:
+	            if (fullDisplayName.contains(" » ")) {
+	            	namesList = fullDisplayName.split(" ");
+	            	projectFullName = namesList[0] + "/" + namesList[2];
+	            	projectName = namesList[2];
+	            } else {
+	            	projectFullName = fullDisplayName.split(" #")[0];
+	            	projectName = projectFullName;
+	            }
+	                      
+	            // Check if a folder job type:
+	            if (!projectFullName.contains("/job/") && projectFullName.contains("/")) {
+	            	projectNameList = projectFullName.split("/");
+	            	projectFullName = projectNameList[0] + "/job/" + projectNameList[1];
+	            }
 
 				String jenkinsUrl = Jenkins.getInstance().getRootUrl();
 				String buildUrl = jenkinsUrl + build.getUrl();
@@ -116,7 +127,7 @@ public class RequestUnlockAction implements Action {
 		return null;
 	}
 
-	public AbstractBuild<?, ?> getBuild() {
+	public Run<?, ?> getBuild() {
 		return build;
 	}
 

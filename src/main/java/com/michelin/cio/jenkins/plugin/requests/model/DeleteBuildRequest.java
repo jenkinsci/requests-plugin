@@ -69,7 +69,7 @@ public class DeleteBuildRequest extends Request {
 					success = requestsUtility.runPostMethod(jenkinsURL, urlString);
 				} catch (IOException e) {
 					errorMessage = e.getMessage();
-					LOGGER.log(Level.SEVERE, "Unable to Unlock the build " + projectFullName + ":" + buildNumber, e.getMessage());
+					LOGGER.log(Level.SEVERE, "Unable to Delete the build " + projectFullName + ":" + buildNumber, e.getMessage());
 					
 					return false;
 				}
