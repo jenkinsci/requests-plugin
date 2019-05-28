@@ -46,8 +46,8 @@ public abstract class Request {
 	protected String errorMessage;
 	private String creationDate;
 	
-	private static final Date TODAY = Calendar.getInstance().getTime();
-	private static final FastDateFormat yymmdd = FastDateFormat.getInstance("yyMMdd");
+	private static String dateFormat="yyyy-MM-dd HH:mm:ss";
+	private static final FastDateFormat yyyymmdd = FastDateFormat.getInstance(dateFormat);
 
 
 	public Request(String requestType, String username, String project, String projectFullName, String buildNumber) {
@@ -56,7 +56,7 @@ public abstract class Request {
 		this.project = project;
 		this.projectFullName = projectFullName;
 		this.buildNumber = buildNumber;
-		this.creationDate = yymmdd.format(TODAY);
+		this.creationDate = yyyymmdd.format(Calendar.getInstance().getTime());
 	}
 
 	public String getProject() {       

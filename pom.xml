@@ -44,12 +44,6 @@
             <email>john.flynn@lexmark.com</email>
             <timezone>-5</timezone>
         </developer>
-        <developer>
-            <id>danielpetisme</id>
-            <name>Daniel Petisme</name>
-            <email>daniel.petisme@gmail.com</email>
-            <timezone>+1</timezone>
-        </developer>
     </developers>
     <build>
     	<pluginManagement>
