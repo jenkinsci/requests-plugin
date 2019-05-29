@@ -41,6 +41,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
@@ -70,7 +71,7 @@ public class RequestMailSender extends Builder{
 
 	private static final Logger LOGGER = Logger.getLogger(RequestMailSender.class.getName());    
 
-	@DataBoundConstructor
+	//@DataBoundConstructor
 	public RequestMailSender(String itemName, String userName, String requestType, String projectURL) {
 		this.itemName = itemName;
 		this.userName = userName;
@@ -244,7 +245,7 @@ public class RequestMailSender extends Builder{
 		private boolean enableUnlockBuild;
 		private boolean enableEmails;
 
-
+		@DataBoundConstructor
 		public DescriptorEmailImpl() {
 			super(RequestMailSender.class);
 			load();
@@ -314,6 +315,7 @@ public class RequestMailSender extends Builder{
 			return enableEmails;
 		}
 
+		@DataBoundSetter
 		public void setEnableDeleteJob(boolean enableDeleteJob) {
 			this.enableDeleteJob = enableDeleteJob;
 		}

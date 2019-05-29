@@ -31,8 +31,6 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.http.client.ClientProtocolException;
-
 
 // Represents a build deletion request sent by a user to Jenkins' administrator.
 // @author John Flynn <john.trixmot.flynn@gmail.com>

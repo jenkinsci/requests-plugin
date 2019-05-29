@@ -131,21 +131,4 @@ public abstract class Request {
 
 	public abstract boolean execute(Item item);
 
-/*	@Override
-	public boolean equals(Object obj) {
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		final Request other = (Request) obj;
-		if ((this.username == null) ? (other.username != null) : !this.username.equals(other.username)) {
-			return false;
-		}
-		if ((this.projectFullName == null) ? (other.projectFullName != null) : !this.projectFullName.equals(other.projectFullName)) {
-			return false;
-		}
-		return true;
-	}*/
 }

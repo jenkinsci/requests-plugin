@@ -56,6 +56,7 @@ public class DeleteJobRequest extends Request {
 				try {
 					item.delete();
 					success = true;
+					errorMessage = "The Job " + item.getFullName() + " has been properly Deleted";
 					LOGGER.log(Level.INFO, "The job {0} has been properly deleted", item.getFullName());
 				} catch (IOException e) {
 					errorMessage = e.getMessage();

@@ -5,7 +5,7 @@ Jenkins Requests Plugin
 Request Delete plugin
 ===============================
 Copyright &copy; 2011-2012, Manufacture Française des Pneumatiques Michelin, Daniel Petisme
-Portions Copyright 2019 Lexmark
+<br>Portions Copyright 2019 Lexmark
 
 About this plugin
 -----------------

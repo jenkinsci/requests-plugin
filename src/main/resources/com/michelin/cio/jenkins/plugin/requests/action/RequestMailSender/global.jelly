@@ -27,8 +27,8 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
          xmlns:t="/lib/hudson" xmlns:f="/lib/form">
 	<f:section title="${%GlobalSectionTitle}" name="globalRequests">
-		<f:entry title="${%EnableDeleteJob}" field="enableDeleteJob" description="${%DeleteJobOption}">
-  		<f:checkbox default="true" />
+		<f:entry title="${%EnableDeleteJob}" field="enableDeleteJob" default="true" description="${%DeleteJobOption}">
+  		<f:checkbox />
 		</f:entry>
 		<f:entry title="${%EnableDeleteBuild}" field="enableDeleteBuild" description="${%DeleteBuildOption}">
   		<f:checkbox/>
