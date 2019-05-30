@@ -28,13 +28,16 @@
          xmlns:t="/lib/hudson" xmlns:f="/lib/form">
 	<f:section title="${%GlobalSectionTitle}" name="globalRequests">
 		<f:entry title="${%EnableDeleteJob}" field="enableDeleteJob" default="true" description="${%DeleteJobOption}">
-  		<f:checkbox />
+  			<f:checkbox />
 		</f:entry>
 		<f:entry title="${%EnableDeleteBuild}" field="enableDeleteBuild" description="${%DeleteBuildOption}">
-  		<f:checkbox/>
+  			<f:checkbox/>
 		</f:entry>
 		<f:entry title="${%EnableUnlockBuild}" field="enableUnlockBuild" description="${%UnlockBuildOption}">
-  		<f:checkbox/>
+  			<f:checkbox/>
+		</f:entry>
+		<f:entry title="${%EnableRenameJob}" field="enableRenameJob" description="${%RenameJobOption}">
+  			<f:checkbox/>
 		</f:entry>
 		<f:entry title="${%Unlock User}" field="unlockuser" description="${%UnlockUser}">
             <f:textbox />

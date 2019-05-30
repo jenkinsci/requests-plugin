@@ -54,6 +54,11 @@ public class RequestJobActionFactory extends TransientActionFactory<Job> {
         if (descriptorEmailImpl.isEnableDeleteJob()) {
         	adminActions.add(new RequestDeleteJobAction(target));
         }
+        
+        //Note: that a restart is required after making a change since this is loaded at start up time:
+        if (descriptorEmailImpl.isEnableRenameJob()) {
+        	adminActions.add(new RequestRenameAction(target));
+        }
 
         return adminActions;
     }

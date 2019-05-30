@@ -243,6 +243,7 @@ public class RequestMailSender extends Builder{
 		private boolean enableDeleteJob;
 		private boolean enableDeleteBuild;
 		private boolean enableUnlockBuild;
+		private boolean enableRenameJob;
 		private boolean enableEmails;
 
 		@DataBoundConstructor
@@ -310,6 +311,10 @@ public class RequestMailSender extends Builder{
 		public boolean isEnableUnlockBuild() {
 			return enableUnlockBuild;
 		}
+		
+		public boolean isEnableRenameJob() {
+			return enableRenameJob;
+		}
 
 		public boolean isEnableEmails(){
 			return enableEmails;
@@ -326,6 +331,11 @@ public class RequestMailSender extends Builder{
 
 		public void setEnableUnlockBuild(boolean enableUnlockBuild) {
 			this.enableUnlockBuild = enableUnlockBuild;
+		}
+		
+		@DataBoundSetter
+		public void setEnableRenameJob(boolean enableRenameJob) {
+			this.enableRenameJob = enableRenameJob;
 		}
 
 		public void setEnableEmails(boolean enableEmails){

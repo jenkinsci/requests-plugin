@@ -26,6 +26,7 @@ package com.michelin.cio.jenkins.plugin.requests;
 
 import com.michelin.cio.jenkins.plugin.requests.model.DeleteBuildRequest;
 import com.michelin.cio.jenkins.plugin.requests.model.DeleteJobRequest;
+import com.michelin.cio.jenkins.plugin.requests.model.RenameRequest;
 import com.michelin.cio.jenkins.plugin.requests.model.Request;
 import com.michelin.cio.jenkins.plugin.requests.model.UnlockRequest;
 
@@ -170,6 +171,7 @@ public class RequestsPlugin extends Plugin {
         Hudson.XSTREAM.alias("UnlockRequest", UnlockRequest.class);
         Hudson.XSTREAM.alias("DeleteJobRequest", DeleteJobRequest.class);
         Hudson.XSTREAM.alias("DeleteBuildRequest", DeleteBuildRequest.class);
+        Hudson.XSTREAM.alias("RenameRequest", RenameRequest.class);
         Hudson.XSTREAM.alias("RequestsPlugin", RequestsPlugin.class);
 
         load();

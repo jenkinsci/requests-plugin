@@ -28,7 +28,6 @@ import hudson.model.Item;
 import jenkins.model.Jenkins;
 
 import java.util.Calendar;
-import java.util.Date;
 import org.apache.commons.lang.time.FastDateFormat;
 
 
@@ -113,7 +112,7 @@ public abstract class Request {
 		if (item != null) {
 			success = execute(item);
 		} else {
-			if (requestType.equals("deleteJob")) {
+			if (requestType.equals("deleteJob") || requestType.equals("renameJob")) {
 				errorMessage = "The job " + projectFullName + " doesn't exist";
 			} else {
 				errorMessage = "The build for " + projectFullName + " doesn't exist";

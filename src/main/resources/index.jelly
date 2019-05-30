@@ -26,5 +26,5 @@
 <?jelly escape-by-default='true'?>
 <div>
     This plugin sets up a request center for non-admin users to be able to ask
-    that their job or build to be deleted or a build to be unlocked.
+    that their job to be deleted or renamed, or a build to be deleted or unlocked.
 </div>
