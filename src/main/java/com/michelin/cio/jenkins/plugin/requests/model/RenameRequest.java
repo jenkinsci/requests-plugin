@@ -34,57 +34,61 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
- // Represents a renaming request sent by a user to the administrator.
- //
- // @author Daniel Petisme <daniel.petisme@gmail.com> <http://danielpetisme.blogspot.com/>
- //
+// Represents a renaming request sent by a user to the administrator.
+//
+// @author Daniel Petisme <daniel.petisme@gmail.com> <http://danielpetisme.blogspot.com/>
+//
 public class RenameRequest extends Request {
 
-    private String newName;
+	private String newName;
 
-    public RenameRequest(String requestType, String username, String project, String projectFullName, String newName) {
-    	super(requestType, username, project, projectFullName, newName);
-        this.newName = newName;
-    }
+	public RenameRequest(String requestType, String username, String project, String projectFullName, String newName) {
+		super(requestType, username, project, projectFullName, newName);
+		this.newName = newName;
+	}
 
-    @Override
-    public String getMessage() {
-    	String[] projectList = null;
-    	String fullNewName = newName;
-    	if (project.contains("/")) {
-    		projectList = project.split("/");
-    		fullNewName = projectList[0] + "/" + newName;
-    	}
-        return Messages.RenameRequest_message(project, fullNewName).toString();
-    }
+	@Override
+	public String getMessage() {
+		String[] projectList = null;
+		String fullNewName = newName;
+		if (project.contains("/")) {
+			projectList = project.split("/");
+			fullNewName = projectList[0] + "/" + newName;
+		}
+		return Messages.RenameRequest_message(project, fullNewName).toString();
+	}
 
-    public String getNewName() {
-        return newName;
-    }
+	public String getNewName() {
+		return newName;
+	}
 
-    @Override
-    public boolean execute(Item item) {
-        boolean success = false;
+	@Override
+	public boolean execute(Item item) {
+		boolean success = false;
 
-        if (Jenkins.getInstance().hasPermission(Item.DELETE) && Jenkins.getInstance().hasPermission(Item.CREATE)) {
-            try {
-                ((Job) item).renameTo(newName);
-                success = true;
-                LOGGER.log(Level.INFO, "The jobs {0} has been properly renamed in {1}", new Object[]{item.getName(), newName});
-            } catch (IOException e) {
-                errorMessage = e.getMessage();
-                LOGGER.log(Level.SEVERE, "Impossible to rename the job " + item.getName(), e);
-            } catch (IllegalArgumentException e) {
-                errorMessage = e.getMessage();
-                LOGGER.log(Level.SEVERE, "Impossible to rename the job " + item.getName(), e);
-            }
-        } else {
-            errorMessage = "The current user " + username + " has no permission to rename the job";
-            LOGGER.log(Level.FINE, "The current user {0} has no permission to RENAME the job", new Object[]{username});
-        }
+		try {
+			if (Jenkins.getInstance().hasPermission(Item.DELETE) && Jenkins.getInstance().hasPermission(Item.CREATE)) {				
+				((Job) item).renameTo(newName);
+				success = true;
+				LOGGER.log(Level.INFO, "The jobs {0} has been properly renamed in {1}", new Object[]{item.getName(), newName});
 
-        return success;
-    }
-    private static final Logger LOGGER = Logger.getLogger(RenameRequest.class.getName());
+			} else {
+				errorMessage = "The current user " + username + " has no permission to rename the job";
+				LOGGER.log(Level.FINE, "The current user {0} has no permission to RENAME the job", new Object[]{username});
+			}
+		} catch (NullPointerException e) {
+			errorMessage = e.getMessage();
+			LOGGER.log(Level.SEVERE, "Unable to rename the job " + item.getName(), e.getMessage());
+		}  catch (IOException e) {
+			errorMessage = e.getMessage();
+			LOGGER.log(Level.SEVERE, "Unable to rename the job " + item.getName(), e.getMessage());
+		} catch (IllegalArgumentException e) {
+			errorMessage = e.getMessage();
+			LOGGER.log(Level.SEVERE, "Unable to rename the job " + item.getName(), e.getMessage());
+		}
+
+		return success;
+	}
+	private static final Logger LOGGER = Logger.getLogger(RenameRequest.class.getName());
 
 }

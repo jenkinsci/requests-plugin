@@ -46,103 +46,109 @@ import java.util.logging.Logger;
 import static java.util.logging.Level.FINE;
 
 
- // Represents the "Ask for renaming" action appearing on a given project's page.
- //
- // @author Daniel Petisme <daniel.petisme@gmail.com> <http://danielpetisme.blogspot.com/>
- //
+// Represents the "Ask for renaming" action appearing on a given project's page.
+//
+// @author Daniel Petisme <daniel.petisme@gmail.com> <http://danielpetisme.blogspot.com/>
+//
 public class RequestRenameAction implements Action {
 
-    private Job<?, ?> project;
+	private Job<?, ?> project;
 
-    public RequestRenameAction(Job<?, ?> target) {
-        this.project = target;
-    }
+	public RequestRenameAction(Job<?, ?> target) {
+		this.project = target;
+	}
 
-    public HttpResponse doCreateRenameRequest(StaplerRequest request, StaplerResponse response) throws IOException, ServletException {
-        if (isIconDisplayed()) {
-            LOGGER.log(FINE, "Renaming request");
+	public HttpResponse doCreateRenameRequest(StaplerRequest request, StaplerResponse response) throws IOException, ServletException {
+		try {
+			if (isIconDisplayed()) {
+				LOGGER.log(FINE, "Renaming request");
 
-            final String newName = request.getParameter("new-name");
-            final String username = request.getParameter("username");
+				final String newName = request.getParameter("new-name");
+				final String username = request.getParameter("username");
 
-            RequestsPlugin plugin = Jenkins.getInstance().getPlugin(RequestsPlugin.class);
-            String[] projectList = null;
-			String projectName = project.getFullName();
-			String projectFullName = project.getFullName();
+				RequestsPlugin plugin = Jenkins.getInstance().getPlugin(RequestsPlugin.class);
+				String[] projectList = null;
+				String projectName = project.getFullName();
+				String projectFullName = project.getFullName();
 
-			// Check if a folder job type:
-			if (!projectFullName.contains("/job/") && projectFullName.contains("/")) {
-				projectList = projectFullName.split("/");
-				projectFullName = projectList[0] + "/job/" + projectList[1];
+				// Check if a folder job type:
+				if (!projectFullName.contains("/job/") && projectFullName.contains("/")) {
+					projectList = projectFullName.split("/");
+					projectFullName = projectList[0] + "/job/" + projectList[1];
+				}
+
+				//String requestType, String username, String project, String projectFullName, String buildNumber
+				plugin.addRequest(new RenameRequest( "renameJob",  username,  projectName,  projectFullName,  newName));
+				LOGGER.log(Level.INFO, "The request to rename the jobs {0} in {1} has been sent to the administrator", new Object[]{project.getName(), newName});
 			}
-            
-            //String requestType, String username, String project, String projectFullName, String buildNumber
-            plugin.addRequest(new RenameRequest( "renameJob",  username,  projectName,  projectFullName,  newName));
-            LOGGER.log(Level.INFO, "The request to rename the jobs {0} in {1} has been sent to the administrator", new Object[]{project.getName(), newName});
-        }
+		} catch (NullPointerException e) {
+			LOGGER.log(Level.SEVERE, "[ERROR] Exception: " + e.getMessage());
 
-        return new HttpRedirect(request.getContextPath() + '/' + project.getUrl());
-    }
+			return null;
+		} 
 
-    public String getDisplayName() {
-        if (isIconDisplayed()) {
-            return Messages.RequestRenameAction_DisplayName().toString();
-        }
-        return null;
-    }
+		return new HttpRedirect(request.getContextPath() + '/' + project.getUrl());
+	}
 
-    public String getIconFileName() {
-        if (isIconDisplayed()) {
-            return "/images/24x24/setting.png";
-        }
-        return null;
-    }
+	public String getDisplayName() {
+		if (isIconDisplayed()) {
+			return Messages.RequestRenameAction_DisplayName().toString();
+		}
+		return null;
+	}
 
-    public Job<?, ?> getProject() {
-        return project;
-    }
+	public String getIconFileName() {
+		if (isIconDisplayed()) {
+			return "/images/24x24/setting.png";
+		}
+		return null;
+	}
 
-    public String getUrlName() {
-        return "request-rename";
-    }
+	public Job<?, ?> getProject() {
+		return project;
+	}
 
-    /*
-     * Permission computing
-     * 1: The user has the permission
-     * 0: The user has not the permission
-     * 
-     * Create    | 1 | 0 | 
-     * Delete    | 0 | 1 | 
-     * Configure | 0 | 0 | 
-     * 
-     * So, the action has to be enabled when:
-     * Create AND !Delete AND !Configure OR
-     * Delete AND !Create AND !Configure
-     */
-    private boolean isIconDisplayed() {
-        boolean isDisplayed = false;
-        try {
-            isDisplayed = ((hasCreatePermission() && !hasDeletePermission() && !hasConfigurePermission()) || (hasDeletePermission() && !hasCreatePermission() && !hasConfigurePermission()));
+	public String getUrlName() {
+		return "request-rename";
+	}
 
-        } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "Impossible to know if the icon has to be displayed", e);
-        }
-        
-        return isDisplayed;
-    }
+	/*
+	 * Permission computing
+	 * 1: The user has the permission
+	 * 0: The user has not the permission
+	 * 
+	 * Create    | 1 | 0 | 
+	 * Delete    | 0 | 1 | 
+	 * Configure | 0 | 0 | 
+	 * 
+	 * So, the action has to be enabled when:
+	 * Create AND !Delete AND !Configure OR
+	 * Delete AND !Create AND !Configure
+	 */
+	private boolean isIconDisplayed() {
+		boolean isDisplayed = false;
+		try {
+			isDisplayed = ((hasCreatePermission() && !hasDeletePermission() && !hasConfigurePermission()) || (hasDeletePermission() && !hasCreatePermission() && !hasConfigurePermission()));
 
-    private boolean hasConfigurePermission() throws IOException, ServletException {
-        return Functions.hasPermission(project, Item.CONFIGURE);
-    }
+		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, "Impossible to know if the icon has to be displayed", e);
+		}
 
-    private boolean hasCreatePermission() throws IOException, ServletException {
-        return Functions.hasPermission(project, Item.CREATE);
-    }
+		return isDisplayed;
+	}
 
-    private boolean hasDeletePermission() throws IOException, ServletException {
-        return Functions.hasPermission(project, Item.DELETE);
-    }
-    
-    private static final Logger LOGGER = Logger.getLogger(RequestRenameAction.class.getName());
+	private boolean hasConfigurePermission() throws IOException, ServletException {
+		return Functions.hasPermission(project, Item.CONFIGURE);
+	}
+
+	private boolean hasCreatePermission() throws IOException, ServletException {
+		return Functions.hasPermission(project, Item.CREATE);
+	}
+
+	private boolean hasDeletePermission() throws IOException, ServletException {
+		return Functions.hasPermission(project, Item.DELETE);
+	}
+
+	private static final Logger LOGGER = Logger.getLogger(RequestRenameAction.class.getName());
 
 }
