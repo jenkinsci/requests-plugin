@@ -106,7 +106,7 @@ public class RequestDeleteJobAction implements Action {
 
 	public String getDisplayName() {
 		if (isIconDisplayed()) {
-			return Messages.RequestDeleteJobAction_DisplayName().toString();
+			return Messages.RequestDeleteJobAction_DisplayName();
 		}
 		return null;
 	}

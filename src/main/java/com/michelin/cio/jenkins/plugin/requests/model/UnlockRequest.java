@@ -44,12 +44,13 @@ public class UnlockRequest extends Request {
 
 	@Override
 	public String getMessage() {
-		return Messages.UnlockRequest_message(buildNumber + " for " + projectFullName).toString();
+		return Messages.UnlockRequest_message(buildNumber + " for " + projectFullName);
 	}
 
 	public boolean execute(Item item) {
 		Jenkins jenkins = null;
 		boolean success = false;
+		String returnStatus = null;
 
 		try {
 			jenkins = Jenkins.getInstance();
@@ -71,7 +72,19 @@ public class UnlockRequest extends Request {
 					RequestsUtility requestsUtility = new RequestsUtility();
 
 					try {
-						success = requestsUtility.runPostMethod(jenkinsURL, urlString);
+						returnStatus = requestsUtility.runPostMethod(jenkinsURL, urlString);
+						
+						if (returnStatus.equals("success")) {
+							errorMessage = "Build number " + buildNumber + " has been properly Unlocked for " + projectFullName;
+							LOGGER.log(Level.INFO, "Build {0} has been properly Unlocked", projectFullName + ":" + buildNumber);
+							success = true;
+						} else {
+							errorMessage = "Unlock Build call has failed for " + projectFullName + ":" + buildNumber + " : " + returnStatus;
+							LOGGER.log(Level.INFO, "Unlock Build call has failed: ", projectFullName + ":" + buildNumber + " : " + returnStatus);
+							
+							return false;
+						}
+						
 					} catch (IOException e) {
 						errorMessage = e.getMessage();
 						LOGGER.log(Level.SEVERE, "Unable to Unlock the build " + projectFullName + ":" + buildNumber, e.getMessage());
@@ -83,15 +96,6 @@ public class UnlockRequest extends Request {
 					errorMessage = e.getMessage();
 					LOGGER.log(Level.SEVERE, "Unable to Unlock the build " + projectFullName + ":" + buildNumber, e.getMessage());
 				}
-
-				if (success) {
-					errorMessage = "Build number " + buildNumber + " has been properly Unlocked for " + projectFullName;
-					LOGGER.log(Level.INFO, "Build {0} has been properly Unlocked", projectFullName + ":" + buildNumber);
-				} else {
-					errorMessage = "Build Unlock call has failed for " + projectFullName + ":" + buildNumber;
-					LOGGER.log(Level.INFO, "Build Unlock call has failed: ", projectFullName + ":" + buildNumber);
-				}
-
 
 			} else {
 				errorMessage = "The current user " + username + " does not have permission to Unlock the job";            

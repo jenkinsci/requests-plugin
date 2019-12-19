@@ -51,7 +51,7 @@ public class RequestJobActionFactory extends TransientActionFactory<Job> {
         List<Action> adminActions = new ArrayList<Action>();
 
         //Note: that a restart is required after making a change since this is loaded at start up time:
-        if (descriptorEmailImpl.isEnableDeleteJob()) {
+        if (descriptorEmailImpl.getEnableDeleteJob()) {
         	adminActions.add(new RequestDeleteJobAction(target));
         }
         

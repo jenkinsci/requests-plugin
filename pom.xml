@@ -21,6 +21,8 @@
 	  <url>https://github.com/jenkinsci/requests-plugin</url>
 	  <tag>requests-2.0.2</tag>
   </scm>
+  
+  
     <dependencies>
     	
 		<!-- https://mvnrepository.com/artifact/commons-codec/commons-codec -->
@@ -45,9 +47,42 @@
             <timezone>-5</timezone>
         </developer>
     </developers>
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+                <version>3.1.8</version>
+            </plugin>
+        </plugins>
+    </reporting>
     <build>
     	<pluginManagement>
     		<plugins>
+    		<plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.7.1</version>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>3.0.0</version>
+            </plugin>
+    		<plugin>
+				  <groupId>com.github.spotbugs</groupId>
+				  <artifactId>spotbugs-maven-plugin</artifactId>
+				  <version>3.1.11</version>
+				  <dependencies>
+				    <!-- overwrite dependency on spotbugs if you want to specify the version of spotbugs -->
+				    <dependency>
+				      <groupId>com.github.spotbugs</groupId>
+				      <artifactId>spotbugs</artifactId>
+				      <version>4.0.0-beta2</version>
+				    </dependency>
+				  </dependencies>
+				</plugin>
     			<plugin>
     				<groupId>org.eclipse.m2e</groupId>
     				<artifactId>lifecycle-mapping</artifactId>

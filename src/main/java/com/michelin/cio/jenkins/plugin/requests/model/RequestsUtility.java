@@ -60,12 +60,12 @@ public class RequestsUtility {
 	private static final Logger LOGGER = Logger.getLogger(RequestsUtility.class.getName());
 	
 
-	public boolean runPostMethod(String jenkinsURL, String urlString) throws ClientProtocolException, IOException {
-		LOGGER.info("[INFO] jenkinsURL: " + jenkinsURL);
+	public String runPostMethod(String jenkinsURL, String urlString) throws ClientProtocolException, IOException {
 		LOGGER.info("[INFO] urlString: " + urlString);
-		boolean returnStatus = false;
+		String returnStatus;
 		DescriptorEmailImpl descriptorEmailImpl = new DescriptorEmailImpl();
 		String username = descriptorEmailImpl.getUnlockuser();
+		//The password must be a Jenkins User Token:
 		Secret password = descriptorEmailImpl.getUnlockpassword();		
 		URI uri = URI.create(urlString);
 		HttpHost host = new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme());
@@ -78,16 +78,16 @@ public class RequestsUtility {
 		HttpPost httpPost = new HttpPost(uri);
 
 		//Get the jenkins crumb for the Post call:
-		URL crumbURL = new URL(jenkinsURL + "crumbIssuer/api/xml?xpath=concat(//crumbRequestField,%22:%22,//crumb)");
-		String[] crumbArray = getCrumb(crumbURL);
+		//URL crumbURL = new URL(jenkinsURL + "crumbIssuer/api/xml?xpath=concat(//crumbRequestField,%22:%22,//crumb)");
+		//String[] crumbArray = getCrumb(crumbURL);
 
-		if (crumbArray[2].equals("true")) {			
-			httpPost.addHeader(crumbArray[0], crumbArray[1]);
+		//if (crumbArray[2].equals("true")) {			
+		//	httpPost.addHeader(crumbArray[0], crumbArray[1]);
 			//LOGGER.info("[INFO] Crumb value set: ");
-		} else { 
+		//} else { 
 			//Jenkins system without a crumb:
-			//LOGGER.info("[INFO] No Crumb value set: ");
-		}
+		//	LOGGER.info("[INFO] No Crumb value set: ");
+		//}
 
 		// Add AuthCache to the execution context
 		HttpClientContext localContext = HttpClientContext.create();
@@ -98,9 +98,10 @@ public class RequestsUtility {
 		LOGGER.info("[INFO] responseCode: " + responseCode);	
 		
 		if ((responseCode >199) && (responseCode < 400)) {
-			returnStatus = true;
+			returnStatus = "success";
 		} else {
 			LOGGER.info("[ERROR] httpClient getReasonPhrase: " + response.getStatusLine().getReasonPhrase());
+			returnStatus = response.getStatusLine().getReasonPhrase();
 		}
 		return returnStatus;
 	}
@@ -109,6 +110,8 @@ public class RequestsUtility {
 		String[] crumbArray = new String[2];
 		String[] returnValues = new String[3];
 		String crumbAvailable = "false";
+		
+		BufferedReader reader = null;
 
 		try {
 			DescriptorEmailImpl descriptorEmailImpl = new DescriptorEmailImpl();
@@ -122,26 +125,32 @@ public class RequestsUtility {
 			httpsURLConnection.setRequestProperty("Authorization", basicAuth);
 
 			InputStream inputStream = httpsURLConnection.getInputStream();
-			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+			 reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
 			StringBuilder out = new StringBuilder();
 			String line;
 
 			while ((line = reader.readLine()) != null) {
 				out.append(line);
 			}
-			reader.close();
 
 			String crumbValue = out.toString();
 			crumbArray = crumbValue.split(":");
-
 			inputStream.close();
 			crumbAvailable = "true";
 
-		} catch (Exception e) {
+		} catch (IOException ioe) {
 			crumbArray[0]= "";
 			crumbArray[1]= "";
 			crumbAvailable = "false";
-			LOGGER.warning("No crumb available: " + e.getMessage());
+			LOGGER.warning("No crumb available: " + ioe.getMessage());
+			
+		} finally {
+			try {
+				if (reader != null)
+					reader.close();
+			} catch (IOException e) {
+				LOGGER.warning("[ERROR]: Unable to close reader" + e.getMessage());
+			}
 		}
 
 		returnValues[0] = crumbArray[0];

@@ -182,7 +182,7 @@ public class RequestsPlugin extends Plugin {
 
         @Override
         public String getDescription() {
-            return Messages.RequestManagementLink_Description().toString();
+            return Messages.RequestManagementLink_Description();
         }
 
         @Override
@@ -191,7 +191,7 @@ public class RequestsPlugin extends Plugin {
         }
 
         public String getDisplayName() {
-            return Messages.RequestManagementLink_DisplayName().toString();
+            return Messages.RequestManagementLink_DisplayName();
         }
 
         @Override

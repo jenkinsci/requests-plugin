@@ -92,7 +92,7 @@ public class RequestRenameAction implements Action {
 
 	public String getDisplayName() {
 		if (isIconDisplayed()) {
-			return Messages.RequestRenameAction_DisplayName().toString();
+			return Messages.RequestRenameAction_DisplayName();
 		}
 		return null;
 	}
@@ -130,7 +130,7 @@ public class RequestRenameAction implements Action {
 		try {
 			isDisplayed = ((hasCreatePermission() && !hasDeletePermission() && !hasConfigurePermission()) || (hasDeletePermission() && !hasCreatePermission() && !hasConfigurePermission()));
 
-		} catch (Exception e) {
+		} catch (IOException | ServletException e) {
 			LOGGER.log(Level.WARNING, "Impossible to know if the icon has to be displayed", e);
 		}
 

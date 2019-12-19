@@ -162,7 +162,7 @@ public class RequestMailSender extends Builder{
 				if (Character.isLetter(jenkinsHostName.charAt(0))){
 					String[] nameArray = jenkinsHostName.split("\\.");
 					jenkinsHostName = nameArray[0];
-					jenkinsHostName = jenkinsHostName.toUpperCase(); 
+					jenkinsHostName = jenkinsHostName.toUpperCase(Locale.ENGLISH); 
 				}
 
 				// Get Jenkins URL from the projectURL:   		
@@ -175,12 +175,14 @@ public class RequestMailSender extends Builder{
 				String pendingRequestsLink = jenkinsURLArray[0] +  "/plugin/requests/";
 
 				// Email Subject line:
-				msg.setSubject(String.format(jenkinsHostName + ": " + " Request has been submitted"));
+				msg.setSubject(String.format(jenkinsHostName + ": " + requestType + " Request has been submitted"));
 
 				// Email page content:
 				buf.append(".......................................................................................................................\n\n");	    	
 				buf.append(requestType + " request has been submitted for '" + itemName + "'.\n\n");
+				buf.append("Pending Request Page:\n");
 				buf.append(pendingRequestsLink + "\n\n\n");
+				buf.append("Project Page:\n");
 				buf.append(getProjectURL() + "\n");
 				buf.append(".......................................................................................................................\n");
 				msg.setText(buf.toString());
@@ -251,6 +253,14 @@ public class RequestMailSender extends Builder{
 			super(RequestMailSender.class);
 			load();
 		}
+		
+		// Runs when the global settings are submitted to save configuration changes:
+		@Override
+		public boolean configure(StaplerRequest req, JSONObject json) throws FormException{
+			req.bindJSON(this, json.getJSONObject("globalRequests"));
+			save();
+			return true;
+		}
 
 		public String getRequestemailserver() {
 			return requestemailserver;
@@ -300,7 +310,7 @@ public class RequestMailSender extends Builder{
 			this.unlockpassword = unlockpassword;
 		}
 
-		public boolean isEnableDeleteJob() {
+		public boolean getEnableDeleteJob() {
 			return enableDeleteJob;
 		}
 
@@ -340,14 +350,6 @@ public class RequestMailSender extends Builder{
 
 		public void setEnableEmails(boolean enableEmails){
 			this.enableEmails = enableEmails;
-		}
-
-		// Runs when the global settings are submitted to save configuration changes:
-		@Override
-		public boolean configure(StaplerRequest req, JSONObject json) throws FormException{
-			req.bindJSON(this, json.getJSONObject("globalRequests"));
-			save();
-			return true;
 		}
 
 		@Override
@@ -398,11 +400,8 @@ public class RequestMailSender extends Builder{
 			buf.append(".......................................................................................................................\n");
 			msg.setText(buf.toString());
 
-
-			if (msg != null) {
-				Transport.send(msg);
-				returnMessage = "Email sent successfully";
-			}
+			Transport.send(msg);
+			returnMessage = "Email sent successfully";
 
 			return FormValidation.ok(returnMessage);
 		}

@@ -118,7 +118,7 @@ public class RequestDeleteBuildAction implements Action {
 
 	public String getDisplayName() {
 		if (isIconDisplayed()) {
-			return Messages.RequestDeleteBuildAction_DisplayName().toString();
+			return Messages.RequestDeleteBuildAction_DisplayName();
 		}
 		return null;
 	}

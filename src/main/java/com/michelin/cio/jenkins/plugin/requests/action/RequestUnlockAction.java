@@ -115,7 +115,7 @@ public class RequestUnlockAction implements Action {
 
 	public String getDisplayName() {
 		if (isIconDisplayed()) {
-			return Messages.RequestUnlockAction_DisplayName().toString();
+			return Messages.RequestUnlockAction_DisplayName();
 		}
 		return null;
 	}

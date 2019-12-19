@@ -45,7 +45,7 @@ public class DeleteJobRequest extends Request {
 
 	@Override
 	public String getMessage() {
-		return Messages.DeleteJobRequest_message(projectFullName).toString();
+		return Messages.DeleteJobRequest_message(projectFullName);
 	}
 
 	public boolean execute(Item item) {

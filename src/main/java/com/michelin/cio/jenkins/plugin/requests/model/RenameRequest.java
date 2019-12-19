@@ -55,7 +55,7 @@ public class RenameRequest extends Request {
 			projectList = project.split("/");
 			fullNewName = projectList[0] + "/" + newName;
 		}
-		return Messages.RenameRequest_message(project, fullNewName).toString();
+		return Messages.RenameRequest_message(project, fullNewName);
 	}
 
 	public String getNewName() {

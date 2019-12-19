@@ -45,12 +45,13 @@ public class DeleteBuildRequest extends Request {
 
 	@Override
 	public String getMessage() {
-		return Messages.DeleteBuildRequest_message(buildNumber + " for " + projectFullName).toString();
+		return Messages.DeleteBuildRequest_message(buildNumber + " for " + projectFullName);
 	}
 
 	public boolean execute(Item item) {
 		Jenkins jenkins = null;
 		boolean success = false;
+		String returnStatus;
 
 		try {
 			jenkins= Jenkins.getInstance();
@@ -64,7 +65,33 @@ public class DeleteBuildRequest extends Request {
 				RequestsUtility requestsUtility = new RequestsUtility();
 				
 				try {
-					success = requestsUtility.runPostMethod(jenkinsURL, urlString);
+					returnStatus = requestsUtility.runPostMethod(jenkinsURL, urlString);
+					//Check if deletion failed due to locked build:
+					if (returnStatus.contains("Forbidden") || returnStatus.contains("Bad Request")) {
+						String unlockUrlString = jenkinsURL + "job/" + projectFullName + "/" + buildNumber + "/toggleLogKeep";
+
+						try {
+							returnStatus = requestsUtility.runPostMethod(jenkinsURL, unlockUrlString);
+							
+							if (returnStatus.equals("success")) {
+								errorMessage = "Build number " + buildNumber + " has been properly Unlocked for " + projectFullName;
+								LOGGER.log(Level.INFO, "Build {0} has been properly Unlocked", projectFullName + ":" + buildNumber);
+							} else {
+								errorMessage = "Build is locked. Unlock Build call has failed for " + projectFullName + ":" + buildNumber + " : " + returnStatus;
+								LOGGER.log(Level.INFO, "Build is locked. Unlock Build call has failed: ", projectFullName + ":" + buildNumber + " : " + returnStatus);
+								
+								return false;
+							}
+						} catch (IOException e) {
+							errorMessage = e.getMessage();
+							LOGGER.log(Level.SEVERE, "Unable to Unlock the build " + projectFullName + ":" + buildNumber, e.getMessage());
+
+							return false;
+						}
+						
+						//Try and run delete build once again:
+						returnStatus = requestsUtility.runPostMethod(jenkinsURL, urlString);
+					}
 				} catch (IOException e) {
 					errorMessage = e.getMessage();
 					LOGGER.log(Level.SEVERE, "Unable to Delete the build " + projectFullName + ":" + buildNumber, e.getMessage());
@@ -72,12 +99,14 @@ public class DeleteBuildRequest extends Request {
 					return false;
 				}
 
-				if (success) {
+				if (returnStatus.equals("success")) {
 					errorMessage = "Build number " + buildNumber + " has been properly Deleted for " + projectFullName;
 					LOGGER.log(Level.INFO, "Build {0} has been properly Deleted", projectFullName + ":" + buildNumber);
+					success = true;
+					
 				} else {
-					errorMessage = "Delete Build call has failed for " + projectFullName + ":" + buildNumber + " Make sure the build is not locked.";
-					LOGGER.log(Level.INFO, "Delete Build call has failed: ", projectFullName + ":" + buildNumber + " Make sure the build is not locked.");
+					errorMessage = "Delete Build call has failed for " + projectFullName + ":" + buildNumber + " : " + returnStatus;
+					LOGGER.log(Level.INFO, "Delete Build call has failed: ", projectFullName + ":" + buildNumber + " : " + returnStatus);
 				}
 
 			} else {
