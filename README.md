@@ -1,16 +1,143 @@
-# requests
-Jenkins Requests Plugin
+Requests Plugin
 
+This plugin sets up a request center for non-admin users to be able to
+ask that their job to be deleted or renamed, or a build to be deleted or
+unlocked.
 
-Request Delete plugin
-===============================
-Copyright &copy; 2011-2012, Manufacture Française des Pneumatiques Michelin, Daniel Petisme
-<br>Portions Copyright 2019 Lexmark
+## Summary
 
-About this plugin
------------------
-The Request plugin is meant to add new actions on Jenkins jobs for users to request to their administrator to delete a build or a job. It also allows a user to request a build to be unlocked. Please take a look at Jenkins' wiki to get detailed information.
+The plugin adds 2 new actions to the job screen so that users who don't
+have the required permissions to delete or to rename Jobs, to send a
+request to the Jenkins administrator to do so.  It also adds 2 new
+actions to the build screen so that users who don't have the required
+permissions to delete or unlock builds can send a request to the Jenkins
+administrator to do so. 
 
-Installation
-------------
-The Requests plugin can be installed from any Jenkins 2.37+ installation connected to the Internet using the **Plugin Manager** screen.
+  
+The Jenkins administrator then gets a dedicated screen to handle all the
+incoming requests. If configured, an email will be sent to the assigned
+admin person and the submitter of the request. The admin user can then
+review the request and then apply the changes with just a click of a
+button.
+
+------------------------------------------------------------------------
+
+## For Users
+
+For users who don't have permissions to Delete a Job, Rename a Job,
+Delete a Build, or Unlock a Build, the following four actions are
+available if enabled.
+
+-   Request For Job Deletion
+-   Request For Build Deletion
+-   Request To Unlock Build
+-   Request Job Rename
+
+  
+
+###                               Project page                                               Project page                                                                           Build page
+
+                       
+  ![](docs/images/jobAction.png){.confluence-embedded-image
+width="231"}       
+ ![](docs/images/renameJob.png){.confluence-embedded-image
+width="210"}                                      
+  ![](docs/images/build-page.png){.confluence-embedded-image
+width="200"}                             
+
+  
+
+------------------------------------------------------------------------
+
+## For Administrators
+
+The Global Settings allow the admin to enable/disable any of the 4
+actions and to enable e-mail notifications (**Manage
+Jenkins** \> **Configure System**):
+
+-   It's important to note that when making a change to the "Enable the
+    link for Delete Job Request" a restart of Jenkins is required so
+    that all applicable jobs receive the action.
+-   Make sure to save email configuration changes before clicking the
+    "Send Test Email" button.
+-   Discard old builds must be enabled in the job configuration before
+    you can view the "Keep this build forever" option.
+
+  
+
+                           
+ ![](docs/images/new_global.png){.confluence-embedded-image
+width="1100"}
+
+        
+
+  
+Administrators get a new **Pending  Requests** entry in Jenkins' main
+configuration screen (**Manage Jenkins**):  
+
+                         
+ ![](docs/images/pendingRequets.png){.confluence-embedded-image
+height="81"}
+
+------------------------------------------------------------------------
+
+                           
+  ![](docs/images/pendingRequestPage.png){.confluence-embedded-image
+width="700"}
+
+------------------------------------------------------------------------
+
+                        
+
+#### In order to see Action                      Not Authorized
+
+Delete Job Request                         Job.Delete = 0
+
+Delete Build Request                       Run.Delete =0
+
+Unlock Build Request                      Run.Delete = 0
+
+Rename Job Request                      Job.Create = 1, Job.Delete = 0,
+Job.Configure = 0 OR Job.Create = 0, Job.Delete = 1, Job.Configure = 0
+
+  
+
+------------------------------------------------------------------------
+
+## Version History
+
+Version 2.0.5 (May 30, 2019)
+
+-   Added Rename Job support back
+
+Version 2.0.4 (May 29, 2019)
+
+-   Added support for Pipeline jobs and builds
+
+Version 2.0.3 (May 28, 2019)
+
+-   Fixed the Creation date format in the Pending request page
+
+Version 2.0.2 (May 24, 2019)
+
+-   Initial release
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
