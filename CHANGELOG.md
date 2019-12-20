@@ -1,6 +1,11 @@
 
 ## Version History
 
+Version 2.1.0 (December 20, 2019)
+
+-	Changed from user password for Delete/Unlock requests to a jenkins user token.
+-	Delete build will now unlock before deleting if its locked instead of warning of locked build.
+
 Version 2.0.5 (May 30, 2019)
 
 -   Added Rename Job support back
