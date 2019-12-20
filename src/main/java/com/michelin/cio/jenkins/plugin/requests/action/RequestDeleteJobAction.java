@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2011-2012, Manufacture Francaise des Pneumatiques Michelin, Daniel Petisme, Romain Seguy
  * Copyright 2019 Lexmark
- * 
+ *
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -50,7 +50,6 @@ import java.util.logging.Logger;
 
 import static java.util.logging.Level.FINE;
 
-
 // Represents the "Request for deletion" action appearing on a given job's page.
 // @author Daniel Petisme <daniel.petisme@gmail.com> <http://danielpetisme.blogspot.com/>
 
@@ -58,7 +57,8 @@ public class RequestDeleteJobAction implements Action {
 
 	private Job<?, ?> project;
 	private transient List<String> errors = new ArrayList<String>();
-	private static final Logger LOGGER = Logger.getLogger(RequestDeleteJobAction.class.getName());
+	private static final Logger LOGGER = Logger
+			.getLogger(RequestDeleteJobAction.class.getName());
 
 	public RequestDeleteJobAction(Job<?, ?> target) {
 		this.project = target;
@@ -73,35 +73,43 @@ public class RequestDeleteJobAction implements Action {
 		errors.add(errorString);
 	}
 
-	public HttpResponse doCreateDeleteJobRequest(StaplerRequest request, StaplerResponse response) throws IOException, ServletException, MessagingException {
+	public HttpResponse doCreateDeleteJobRequest(StaplerRequest request,
+			StaplerResponse response)
+			throws IOException, ServletException, MessagingException {
 		try {
 			if (isIconDisplayed()) {
 				LOGGER.log(FINE, "Delete Job Request");
 				errors.clear();
 				final String username = request.getParameter("username");
-				RequestsPlugin plugin = Jenkins.getInstance().getPlugin(RequestsPlugin.class);
+				RequestsPlugin plugin = Jenkins.getInstance()
+						.getPlugin(RequestsPlugin.class);
 				String[] projectList = null;
 				String projectName = project.getFullName();
 				String projectFullName = project.getFullName();
 
 				// Check if a folder job type:
-				if (!projectFullName.contains("/job/") && projectFullName.contains("/")) {
+				if (!projectFullName.contains("/job/")
+						&& projectFullName.contains("/")) {
 					projectList = projectFullName.split("/");
 					projectFullName = projectList[0] + "/job/" + projectList[1];
 				}
 
-				RequestMailSender mailSender = new RequestMailSender(project.getName(), username, "A Delete Job", project.getAbsoluteUrl());
+				RequestMailSender mailSender = new RequestMailSender(
+						project.getName(), username, "A Delete Job",
+						project.getAbsoluteUrl());
 				mailSender.executeEmail();
-				plugin.addRequest(new DeleteJobRequest("deleteJob", username, projectName, projectFullName, ""));                   
+				plugin.addRequest(new DeleteJobRequest("deleteJob", username,
+						projectName, projectFullName, ""));
 			}
 
 		} catch (NullPointerException e) {
 			LOGGER.log(Level.SEVERE, "[ERROR] Exception: " + e.getMessage());
 
 			return null;
-		} 
+		}
 
-		return new HttpRedirect(request.getContextPath() + '/' + project.getUrl());
+		return new HttpRedirect(
+				request.getContextPath() + '/' + project.getUrl());
 	}
 
 	public String getDisplayName() {
@@ -134,13 +142,15 @@ public class RequestDeleteJobAction implements Action {
 		try {
 			isDisplayed = hasConfigurePermission() && !hasDeletePermission();
 		} catch (Exception e) {
-			LOGGER.log(Level.WARNING, "Impossible to know if the icon has to be displayed", e);
+			LOGGER.log(Level.WARNING,
+					"Impossible to know if the icon has to be displayed", e);
 		}
 
 		return isDisplayed;
 	}
 
-	private boolean hasConfigurePermission() throws IOException, ServletException {
+	private boolean hasConfigurePermission()
+			throws IOException, ServletException {
 		return Functions.hasPermission(project, Item.CONFIGURE);
 	}
 

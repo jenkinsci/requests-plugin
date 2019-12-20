@@ -44,24 +44,26 @@ import java.util.List;
 
 @Extension
 public class RequestJobActionFactory extends TransientActionFactory<Job> {
-	
-    @Override
-    public Collection<? extends Action> createFor(Job target) {
-    	RequestMailSender.DescriptorEmailImpl descriptorEmailImpl = new RequestMailSender.DescriptorEmailImpl();
-        List<Action> adminActions = new ArrayList<Action>();
 
-        //Note: that a restart is required after making a change since this is loaded at start up time:
-        if (descriptorEmailImpl.getEnableDeleteJob()) {
-        	adminActions.add(new RequestDeleteJobAction(target));
-        }
-        
-        //Note: that a restart is required after making a change since this is loaded at start up time:
-        if (descriptorEmailImpl.isEnableRenameJob()) {
-        	adminActions.add(new RequestRenameAction(target));
-        }
+	@Override
+	public Collection<? extends Action> createFor(Job target) {
+		RequestMailSender.DescriptorEmailImpl descriptorEmailImpl = new RequestMailSender.DescriptorEmailImpl();
+		List<Action> adminActions = new ArrayList<Action>();
 
-        return adminActions;
-    }
+		// Note: that a restart is required after making a change since this is
+		// loaded at start up time:
+		if (descriptorEmailImpl.getEnableDeleteJob()) {
+			adminActions.add(new RequestDeleteJobAction(target));
+		}
+
+		// Note: that a restart is required after making a change since this is
+		// loaded at start up time:
+		if (descriptorEmailImpl.isEnableRenameJob()) {
+			adminActions.add(new RequestRenameAction(target));
+		}
+
+		return adminActions;
+	}
 
 	@Override
 	public Class<Job> type() {

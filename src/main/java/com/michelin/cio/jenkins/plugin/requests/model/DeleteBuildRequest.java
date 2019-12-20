@@ -31,21 +31,23 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
 // Represents a build deletion request sent by a user to Jenkins' administrator.
 // @author John Flynn <john.trixmot.flynn@gmail.com>
 
 public class DeleteBuildRequest extends Request {
 
-	private static final Logger LOGGER = Logger.getLogger(DeleteBuildRequest.class.getName());
+	private static final Logger LOGGER = Logger
+			.getLogger(DeleteBuildRequest.class.getName());
 
-	public DeleteBuildRequest(String requestType, String username, String project, String projectFullName, String buildNumber) {
+	public DeleteBuildRequest(String requestType, String username,
+			String project, String projectFullName, String buildNumber) {
 		super(requestType, username, project, projectFullName, buildNumber);
 	}
 
 	@Override
 	public String getMessage() {
-		return Messages.DeleteBuildRequest_message(buildNumber + " for " + projectFullName);
+		return Messages.DeleteBuildRequest_message(
+				buildNumber + " for " + projectFullName);
 	}
 
 	public boolean execute(Item item) {
@@ -54,71 +56,112 @@ public class DeleteBuildRequest extends Request {
 		String returnStatus;
 
 		try {
-			jenkins= Jenkins.getInstance();
-			if(jenkins == null) throw new NullPointerException("Jenkins instance is null");
+			jenkins = Jenkins.getInstance();
+			if (jenkins == null)
+				throw new NullPointerException("Jenkins instance is null");
 
-			if (Jenkins.getInstance().hasPermission(Run.DELETE)) {            
-				String jenkinsURL = null;		
+			if (Jenkins.getInstance().hasPermission(Run.DELETE)) {
+				String jenkinsURL = null;
 				jenkinsURL = Jenkins.getInstance().getRootUrl();
-				if(jenkinsURL == null) throw new NullPointerException("Jenkins instance is null");
-				String urlString = jenkinsURL + "job/" + projectFullName + "/" + buildNumber + "/doDelete";
+				if (jenkinsURL == null)
+					throw new NullPointerException("Jenkins instance is null");
+				String urlString = jenkinsURL + "job/" + projectFullName + "/"
+						+ buildNumber + "/doDelete";
 				RequestsUtility requestsUtility = new RequestsUtility();
-				
+
 				try {
-					returnStatus = requestsUtility.runPostMethod(jenkinsURL, urlString);
-					//Check if deletion failed due to locked build:
-					if (returnStatus.contains("Forbidden") || returnStatus.contains("Bad Request")) {
-						String unlockUrlString = jenkinsURL + "job/" + projectFullName + "/" + buildNumber + "/toggleLogKeep";
+					returnStatus = requestsUtility.runPostMethod(jenkinsURL,
+							urlString);
+					// Check if deletion failed due to locked build:
+					if (returnStatus.contains("Forbidden")
+							|| returnStatus.contains("Bad Request")) {
+						String unlockUrlString = jenkinsURL + "job/"
+								+ projectFullName + "/" + buildNumber
+								+ "/toggleLogKeep";
 
 						try {
-							returnStatus = requestsUtility.runPostMethod(jenkinsURL, unlockUrlString);
-							
+							returnStatus = requestsUtility
+									.runPostMethod(jenkinsURL, unlockUrlString);
+
 							if (returnStatus.equals("success")) {
-								errorMessage = "Build number " + buildNumber + " has been properly Unlocked for " + projectFullName;
-								LOGGER.log(Level.INFO, "Build {0} has been properly Unlocked", projectFullName + ":" + buildNumber);
+								errorMessage = "Build number " + buildNumber
+										+ " has been properly Unlocked for "
+										+ projectFullName;
+								LOGGER.log(Level.INFO,
+										"Build {0} has been properly Unlocked",
+										projectFullName + ":" + buildNumber);
 							} else {
-								errorMessage = "Build is locked. Unlock Build call has failed for " + projectFullName + ":" + buildNumber + " : " + returnStatus;
-								LOGGER.log(Level.INFO, "Build is locked. Unlock Build call has failed: ", projectFullName + ":" + buildNumber + " : " + returnStatus);
-								
+								errorMessage = "Build is locked. Unlock Build call has failed for "
+										+ projectFullName + ":" + buildNumber
+										+ " : " + returnStatus;
+								LOGGER.log(Level.INFO,
+										"Build is locked. Unlock Build call has failed: ",
+										projectFullName + ":" + buildNumber
+												+ " : " + returnStatus);
+
 								return false;
 							}
 						} catch (IOException e) {
 							errorMessage = e.getMessage();
-							LOGGER.log(Level.SEVERE, "Unable to Unlock the build " + projectFullName + ":" + buildNumber, e.getMessage());
+							LOGGER.log(Level.SEVERE,
+									"Unable to Unlock the build "
+											+ projectFullName + ":"
+											+ buildNumber,
+									e.getMessage());
 
 							return false;
 						}
-						
-						//Try and run delete build once again:
-						returnStatus = requestsUtility.runPostMethod(jenkinsURL, urlString);
+
+						// Try and run delete build once again:
+						returnStatus = requestsUtility.runPostMethod(jenkinsURL,
+								urlString);
 					}
 				} catch (IOException e) {
 					errorMessage = e.getMessage();
-					LOGGER.log(Level.SEVERE, "Unable to Delete the build " + projectFullName + ":" + buildNumber, e.getMessage());
-					
+					LOGGER.log(
+							Level.SEVERE, "Unable to Delete the build "
+									+ projectFullName + ":" + buildNumber,
+							e.getMessage());
+
 					return false;
 				}
 
 				if (returnStatus.equals("success")) {
-					errorMessage = "Build number " + buildNumber + " has been properly Deleted for " + projectFullName;
-					LOGGER.log(Level.INFO, "Build {0} has been properly Deleted", projectFullName + ":" + buildNumber);
+					errorMessage = "Build number " + buildNumber
+							+ " has been properly Deleted for "
+							+ projectFullName;
+					LOGGER.log(Level.INFO,
+							"Build {0} has been properly Deleted",
+							projectFullName + ":" + buildNumber);
 					success = true;
-					
+
 				} else {
-					errorMessage = "Delete Build call has failed for " + projectFullName + ":" + buildNumber + " : " + returnStatus;
-					LOGGER.log(Level.INFO, "Delete Build call has failed: ", projectFullName + ":" + buildNumber + " : " + returnStatus);
+					errorMessage = "Delete Build call has failed for "
+							+ projectFullName + ":" + buildNumber + " : "
+							+ returnStatus;
+					LOGGER.log(Level.INFO, "Delete Build call has failed: ",
+							projectFullName + ":" + buildNumber + " : "
+									+ returnStatus);
 				}
 
 			} else {
-				errorMessage = "The current user " + username + " does not have permission to delete the build";            
-				LOGGER.log(Level.FINE, "The current user {0} does not have permission to DELETE the build", new Object[]{username});LOGGER.log(Level.FINE, "The current user does not have the DELETE permission");
+				errorMessage = "The current user " + username
+						+ " does not have permission to delete the build";
+				LOGGER.log(Level.FINE,
+						"The current user {0} does not have permission to DELETE the build",
+						new Object[] { username });
+				LOGGER.log(Level.FINE,
+						"The current user does not have the DELETE permission");
 			}
 		} catch (NullPointerException e) {
 			errorMessage = e.getMessage();
-			LOGGER.log(Level.SEVERE, "Unable to Delete the build " + projectFullName + ":" + buildNumber, e.getMessage());
+			LOGGER.log(
+					Level.SEVERE, "Unable to Delete the build "
+							+ projectFullName + ":" + buildNumber,
+					e.getMessage());
 
 			return false;
-		} 
+		}
 
 		return success;
 	}

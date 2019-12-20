@@ -46,7 +46,6 @@ import java.util.logging.Logger;
 
 import static java.util.logging.Level.FINE;
 
-
 // Represents the "Request for build deletion" action appearing on a given build's page.
 // @author John Flynn <john.trixmot.flynn1@gmail.com>
 
@@ -54,7 +53,8 @@ public class RequestDeleteBuildAction implements Action {
 
 	private Run<?, ?> build;
 	private transient List<String> errors = new ArrayList<String>();
-	private static final Logger LOGGER = Logger.getLogger(RequestDeleteBuildAction.class.getName());
+	private static final Logger LOGGER = Logger
+			.getLogger(RequestDeleteBuildAction.class.getName());
 
 	public RequestDeleteBuildAction(Run<?, ?> target) {
 		this.build = target;
@@ -69,13 +69,16 @@ public class RequestDeleteBuildAction implements Action {
 		errors.add(errorString);
 	}
 
-	public HttpResponse doCreateDeleteBuildRequest(StaplerRequest request, StaplerResponse response) throws IOException, ServletException, MessagingException {
+	public HttpResponse doCreateDeleteBuildRequest(StaplerRequest request,
+			StaplerResponse response)
+			throws IOException, ServletException, MessagingException {
 		try {
 			if (isIconDisplayed()) {
 				LOGGER.log(FINE, "Delete Build request");
 				errors.clear();
 				final String username = request.getParameter("username");
-				RequestsPlugin plugin = Jenkins.getInstance().getPlugin(RequestsPlugin.class);
+				RequestsPlugin plugin = Jenkins.getInstance()
+						.getPlugin(RequestsPlugin.class);
 				String[] projectNameList = null;
 				String buildName = build.getDisplayName();
 				String projectFullName;
@@ -95,25 +98,31 @@ public class RequestDeleteBuildAction implements Action {
 				projectName = projectFullName;
 
 				// Check if a folder job type:
-				if (!projectFullName.contains("/job/") && projectFullName.contains("/")) {
+				if (!projectFullName.contains("/job/")
+						&& projectFullName.contains("/")) {
 					projectNameList = projectFullName.split("/");
-					projectFullName = projectNameList[0] + "/job/" + projectNameList[1];
+					projectFullName = projectNameList[0] + "/job/"
+							+ projectNameList[1];
 				}
 
 				String jenkinsUrl = Jenkins.getInstance().getRootUrl();
 				String buildUrl = jenkinsUrl + build.getUrl();
-				RequestMailSender mailSender = new RequestMailSender(buildName, username, "A Delete Build", buildUrl);
+				RequestMailSender mailSender = new RequestMailSender(buildName,
+						username, "A Delete Build", buildUrl);
 				mailSender.executeEmail();
-				plugin.addRequest(new DeleteBuildRequest("deleteBuild", username, projectName, projectFullName, Integer.toString(buildNumber)));                   
+				plugin.addRequest(new DeleteBuildRequest("deleteBuild",
+						username, projectName, projectFullName,
+						Integer.toString(buildNumber)));
 			}
 		} catch (NullPointerException e) {
 
 			LOGGER.log(Level.SEVERE, "Exception: " + e.getMessage());
 
 			return null;
-		} 
+		}
 
-		return new HttpRedirect(request.getContextPath() + '/' + build.getUrl());
+		return new HttpRedirect(
+				request.getContextPath() + '/' + build.getUrl());
 	}
 
 	public String getDisplayName() {
@@ -146,7 +155,8 @@ public class RequestDeleteBuildAction implements Action {
 		try {
 			isDisplayed = !hasDeletePermission();
 		} catch (Exception e) {
-			LOGGER.log(Level.WARNING, "Impossible to know if the icon has to be displayed", e);
+			LOGGER.log(Level.WARNING,
+					"Impossible to know if the icon has to be displayed", e);
 		}
 
 		return isDisplayed;

@@ -52,55 +52,63 @@ import java.net.URI;
 import java.net.URL;
 import java.util.logging.Logger;
 
-
 // @author John Flynn <john.trixmot.flynn@gmail.com>
 
 public class RequestsUtility {
 
-	private static final Logger LOGGER = Logger.getLogger(RequestsUtility.class.getName());
-	
+	private static final Logger LOGGER = Logger
+			.getLogger(RequestsUtility.class.getName());
 
-	public String runPostMethod(String jenkinsURL, String urlString) throws ClientProtocolException, IOException {
+	public String runPostMethod(String jenkinsURL, String urlString)
+			throws ClientProtocolException, IOException {
 		LOGGER.info("[INFO] urlString: " + urlString);
 		String returnStatus;
 		DescriptorEmailImpl descriptorEmailImpl = new DescriptorEmailImpl();
 		String username = descriptorEmailImpl.getUnlockuser();
-		//The password must be a Jenkins User Token:
-		Secret password = descriptorEmailImpl.getUnlockpassword();		
+		// The password must be a Jenkins User Token:
+		Secret password = descriptorEmailImpl.getUnlockpassword();
 		URI uri = URI.create(urlString);
-		HttpHost host = new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme());
+		HttpHost host = new HttpHost(uri.getHost(), uri.getPort(),
+				uri.getScheme());
 		CredentialsProvider credsProvider = new BasicCredentialsProvider();
-		credsProvider.setCredentials(new AuthScope(uri.getHost(), uri.getPort()), new UsernamePasswordCredentials(username, password.getPlainText()));
+		credsProvider.setCredentials(
+				new AuthScope(uri.getHost(), uri.getPort()),
+				new UsernamePasswordCredentials(username,
+						password.getPlainText()));
 		AuthCache authCache = new BasicAuthCache();
 		BasicScheme basicAuth = new BasicScheme();
 		authCache.put(host, basicAuth);
-		CloseableHttpClient httpClient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).build();
+		CloseableHttpClient httpClient = HttpClients.custom()
+				.setDefaultCredentialsProvider(credsProvider).build();
 		HttpPost httpPost = new HttpPost(uri);
 
-		//Get the jenkins crumb for the Post call:
-		//URL crumbURL = new URL(jenkinsURL + "crumbIssuer/api/xml?xpath=concat(//crumbRequestField,%22:%22,//crumb)");
-		//String[] crumbArray = getCrumb(crumbURL);
+		// Get the jenkins crumb for the Post call:
+		// URL crumbURL = new URL(jenkinsURL +
+		// "crumbIssuer/api/xml?xpath=concat(//crumbRequestField,%22:%22,//crumb)");
+		// String[] crumbArray = getCrumb(crumbURL);
 
-		//if (crumbArray[2].equals("true")) {			
-		//	httpPost.addHeader(crumbArray[0], crumbArray[1]);
-			//LOGGER.info("[INFO] Crumb value set: ");
-		//} else { 
-			//Jenkins system without a crumb:
-		//	LOGGER.info("[INFO] No Crumb value set: ");
-		//}
+		// if (crumbArray[2].equals("true")) {
+		// httpPost.addHeader(crumbArray[0], crumbArray[1]);
+		// LOGGER.info("[INFO] Crumb value set: ");
+		// } else {
+		// Jenkins system without a crumb:
+		// LOGGER.info("[INFO] No Crumb value set: ");
+		// }
 
 		// Add AuthCache to the execution context
 		HttpClientContext localContext = HttpClientContext.create();
 		localContext.setAuthCache(authCache);
 
-		HttpResponse response = httpClient.execute(host, httpPost, localContext);
+		HttpResponse response = httpClient.execute(host, httpPost,
+				localContext);
 		int responseCode = response.getStatusLine().getStatusCode();
-		LOGGER.info("[INFO] responseCode: " + responseCode);	
-		
-		if ((responseCode >199) && (responseCode < 400)) {
+		LOGGER.info("[INFO] responseCode: " + responseCode);
+
+		if ((responseCode > 199) && (responseCode < 400)) {
 			returnStatus = "success";
 		} else {
-			LOGGER.info("[ERROR] httpClient getReasonPhrase: " + response.getStatusLine().getReasonPhrase());
+			LOGGER.info("[ERROR] httpClient getReasonPhrase: "
+					+ response.getStatusLine().getReasonPhrase());
 			returnStatus = response.getStatusLine().getReasonPhrase();
 		}
 		return returnStatus;
@@ -110,14 +118,17 @@ public class RequestsUtility {
 		String[] crumbArray = new String[2];
 		String[] returnValues = new String[3];
 		String crumbAvailable = "false";
-		
+
 		BufferedReader reader = null;
 
 		try {
 			DescriptorEmailImpl descriptorEmailImpl = new DescriptorEmailImpl();
-			String authStr = descriptorEmailImpl.getUnlockuser() + ":" + descriptorEmailImpl.getUnlockpassword();
-			String basicAuth = "Basic " + DatatypeConverter.printBase64Binary(authStr.getBytes("utf-8"));
-			HttpsURLConnection httpsURLConnection = (HttpsURLConnection) url.openConnection();
+			String authStr = descriptorEmailImpl.getUnlockuser() + ":"
+					+ descriptorEmailImpl.getUnlockpassword();
+			String basicAuth = "Basic " + DatatypeConverter
+					.printBase64Binary(authStr.getBytes("utf-8"));
+			HttpsURLConnection httpsURLConnection = (HttpsURLConnection) url
+					.openConnection();
 			httpsURLConnection.setRequestMethod("GET");
 			httpsURLConnection.setUseCaches(false);
 			httpsURLConnection.setDoInput(true);
@@ -125,7 +136,8 @@ public class RequestsUtility {
 			httpsURLConnection.setRequestProperty("Authorization", basicAuth);
 
 			InputStream inputStream = httpsURLConnection.getInputStream();
-			 reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+			reader = new BufferedReader(
+					new InputStreamReader(inputStream, "UTF-8"));
 			StringBuilder out = new StringBuilder();
 			String line;
 
@@ -139,17 +151,18 @@ public class RequestsUtility {
 			crumbAvailable = "true";
 
 		} catch (IOException ioe) {
-			crumbArray[0]= "";
-			crumbArray[1]= "";
+			crumbArray[0] = "";
+			crumbArray[1] = "";
 			crumbAvailable = "false";
 			LOGGER.warning("No crumb available: " + ioe.getMessage());
-			
+
 		} finally {
 			try {
 				if (reader != null)
 					reader.close();
 			} catch (IOException e) {
-				LOGGER.warning("[ERROR]: Unable to close reader" + e.getMessage());
+				LOGGER.warning(
+						"[ERROR]: Unable to close reader" + e.getMessage());
 			}
 		}
 
@@ -159,5 +172,5 @@ public class RequestsUtility {
 
 		return returnValues;
 	}
-    
+
 }

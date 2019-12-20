@@ -23,7 +23,6 @@
  */
 package com.michelin.cio.jenkins.plugin.requests.action;
 
-
 import hudson.Functions;
 import hudson.model.Action;
 import hudson.model.Run;
@@ -49,7 +48,8 @@ import static java.util.logging.Level.FINE;
 // @author John Flynn <john.trixmot.flynn@gmail.com>
 
 public class RequestUnlockAction implements Action {
-	public static final Logger LOGGER = Logger.getLogger(RequestUnlockAction.class.getName());
+	public static final Logger LOGGER = Logger
+			.getLogger(RequestUnlockAction.class.getName());
 	private transient List<String> errors = new ArrayList<String>();
 	private Run<?, ?> build;
 
@@ -66,42 +66,50 @@ public class RequestUnlockAction implements Action {
 		errors.add(errorString);
 	}
 
-	public HttpResponse doCreateUnlockRequest(StaplerRequest request, StaplerResponse response) throws IOException, ServletException, MessagingException {
+	public HttpResponse doCreateUnlockRequest(StaplerRequest request,
+			StaplerResponse response)
+			throws IOException, ServletException, MessagingException {
 		try {
 			if (isIconDisplayed()) {
 				LOGGER.log(FINE, "Unlock Build Request");
 				errors.clear();
-	            final String username = request.getParameter("username");
-	            RequestsPlugin plugin = Jenkins.getInstance().getPlugin(RequestsPlugin.class);
-	            String[] projectNameList = null;
-	            String buildName = build.getDisplayName();
-	            String projectFullName;
-	            String projectName;
-	            int buildNumber = build.getNumber();
-	            String fullDisplayName = build.getFullDisplayName();
-	            String[] namesList = null;
-	            
-	            // Need to exract the job name:
-	            if (fullDisplayName.contains(" » ")) {
-	            	namesList = fullDisplayName.split(" ");
-	            	projectFullName = namesList[0] + "/" + namesList[2];
-	            	projectName = namesList[2];
-	            } else {
-	            	projectFullName = fullDisplayName.split(" #")[0];
-	            	projectName = projectFullName;
-	            }
-	                      
-	            // Check if a folder job type:
-	            if (!projectFullName.contains("/job/") && projectFullName.contains("/")) {
-	            	projectNameList = projectFullName.split("/");
-	            	projectFullName = projectNameList[0] + "/job/" + projectNameList[1];
-	            }
+				final String username = request.getParameter("username");
+				RequestsPlugin plugin = Jenkins.getInstance()
+						.getPlugin(RequestsPlugin.class);
+				String[] projectNameList = null;
+				String buildName = build.getDisplayName();
+				String projectFullName;
+				String projectName;
+				int buildNumber = build.getNumber();
+				String fullDisplayName = build.getFullDisplayName();
+				String[] namesList = null;
+
+				// Need to exract the job name:
+				if (fullDisplayName.contains(" » ")) {
+					namesList = fullDisplayName.split(" ");
+					projectFullName = namesList[0] + "/" + namesList[2];
+					projectName = namesList[2];
+				} else {
+					projectFullName = fullDisplayName.split(" #")[0];
+					projectName = projectFullName;
+				}
+
+				// Check if a folder job type:
+				if (!projectFullName.contains("/job/")
+						&& projectFullName.contains("/")) {
+					projectNameList = projectFullName.split("/");
+					projectFullName = projectNameList[0] + "/job/"
+							+ projectNameList[1];
+				}
 
 				String jenkinsUrl = Jenkins.getInstance().getRootUrl();
 				String buildUrl = jenkinsUrl + build.getUrl();
-				RequestMailSender mailSender = new RequestMailSender(buildName, username, "An Unlock Build", buildUrl);            
+				RequestMailSender mailSender = new RequestMailSender(buildName,
+						username, "An Unlock Build", buildUrl);
 				mailSender.executeEmail();
-				plugin.addRequest(new UnlockRequest("unlockBuild", username, projectName, projectFullName, Integer.toString(buildNumber)));
+				plugin.addRequest(new UnlockRequest("unlockBuild", username,
+						projectName, projectFullName,
+						Integer.toString(buildNumber)));
 			}
 
 		} catch (NullPointerException e) {
@@ -110,7 +118,8 @@ public class RequestUnlockAction implements Action {
 			return null;
 		}
 
-		return new HttpRedirect(request.getContextPath() + '/' + build.getUrl());
+		return new HttpRedirect(
+				request.getContextPath() + '/' + build.getUrl());
 	}
 
 	public String getDisplayName() {
@@ -131,7 +140,7 @@ public class RequestUnlockAction implements Action {
 		return build;
 	}
 
-	public String getUrlName(){
+	public String getUrlName() {
 		return "request-unlock";
 	}
 
@@ -140,7 +149,8 @@ public class RequestUnlockAction implements Action {
 		try {
 			isDisplayed = !hasDeletePermission();
 		} catch (Exception e) {
-			LOGGER.log(Level.WARNING, "Impossible to know if the icon has to be displayed", e);
+			LOGGER.log(Level.WARNING,
+					"Impossible to know if the icon has to be displayed", e);
 		}
 
 		return isDisplayed;
@@ -148,6 +158,6 @@ public class RequestUnlockAction implements Action {
 
 	private boolean hasDeletePermission() throws IOException, ServletException {
 		return Functions.hasPermission(Run.DELETE);
-	}	
+	}
 
 }

@@ -26,7 +26,6 @@
 
 package com.michelin.cio.jenkins.plugin.requests.action;
 
-
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.*;
@@ -54,11 +53,10 @@ import hudson.tasks.Builder;
 import hudson.util.FormValidation;
 import hudson.util.Secret;
 
-
 // Option to email an admin user/group for delete request:
 // @author John Flynn <john.trixmot.flynn@gmail.com>
 
-public class RequestMailSender extends Builder{ 
+public class RequestMailSender extends Builder {
 
 	private final String itemName;
 	private final String userName;
@@ -68,14 +66,15 @@ public class RequestMailSender extends Builder{
 	private String requestmaildomain;
 	private String requestemailserver;
 
+	private static final Logger LOGGER = Logger
+			.getLogger(RequestMailSender.class.getName());
 
-	private static final Logger LOGGER = Logger.getLogger(RequestMailSender.class.getName());    
-
-	//@DataBoundConstructor
-	public RequestMailSender(String itemName, String userName, String requestType, String projectURL) {
+	// @DataBoundConstructor
+	public RequestMailSender(String itemName, String userName,
+			String requestType, String projectURL) {
 		this.itemName = itemName;
 		this.userName = userName;
-		this.requestType = requestType; 
+		this.requestType = requestType;
 		this.projectURL = projectURL;
 	}
 
@@ -84,16 +83,18 @@ public class RequestMailSender extends Builder{
 		boolean checkStatus = false;
 
 		// Check for null, or white space:
-		if (requestadminemail != null && StringUtils.isNotBlank(requestadminemail)) {	   		
-			// Check if address is in the form of "Jenkins Daemon <foo@acme.org>":
+		if (requestadminemail != null
+				&& StringUtils.isNotBlank(requestadminemail)) {
+			// Check if address is in the form of "Jenkins Daemon
+			// <foo@acme.org>":
 			if (StringUtils.contains(requestadminemail, '<')) {
 				String[] tokens = requestadminemail.split("<");
 				String tempStr = tokens[1];
 				tokens = tempStr.split(">");
-				requestadminemail = tokens[0]; 
+				requestadminemail = tokens[0];
 			}
 			checkStatus = true;
-		} 
+		}
 
 		return checkStatus;
 	}
@@ -102,10 +103,11 @@ public class RequestMailSender extends Builder{
 		return projectURL;
 	}
 
-	public void executeEmail() throws MessagingException, UnknownHostException {  
+	public void executeEmail() throws MessagingException, UnknownHostException {
 		// Check if email option is set in the global configuration:
 		if (!getDescriptor().isEnableEmails()) {
-			LOGGER.log(Level.INFO, "[INFO] The Request email option is not enabled so an email will not be sent");
+			LOGGER.log(Level.INFO,
+					"[INFO] The Request email option is not enabled so an email will not be sent");
 			return;
 		}
 		requestadminemail = getDescriptor().getRequestadminemail();
@@ -113,25 +115,29 @@ public class RequestMailSender extends Builder{
 		requestemailserver = getDescriptor().getRequestemailserver();
 		boolean failedStatus = false;
 
-		if (requestemailserver == null || requestemailserver.equals("")) {   		
-			LOGGER.log(Level.WARNING, "[ERROR] The Requests email server value is missing so no email will not be sent");
+		if (requestemailserver == null || requestemailserver.equals("")) {
+			LOGGER.log(Level.WARNING,
+					"[ERROR] The Requests email server value is missing so no email will not be sent");
 			failedStatus = true;
 		}
 
-		if (requestmaildomain == null || requestmaildomain.equals("")) {   		
-			LOGGER.log(Level.WARNING, "[ERROR] The Requests email domain is missing so mo email will not be sent");
+		if (requestmaildomain == null || requestmaildomain.equals("")) {
+			LOGGER.log(Level.WARNING,
+					"[ERROR] The Requests email domain is missing so mo email will not be sent");
 			failedStatus = true;
 		}
 
-		if (requestadminemail == null || requestadminemail.equals("")) {   		
-			LOGGER.log(Level.WARNING, "[ERROR] The Requests email address is missing so no email will not be sent");
+		if (requestadminemail == null || requestadminemail.equals("")) {
+			LOGGER.log(Level.WARNING,
+					"[ERROR] The Requests email address is missing so no email will not be sent");
 			failedStatus = true;
 		}
 
 		if (!checkAddress()) {
-			LOGGER.log(Level.WARNING, "[ERROR] The Requests email address is invalid so no email will not be sent");
+			LOGGER.log(Level.WARNING,
+					"[ERROR] The Requests email address is invalid so no email will not be sent");
 			failedStatus = true;
-		}    	
+		}
 
 		if (failedStatus) {
 			return;
@@ -141,13 +147,16 @@ public class RequestMailSender extends Builder{
 
 		if (mail != null) {
 			Transport.send(mail);
-			LOGGER.log(Level.INFO, "[INFO] A Request email has been sent to " + requestadminemail + " from " + userName);
+			LOGGER.log(Level.INFO, "[INFO] A Request email has been sent to "
+					+ requestadminemail + " from " + userName);
 		}
 
 		return;
 	}
 
-	private MimeMessage createMail(String itemName, String userName, String requestType) throws MessagingException, UnknownHostException {
+	private MimeMessage createMail(String itemName, String userName,
+			String requestType)
+			throws MessagingException, UnknownHostException {
 		String jenkinsURL = getProjectURL();
 		MimeMessage msg = createEmptyMail();
 		StringBuffer buf = new StringBuffer();
@@ -155,36 +164,43 @@ public class RequestMailSender extends Builder{
 
 		try {
 
-			if (msg != null) { 	
-				String jenkinsHostName = InetAddress.getLocalHost().getHostName();
+			if (msg != null) {
+				String jenkinsHostName = InetAddress.getLocalHost()
+						.getHostName();
 
 				// Check to see if the hostname is an ip address:
-				if (Character.isLetter(jenkinsHostName.charAt(0))){
+				if (Character.isLetter(jenkinsHostName.charAt(0))) {
 					String[] nameArray = jenkinsHostName.split("\\.");
 					jenkinsHostName = nameArray[0];
-					jenkinsHostName = jenkinsHostName.toUpperCase(Locale.ENGLISH); 
+					jenkinsHostName = jenkinsHostName
+							.toUpperCase(Locale.ENGLISH);
 				}
 
-				// Get Jenkins URL from the projectURL:   		
-				if (projectURL.contains("/view/")){
+				// Get Jenkins URL from the projectURL:
+				if (projectURL.contains("/view/")) {
 					jenkinsURLArray = jenkinsURL.split("/view/");
 				} else if (jenkinsURL.contains("/job/")) {
 					jenkinsURLArray = jenkinsURL.split("/job/");
-				} 
+				}
 
-				String pendingRequestsLink = jenkinsURLArray[0] +  "/plugin/requests/";
+				String pendingRequestsLink = jenkinsURLArray[0]
+						+ "/plugin/requests/";
 
 				// Email Subject line:
-				msg.setSubject(String.format(jenkinsHostName + ": " + requestType + " Request has been submitted"));
+				msg.setSubject(String.format(jenkinsHostName + ": "
+						+ requestType + " Request has been submitted"));
 
 				// Email page content:
-				buf.append(".......................................................................................................................\n\n");	    	
-				buf.append(requestType + " request has been submitted for '" + itemName + "'.\n\n");
+				buf.append(
+						".......................................................................................................................\n\n");
+				buf.append(requestType + " request has been submitted for '"
+						+ itemName + "'.\n\n");
 				buf.append("Pending Request Page:\n");
 				buf.append(pendingRequestsLink + "\n\n\n");
 				buf.append("Project Page:\n");
 				buf.append(getProjectURL() + "\n");
-				buf.append(".......................................................................................................................\n");
+				buf.append(
+						".......................................................................................................................\n");
 				msg.setText(buf.toString());
 			}
 
@@ -202,14 +218,14 @@ public class RequestMailSender extends Builder{
 		if (emailHost == null || requestemailserver.equals("")) {
 			emailHost = "localhost";
 		}
-		Properties properties = System.getProperties();       
+		Properties properties = System.getProperties();
 		properties.setProperty(requestemailserver, emailHost);
 		Session session = Session.getDefaultInstance(properties);
 		MimeMessage msg = null;
 
-		try{	
+		try {
 			msg = new MimeMessage(session);
-			msg.setContent("", "text/html");	        
+			msg.setContent("", "text/html");
 			msg.setFrom(new InternetAddress(userName + requestmaildomain));
 			msg.setSentDate(new Date());
 
@@ -222,8 +238,9 @@ public class RequestMailSender extends Builder{
 			msg.addRecipients(Message.RecipientType.TO, addresss_TO);
 			msg.addRecipients(Message.RecipientType.CC, addresss_CC);
 
-		}catch (MessagingException me) {
-			LOGGER.log(Level.WARNING, "Unable to create email message! ",  me.getMessage());
+		} catch (MessagingException me) {
+			LOGGER.log(Level.WARNING, "Unable to create email message! ",
+					me.getMessage());
 		}
 
 		return msg;
@@ -234,7 +251,8 @@ public class RequestMailSender extends Builder{
 	}
 
 	@Extension()
-	public static class DescriptorEmailImpl extends BuildStepDescriptor<Builder> {
+	public static class DescriptorEmailImpl
+			extends BuildStepDescriptor<Builder> {
 
 		private String requestadminemail;
 		private String requestemailserver;
@@ -253,10 +271,12 @@ public class RequestMailSender extends Builder{
 			super(RequestMailSender.class);
 			load();
 		}
-		
-		// Runs when the global settings are submitted to save configuration changes:
+
+		// Runs when the global settings are submitted to save configuration
+		// changes:
 		@Override
-		public boolean configure(StaplerRequest req, JSONObject json) throws FormException{
+		public boolean configure(StaplerRequest req, JSONObject json)
+				throws FormException {
 			req.bindJSON(this, json.getJSONObject("globalRequests"));
 			save();
 			return true;
@@ -321,12 +341,12 @@ public class RequestMailSender extends Builder{
 		public boolean isEnableUnlockBuild() {
 			return enableUnlockBuild;
 		}
-		
+
 		public boolean isEnableRenameJob() {
 			return enableRenameJob;
 		}
 
-		public boolean isEnableEmails(){
+		public boolean isEnableEmails() {
 			return enableEmails;
 		}
 
@@ -342,13 +362,13 @@ public class RequestMailSender extends Builder{
 		public void setEnableUnlockBuild(boolean enableUnlockBuild) {
 			this.enableUnlockBuild = enableUnlockBuild;
 		}
-		
+
 		@DataBoundSetter
 		public void setEnableRenameJob(boolean enableRenameJob) {
 			this.enableRenameJob = enableRenameJob;
 		}
 
-		public void setEnableEmails(boolean enableEmails){
+		public void setEnableEmails(boolean enableEmails) {
 			this.enableEmails = enableEmails;
 		}
 
@@ -362,20 +382,22 @@ public class RequestMailSender extends Builder{
 			return "Requests";
 		}
 
-		public FormValidation doTestEmail(@QueryParameter("testEmailAddress") final String testEmailAddress) throws MessagingException, UnknownHostException {
+		public FormValidation doTestEmail(
+				@QueryParameter("testEmailAddress") final String testEmailAddress)
+				throws MessagingException, UnknownHostException {
 			String emailHost = getRequestemailhost();
 			String returnMessage = "Unable to create email message";
 			if (emailHost == null || requestemailserver.equals("")) {
 				emailHost = "localhost";
 			}
-			Properties properties = System.getProperties();       
+			Properties properties = System.getProperties();
 			properties.setProperty(requestemailserver, emailHost);
 			Session session = Session.getDefaultInstance(properties);
 			MimeMessage msg = null;
 
-			try{	
+			try {
 				msg = new MimeMessage(session);
-				msg.setContent("", "text/html");	        
+				msg.setContent("", "text/html");
 				msg.setFrom(new InternetAddress(requestadminemail));
 				msg.setSentDate(new Date());
 
@@ -384,20 +406,25 @@ public class RequestMailSender extends Builder{
 				msg.addRecipients(Message.RecipientType.TO, addresss_TO);
 
 			} catch (MessagingException me) {
-				LOGGER.log(Level.WARNING, "Unable to create email message! ",  me.getMessage());
-				returnMessage = "Unable to create email message"; 	
+				LOGGER.log(Level.WARNING, "Unable to create email message! ",
+						me.getMessage());
+				returnMessage = "Unable to create email message";
 				return FormValidation.error(returnMessage);
 			}
 
 			StringBuffer buf = new StringBuffer();
 
 			// Email Subject line:
-			msg.setSubject(String.format("Test Email - Jenkins Request Plugin"));
+			msg.setSubject(
+					String.format("Test Email - Jenkins Request Plugin"));
 
 			// Email page content:
-			buf.append(".......................................................................................................................\n");	    	
-			buf.append("This is a test email from the Jenkins Requests Plugin\n");
-			buf.append(".......................................................................................................................\n");
+			buf.append(
+					".......................................................................................................................\n");
+			buf.append(
+					"This is a test email from the Jenkins Requests Plugin\n");
+			buf.append(
+					".......................................................................................................................\n");
 			msg.setText(buf.toString());
 
 			Transport.send(msg);
@@ -409,5 +436,3 @@ public class RequestMailSender extends Builder{
 	}
 
 }
-
-

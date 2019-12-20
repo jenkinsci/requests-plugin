@@ -31,20 +31,22 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
 // @author John Flynn <john.trixmot.flynn@gmail.com>
 
 public class UnlockRequest extends Request {
 
-	private static final Logger LOGGER = Logger.getLogger(UnlockRequest.class.getName());
+	private static final Logger LOGGER = Logger
+			.getLogger(UnlockRequest.class.getName());
 
-	public UnlockRequest(String requestType, String username, String project, String projectFullName, String buildNumber) {
+	public UnlockRequest(String requestType, String username, String project,
+			String projectFullName, String buildNumber) {
 		super(requestType, username, project, projectFullName, buildNumber);
 	}
 
 	@Override
 	public String getMessage() {
-		return Messages.UnlockRequest_message(buildNumber + " for " + projectFullName);
+		return Messages
+				.UnlockRequest_message(buildNumber + " for " + projectFullName);
 	}
 
 	public boolean execute(Item item) {
@@ -54,52 +56,76 @@ public class UnlockRequest extends Request {
 
 		try {
 			jenkins = Jenkins.getInstance();
-			if (jenkins == null) throw new NullPointerException("Jenkins instance is null");
+			if (jenkins == null)
+				throw new NullPointerException("Jenkins instance is null");
 
-			if (Jenkins.getInstance() != null && Jenkins.getInstance().hasPermission(Run.DELETE)) {            
+			if (Jenkins.getInstance() != null
+					&& Jenkins.getInstance().hasPermission(Run.DELETE)) {
 				try {
 					String jenkinsURL = null;
 
 					try {
 						jenkinsURL = Jenkins.getInstance().getRootUrl();
-						if(jenkinsURL == null) throw new NullPointerException("Jenkins instance is null");
+						if (jenkinsURL == null)
+							throw new NullPointerException(
+									"Jenkins instance is null");
 					} catch (NullPointerException npe) {
 						LOGGER.log(Level.SEVERE, "[ERROR] Exception: " + npe);
 						return false;
 					}
 
-					String urlString = jenkinsURL + "job/" + projectFullName + "/" + buildNumber + "/toggleLogKeep";
+					String urlString = jenkinsURL + "job/" + projectFullName
+							+ "/" + buildNumber + "/toggleLogKeep";
 					RequestsUtility requestsUtility = new RequestsUtility();
 
 					try {
-						returnStatus = requestsUtility.runPostMethod(jenkinsURL, urlString);
-						
+						returnStatus = requestsUtility.runPostMethod(jenkinsURL,
+								urlString);
+
 						if (returnStatus.equals("success")) {
-							errorMessage = "Build number " + buildNumber + " has been properly Unlocked for " + projectFullName;
-							LOGGER.log(Level.INFO, "Build {0} has been properly Unlocked", projectFullName + ":" + buildNumber);
+							errorMessage = "Build number " + buildNumber
+									+ " has been properly Unlocked for "
+									+ projectFullName;
+							LOGGER.log(Level.INFO,
+									"Build {0} has been properly Unlocked",
+									projectFullName + ":" + buildNumber);
 							success = true;
 						} else {
-							errorMessage = "Unlock Build call has failed for " + projectFullName + ":" + buildNumber + " : " + returnStatus;
-							LOGGER.log(Level.INFO, "Unlock Build call has failed: ", projectFullName + ":" + buildNumber + " : " + returnStatus);
-							
+							errorMessage = "Unlock Build call has failed for "
+									+ projectFullName + ":" + buildNumber
+									+ " : " + returnStatus;
+							LOGGER.log(Level.INFO,
+									"Unlock Build call has failed: ",
+									projectFullName + ":" + buildNumber + " : "
+											+ returnStatus);
+
 							return false;
 						}
-						
+
 					} catch (IOException e) {
 						errorMessage = e.getMessage();
-						LOGGER.log(Level.SEVERE, "Unable to Unlock the build " + projectFullName + ":" + buildNumber, e.getMessage());
+						LOGGER.log(
+								Level.SEVERE, "Unable to Unlock the build "
+										+ projectFullName + ":" + buildNumber,
+								e.getMessage());
 
 						return false;
 					}
 
 				} catch (Exception e) {
 					errorMessage = e.getMessage();
-					LOGGER.log(Level.SEVERE, "Unable to Unlock the build " + projectFullName + ":" + buildNumber, e.getMessage());
+					LOGGER.log(
+							Level.SEVERE, "Unable to Unlock the build "
+									+ projectFullName + ":" + buildNumber,
+							e.getMessage());
 				}
 
 			} else {
-				errorMessage = "The current user " + username + " does not have permission to Unlock the job";            
-				LOGGER.log(Level.FINE, "The current user {0} does not have permission to UNLOCK the job", new Object[]{username});
+				errorMessage = "The current user " + username
+						+ " does not have permission to Unlock the job";
+				LOGGER.log(Level.FINE,
+						"The current user {0} does not have permission to UNLOCK the job",
+						new Object[] { username });
 			}
 
 		} catch (NullPointerException npe) {

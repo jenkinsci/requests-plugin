@@ -45,7 +45,6 @@ import java.util.logging.Logger;
 
 import static java.util.logging.Level.FINE;
 
-
 // Represents the "Ask for renaming" action appearing on a given project's page.
 //
 // @author Daniel Petisme <daniel.petisme@gmail.com> <http://danielpetisme.blogspot.com/>
@@ -58,7 +57,8 @@ public class RequestRenameAction implements Action {
 		this.project = target;
 	}
 
-	public HttpResponse doCreateRenameRequest(StaplerRequest request, StaplerResponse response) throws IOException, ServletException {
+	public HttpResponse doCreateRenameRequest(StaplerRequest request,
+			StaplerResponse response) throws IOException, ServletException {
 		try {
 			if (isIconDisplayed()) {
 				LOGGER.log(FINE, "Renaming request");
@@ -66,28 +66,35 @@ public class RequestRenameAction implements Action {
 				final String newName = request.getParameter("new-name");
 				final String username = request.getParameter("username");
 
-				RequestsPlugin plugin = Jenkins.getInstance().getPlugin(RequestsPlugin.class);
+				RequestsPlugin plugin = Jenkins.getInstance()
+						.getPlugin(RequestsPlugin.class);
 				String[] projectList = null;
 				String projectName = project.getFullName();
 				String projectFullName = project.getFullName();
 
 				// Check if a folder job type:
-				if (!projectFullName.contains("/job/") && projectFullName.contains("/")) {
+				if (!projectFullName.contains("/job/")
+						&& projectFullName.contains("/")) {
 					projectList = projectFullName.split("/");
 					projectFullName = projectList[0] + "/job/" + projectList[1];
 				}
 
-				//String requestType, String username, String project, String projectFullName, String buildNumber
-				plugin.addRequest(new RenameRequest( "renameJob",  username,  projectName,  projectFullName,  newName));
-				LOGGER.log(Level.INFO, "The request to rename the jobs {0} in {1} has been sent to the administrator", new Object[]{project.getName(), newName});
+				// String requestType, String username, String project, String
+				// projectFullName, String buildNumber
+				plugin.addRequest(new RenameRequest("renameJob", username,
+						projectName, projectFullName, newName));
+				LOGGER.log(Level.INFO,
+						"The request to rename the jobs {0} in {1} has been sent to the administrator",
+						new Object[] { project.getName(), newName });
 			}
 		} catch (NullPointerException e) {
 			LOGGER.log(Level.SEVERE, "[ERROR] Exception: " + e.getMessage());
 
 			return null;
-		} 
+		}
 
-		return new HttpRedirect(request.getContextPath() + '/' + project.getUrl());
+		return new HttpRedirect(
+				request.getContextPath() + '/' + project.getUrl());
 	}
 
 	public String getDisplayName() {
@@ -113,31 +120,32 @@ public class RequestRenameAction implements Action {
 	}
 
 	/*
-	 * Permission computing
-	 * 1: The user has the permission
-	 * 0: The user has not the permission
-	 * 
-	 * Create    | 1 | 0 | 
-	 * Delete    | 0 | 1 | 
-	 * Configure | 0 | 0 | 
-	 * 
-	 * So, the action has to be enabled when:
-	 * Create AND !Delete AND !Configure OR
-	 * Delete AND !Create AND !Configure
+	 * Permission computing 1: The user has the permission 0: The user has not
+	 * the permission
+	 *
+	 * Create | 1 | 0 | Delete | 0 | 1 | Configure | 0 | 0 |
+	 *
+	 * So, the action has to be enabled when: Create AND !Delete AND !Configure
+	 * OR Delete AND !Create AND !Configure
 	 */
 	private boolean isIconDisplayed() {
 		boolean isDisplayed = false;
 		try {
-			isDisplayed = ((hasCreatePermission() && !hasDeletePermission() && !hasConfigurePermission()) || (hasDeletePermission() && !hasCreatePermission() && !hasConfigurePermission()));
+			isDisplayed = ((hasCreatePermission() && !hasDeletePermission()
+					&& !hasConfigurePermission())
+					|| (hasDeletePermission() && !hasCreatePermission()
+							&& !hasConfigurePermission()));
 
 		} catch (IOException | ServletException e) {
-			LOGGER.log(Level.WARNING, "Impossible to know if the icon has to be displayed", e);
+			LOGGER.log(Level.WARNING,
+					"Impossible to know if the icon has to be displayed", e);
 		}
 
 		return isDisplayed;
 	}
 
-	private boolean hasConfigurePermission() throws IOException, ServletException {
+	private boolean hasConfigurePermission()
+			throws IOException, ServletException {
 		return Functions.hasPermission(project, Item.CONFIGURE);
 	}
 
@@ -149,6 +157,7 @@ public class RequestRenameAction implements Action {
 		return Functions.hasPermission(project, Item.DELETE);
 	}
 
-	private static final Logger LOGGER = Logger.getLogger(RequestRenameAction.class.getName());
+	private static final Logger LOGGER = Logger
+			.getLogger(RequestRenameAction.class.getName());
 
 }

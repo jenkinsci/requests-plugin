@@ -2,7 +2,7 @@
  * The MIT License
  *
  * Copyright (c) 2011-2012, Manufacture Francaise des Pneumatiques Michelin, Daniel Petisme
- * Portions Copyright 2019 Lexmark 
+ * Portions Copyright 2019 Lexmark
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -50,154 +50,163 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
 //Manages pending requests.
-// @author Daniel Petisme <daniel.petisme@gmail.com> <http://danielpetisme.blogspot.com/>, John Flynn <john.trixmot.flynn1@gmail.com> 
+// @author Daniel Petisme <daniel.petisme@gmail.com> <http://danielpetisme.blogspot.com/>, John Flynn <john.trixmot.flynn1@gmail.com>
 
 public class RequestsPlugin extends Plugin {
 
+	// The requests are unique (to avoid duplication problems like delete a job
+	// already deleted)
+	private List<Request> requests = new ArrayList<Request>();
+	private static final Logger LOGGER = Logger
+			.getLogger(RequestsPlugin.class.getName());
+	private transient List<String> errors = new ArrayList<String>();
 
-    //The requests are unique (to avoid duplication problems like delete a job already deleted)
-    private List<Request> requests = new ArrayList<Request>();
-    private static final Logger LOGGER = Logger.getLogger(RequestsPlugin.class.getName());
-    private transient List<String> errors = new ArrayList<String>();
+	public void addRequest(final Request request) {
+		boolean alreadyRequested = false;
 
-    public void addRequest(final Request request) {
-    	boolean alreadyRequested = false;
-        
-        for (int i = 0; i < requests.size(); i++) {
-            String projectFullName = requests.get(i).getProjectFullName();
-            String buildNumber = requests.get(i).getBuildNumber();
-            String requestType = requests.get(i).getRequestType();
-            
-            //Allows a delete project, delete build and unlock build for the same build but will not submit duplicate of the same request:
-            if (projectFullName.equals(request.getProjectFullName()) && buildNumber.equals(request.getBuildNumber()) && requestType.equals(request.getRequestType())) {
-            	alreadyRequested = true;
-            	break;
-            }
-        }
+		for (int i = 0; i < requests.size(); i++) {
+			String projectFullName = requests.get(i).getProjectFullName();
+			String buildNumber = requests.get(i).getBuildNumber();
+			String requestType = requests.get(i).getRequestType();
 
-        if (!alreadyRequested) {
-            requests.add(request);
-            persistPendingRequests();
-        }
-    }
+			// Allows a delete project, delete build and unlock build for the
+			// same build but will not submit duplicate of the same request:
+			if (projectFullName.equals(request.getProjectFullName())
+					&& buildNumber.equals(request.getBuildNumber())
+					&& requestType.equals(request.getRequestType())) {
+				alreadyRequested = true;
+				break;
+			}
+		}
 
-    public HttpResponse doManageRequests(StaplerRequest request, StaplerResponse response) throws IOException, ServletException {
-        Jenkins.getInstance().checkPermission(Jenkins.ADMINISTER);
+		if (!alreadyRequested) {
+			requests.add(request);
+			persistPendingRequests();
+		}
+	}
 
-        errors.clear();
+	public HttpResponse doManageRequests(StaplerRequest request,
+			StaplerResponse response) throws IOException, ServletException {
+		Jenkins.getInstance().checkPermission(Jenkins.ADMINISTER);
 
-        String[] selectedRequests = request.getParameterValues("selected");
-        ArrayList<Integer> selectedIndexs = new ArrayList<Integer>();
-        //Store the request once they have been applied
-        List<Request> requestsToRemove = new ArrayList<Request>();
+		errors.clear();
 
-        if (selectedRequests != null && selectedRequests.length > 0) {
-            for (String sindex : selectedRequests) {
-                if (StringUtils.isNotBlank(sindex)) {
-                    int index = Integer.parseInt(sindex);
-                    Request currentRequest = requests.get(index);
-                    selectedIndexs.add(index);
-                    
-                    if (StringUtils.isNotBlank(request.getParameter("apply"))) {
-                    	String requestType = currentRequest.getRequestType();
-                        if (currentRequest.process(requestType)) {
-                            //Store to remove
-                            requestsToRemove.add(currentRequest);
-                           
-                        } else {
-                            errors.add(currentRequest.getErrorMessage());
-                            LOGGER.log(Level.WARNING, "The request \"{0}\" can not be processed", currentRequest.getMessage());
-                        }
-                    } else {
-                        requestsToRemove.add(currentRequest);
-                        LOGGER.log(Level.INFO, "The request \"{0}\" has been discarded", currentRequest.getMessage());
-                    }
+		String[] selectedRequests = request.getParameterValues("selected");
+		ArrayList<Integer> selectedIndexs = new ArrayList<Integer>();
+		// Store the request once they have been applied
+		List<Request> requestsToRemove = new ArrayList<Request>();
 
-                } else {
-                    LOGGER.log(Level.WARNING, "The request index is not defined");
-                }
-            }
-        } else {
-            LOGGER.log(Level.FINE, "Nothing selected");
-        }
+		if (selectedRequests != null && selectedRequests.length > 0) {
+			for (String sindex : selectedRequests) {
+				if (StringUtils.isNotBlank(sindex)) {
+					int index = Integer.parseInt(sindex);
+					Request currentRequest = requests.get(index);
+					selectedIndexs.add(index);
 
-        //Once it has done the work, it removes the applied requests
-        if (!requestsToRemove.isEmpty()) {
-            removeAllRequests(selectedIndexs);
-        }
-        
-        return new HttpRedirect(".");
-    }
+					if (StringUtils.isNotBlank(request.getParameter("apply"))) {
+						String requestType = currentRequest.getRequestType();
+						if (currentRequest.process(requestType)) {
+							// Store to remove
+							requestsToRemove.add(currentRequest);
 
-    public List<Request> getRequests() {
-        return requests;
-    }
+						} else {
+							errors.add(currentRequest.getErrorMessage());
+							LOGGER.log(Level.WARNING,
+									"The request \"{0}\" can not be processed",
+									currentRequest.getMessage());
+						}
+					} else {
+						requestsToRemove.add(currentRequest);
+						LOGGER.log(Level.INFO,
+								"The request \"{0}\" has been discarded",
+								currentRequest.getMessage());
+					}
 
-    public List<String> getErrors() {
-        return errors;
-    }
-    
-    public void setErrors(String errorString) {
-    	errors.clear();
-    	errors.add(errorString);
-    }
-    
-    private void persistPendingRequests() {
-        try {
-            save();
-        } catch (IOException e) {
-            LOGGER.log(Level.WARNING, "Failed to persist the pending requests");
-        }
-    }
+				} else {
+					LOGGER.log(Level.WARNING,
+							"The request index is not defined");
+				}
+			}
+		} else {
+			LOGGER.log(Level.FINE, "Nothing selected");
+		}
 
-	public void removeAllRequests(ArrayList<Integer> selectedIndexs) {  
+		// Once it has done the work, it removes the applied requests
+		if (!requestsToRemove.isEmpty()) {
+			removeAllRequests(selectedIndexs);
+		}
+
+		return new HttpRedirect(".");
+	}
+
+	public List<Request> getRequests() {
+		return requests;
+	}
+
+	public List<String> getErrors() {
+		return errors;
+	}
+
+	public void setErrors(String errorString) {
+		errors.clear();
+		errors.add(errorString);
+	}
+
+	private void persistPendingRequests() {
+		try {
+			save();
+		} catch (IOException e) {
+			LOGGER.log(Level.WARNING, "Failed to persist the pending requests");
+		}
+	}
+
+	public void removeAllRequests(ArrayList<Integer> selectedIndexs) {
 		// Remove index's from requests starting with highest index first:
-		Collections.sort(selectedIndexs, Collections.reverseOrder()); 
-		
-        for (int i = 0; i < selectedIndexs.size(); i++) {
-        	int selectedIndex = selectedIndexs.get(i);
-        	requests.remove(selectedIndex);            
-        }
-      
-        persistPendingRequests();
-    }
+		Collections.sort(selectedIndexs, Collections.reverseOrder());
 
-    @Override
-    public void start() throws Exception {
-        super.start();
+		for (int i = 0; i < selectedIndexs.size(); i++) {
+			int selectedIndex = selectedIndexs.get(i);
+			requests.remove(selectedIndex);
+		}
 
-        Hudson.XSTREAM.alias("UnlockRequest", UnlockRequest.class);
-        Hudson.XSTREAM.alias("DeleteJobRequest", DeleteJobRequest.class);
-        Hudson.XSTREAM.alias("DeleteBuildRequest", DeleteBuildRequest.class);
-        Hudson.XSTREAM.alias("RenameRequest", RenameRequest.class);
-        Hudson.XSTREAM.alias("RequestsPlugin", RequestsPlugin.class);
+		persistPendingRequests();
+	}
 
-        load();
-    }
+	@Override
+	public void start() throws Exception {
+		super.start();
 
-    @Extension
-    public static final class RequestManagementLink extends ManagementLink {
+		Hudson.XSTREAM.alias("UnlockRequest", UnlockRequest.class);
+		Hudson.XSTREAM.alias("DeleteJobRequest", DeleteJobRequest.class);
+		Hudson.XSTREAM.alias("DeleteBuildRequest", DeleteBuildRequest.class);
+		Hudson.XSTREAM.alias("RenameRequest", RenameRequest.class);
+		Hudson.XSTREAM.alias("RequestsPlugin", RequestsPlugin.class);
 
-        @Override
-        public String getDescription() {
-            return Messages.RequestManagementLink_Description();
-        }
+		load();
+	}
 
-        @Override
-        public String getIconFileName() {
-            return "/images/48x48/clipboard.png";
-        }
+	@Extension
+	public static final class RequestManagementLink extends ManagementLink {
 
-        public String getDisplayName() {
-            return Messages.RequestManagementLink_DisplayName();
-        }
+		@Override
+		public String getDescription() {
+			return Messages.RequestManagementLink_Description();
+		}
 
-        @Override
-        public String getUrlName() {
-            return "plugin/requests";
-        }
-    }
-    
+		@Override
+		public String getIconFileName() {
+			return "/images/48x48/clipboard.png";
+		}
+
+		public String getDisplayName() {
+			return Messages.RequestManagementLink_DisplayName();
+		}
+
+		@Override
+		public String getUrlName() {
+			return "plugin/requests";
+		}
+	}
+
 }

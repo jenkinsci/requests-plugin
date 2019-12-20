@@ -40,7 +40,6 @@ import java.util.List;
 @Extension
 public class RequestBuildActionFactory extends TransientActionFactory<Run> {
 
-	
     @Override public Class<Run> type() {
         return Run.class;
     }
@@ -52,11 +51,11 @@ public class RequestBuildActionFactory extends TransientActionFactory<Run> {
         if (descriptorEmailImpl.isEnableDeleteBuild()) {
         	adminActions.add(new RequestDeleteBuildAction(target));
         }
-        
+
         if (descriptorEmailImpl.isEnableUnlockBuild()) {
         	adminActions.add(new RequestUnlockAction(target));
         }
-        
+
         return adminActions;
     }
 

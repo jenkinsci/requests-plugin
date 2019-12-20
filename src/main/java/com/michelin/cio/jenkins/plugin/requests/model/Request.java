@@ -30,12 +30,9 @@ import jenkins.model.Jenkins;
 import java.util.Calendar;
 import org.apache.commons.lang.time.FastDateFormat;
 
-
-
 // @author Daniel Petisme <daniel.petisme@gmail.com> <http://danielpetisme.blogspot.com/>
 
 public abstract class Request {
-
 
 	protected String requestType;
 	protected String username;
@@ -44,12 +41,13 @@ public abstract class Request {
 	protected String buildNumber;
 	protected String errorMessage;
 	private String creationDate;
-	
-	private static String dateFormat="yyyy-MM-dd HH:mm:ss";
-	private static final FastDateFormat yyyymmdd = FastDateFormat.getInstance(dateFormat);
 
+	private static String dateFormat = "yyyy-MM-dd HH:mm:ss";
+	private static final FastDateFormat yyyymmdd = FastDateFormat
+			.getInstance(dateFormat);
 
-	public Request(String requestType, String username, String project, String projectFullName, String buildNumber) {
+	public Request(String requestType, String username, String project,
+			String projectFullName, String buildNumber) {
 		this.requestType = requestType;
 		this.username = username;
 		this.project = project;
@@ -58,16 +56,17 @@ public abstract class Request {
 		this.creationDate = yyyymmdd.format(Calendar.getInstance().getTime());
 	}
 
-	public String getProject() {       
+	public String getProject() {
 		return project;
 	}
 
 	public String getProjectFullName() {
 		String[] projectList = null;
-		if (!projectFullName.contains("/job/") && projectFullName.contains("/")) {
+		if (!projectFullName.contains("/job/")
+				&& projectFullName.contains("/")) {
 			projectList = projectFullName.split("/");
 			projectFullName = projectList[0] + "/job/" + projectList[1];
-		} 
+		}
 
 		return projectFullName;
 	}
@@ -95,35 +94,38 @@ public abstract class Request {
 	public abstract String getMessage();
 
 	public boolean process(String requestType) {
-		boolean success = false;  
+		boolean success = false;
 		String[] projectNameList = null;
 		String searchName = projectFullName;
-		
+
 		try {
 
-		// Check if a folder job type:
-		if (searchName.contains("/job/")) {
-			projectNameList = searchName.split("/job/");
-			searchName = projectNameList[0] + "/" + projectNameList[1];
-		}
+			// Check if a folder job type:
+			if (searchName.contains("/job/")) {
+				projectNameList = searchName.split("/job/");
+				searchName = projectNameList[0] + "/" + projectNameList[1];
+			}
 
-		Item item = Jenkins.getInstance().getItemByFullName(searchName);
+			Item item = Jenkins.getInstance().getItemByFullName(searchName);
 
-		if (item != null) {
-			success = execute(item);
-		} else {
-			if (requestType.equals("deleteJob") || requestType.equals("renameJob")) {
-				errorMessage = "The job " + projectFullName + " doesn't exist";
+			if (item != null) {
+				success = execute(item);
 			} else {
-				errorMessage = "The build for " + projectFullName + " doesn't exist";
-			}            
-		}
-		
+				if (requestType.equals("deleteJob")
+						|| requestType.equals("renameJob")) {
+					errorMessage = "The job " + projectFullName
+							+ " doesn't exist";
+				} else {
+					errorMessage = "The build for " + projectFullName
+							+ " doesn't exist";
+				}
+			}
+
 		} catch (NullPointerException e) {
 			errorMessage = e.getMessage();
 
 			return false;
-		} 
+		}
 
 		return success;
 	}

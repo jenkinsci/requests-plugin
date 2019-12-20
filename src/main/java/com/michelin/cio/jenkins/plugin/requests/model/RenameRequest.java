@@ -33,7 +33,6 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
 // Represents a renaming request sent by a user to the administrator.
 //
 // @author Daniel Petisme <daniel.petisme@gmail.com> <http://danielpetisme.blogspot.com/>
@@ -42,7 +41,8 @@ public class RenameRequest extends Request {
 
 	private String newName;
 
-	public RenameRequest(String requestType, String username, String project, String projectFullName, String newName) {
+	public RenameRequest(String requestType, String username, String project,
+			String projectFullName, String newName) {
 		super(requestType, username, project, projectFullName, newName);
 		this.newName = newName;
 	}
@@ -67,28 +67,42 @@ public class RenameRequest extends Request {
 		boolean success = false;
 
 		try {
-			if (Jenkins.getInstance().hasPermission(Item.DELETE) && Jenkins.getInstance().hasPermission(Item.CREATE)) {				
+			if (Jenkins.getInstance().hasPermission(Item.DELETE)
+					&& Jenkins.getInstance().hasPermission(Item.CREATE)) {
 				((Job) item).renameTo(newName);
 				success = true;
-				LOGGER.log(Level.INFO, "The jobs {0} has been properly renamed in {1}", new Object[]{item.getName(), newName});
+				LOGGER.log(Level.INFO,
+						"The jobs {0} has been properly renamed in {1}",
+						new Object[] { item.getName(), newName });
 
 			} else {
-				errorMessage = "The current user " + username + " has no permission to rename the job";
-				LOGGER.log(Level.FINE, "The current user {0} has no permission to RENAME the job", new Object[]{username});
+				errorMessage = "The current user " + username
+						+ " has no permission to rename the job";
+				LOGGER.log(Level.FINE,
+						"The current user {0} has no permission to RENAME the job",
+						new Object[] { username });
 			}
 		} catch (NullPointerException e) {
 			errorMessage = e.getMessage();
-			LOGGER.log(Level.SEVERE, "Unable to rename the job " + item.getName(), e.getMessage());
-		}  catch (IOException e) {
+			LOGGER.log(Level.SEVERE,
+					"Unable to rename the job " + item.getName(),
+					e.getMessage());
+		} catch (IOException e) {
 			errorMessage = e.getMessage();
-			LOGGER.log(Level.SEVERE, "Unable to rename the job " + item.getName(), e.getMessage());
+			LOGGER.log(Level.SEVERE,
+					"Unable to rename the job " + item.getName(),
+					e.getMessage());
 		} catch (IllegalArgumentException e) {
 			errorMessage = e.getMessage();
-			LOGGER.log(Level.SEVERE, "Unable to rename the job " + item.getName(), e.getMessage());
+			LOGGER.log(Level.SEVERE,
+					"Unable to rename the job " + item.getName(),
+					e.getMessage());
 		}
 
 		return success;
 	}
-	private static final Logger LOGGER = Logger.getLogger(RenameRequest.class.getName());
+
+	private static final Logger LOGGER = Logger
+			.getLogger(RenameRequest.class.getName());
 
 }
