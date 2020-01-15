@@ -1,6 +1,12 @@
 
 ## Version History
 
+
+Version 2.2.2 (January 15, 2020)
+
+-	JENKINS-60780 Fixed delete job when within multiple folders views.
+-	JENKINS-60781 Allow multiple admin email addresses.
+
 Version 2.2.1 (January 08, 2020)
 
 -	Changed from user password for Delete/Unlock requests to a jenkins user token.
