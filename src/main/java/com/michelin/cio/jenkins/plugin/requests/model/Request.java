@@ -29,6 +29,7 @@ import jenkins.model.Jenkins;
 
 import java.util.Calendar;
 import org.apache.commons.lang.time.FastDateFormat;
+import java.util.logging.Logger;
 
 // @author Daniel Petisme <daniel.petisme@gmail.com> <http://danielpetisme.blogspot.com/>
 
@@ -45,6 +46,8 @@ public abstract class Request {
 	private static String dateFormat = "yyyy-MM-dd HH:mm:ss";
 	private static final FastDateFormat yyyymmdd = FastDateFormat
 			.getInstance(dateFormat);
+	private static final Logger LOGGER = Logger
+			.getLogger(RequestsUtility.class.getName());
 
 	public Request(String requestType, String username, String project,
 			String projectFullName, String buildNumber) {
@@ -57,15 +60,24 @@ public abstract class Request {
 	}
 
 	public String getProject() {
+		if (project.contains("/job/") || projectFullName.contains("/")) {
+			String [] projectList = projectFullName.split("/");
+			int nameCount = projectList.length;
+			project = projectList[nameCount-1];
+		}
 		return project;
 	}
 
 	public String getProjectFullName() {
 		String[] projectList = null;
-		if (!projectFullName.contains("/job/")
-				&& projectFullName.contains("/")) {
+		if (!projectFullName.contains("/job/") && projectFullName.contains("/")) {
 			projectList = projectFullName.split("/");
-			projectFullName = projectList[0] + "/job/" + projectList[1];
+			// Need to add '/job/' in between all names:
+			int nameCount = projectList.length;
+			projectFullName = projectList[0];
+			for (int i = 1; i < nameCount; i++) {
+				projectFullName = projectFullName + "/job/" + projectList[i];
+			}
 		}
 
 		return projectFullName;
@@ -97,13 +109,21 @@ public abstract class Request {
 		boolean success = false;
 		String[] projectNameList = null;
 		String searchName = projectFullName;
+		LOGGER.info("[INFO] searchName: " + searchName);
 
 		try {
 
 			// Check if a folder job type:
 			if (searchName.contains("/job/")) {
 				projectNameList = searchName.split("/job/");
-				searchName = projectNameList[0] + "/" + projectNameList[1];
+				// Need to add '/job/' in between all names:
+				int nameCount = projectNameList.length;
+				projectFullName = projectNameList[0];
+				for (int i = 1; i < nameCount; i++) {
+					projectFullName = projectFullName + "/" + projectNameList[i];
+				}
+				searchName = projectFullName;
+				//LOGGER.info("[INFO] FOLDER NAME: " + projectFullName);
 			}
 
 			Item item = Jenkins.getInstance().getItemByFullName(searchName);

@@ -46,12 +46,12 @@ public class DeleteJobRequest extends Request {
 
 	@Override
 	public String getMessage() {
-		return Messages.DeleteJobRequest_message(projectFullName);
+		return Messages.DeleteJobRequest_message(project);
 	}
 
 	public boolean execute(Item item) {
 		boolean success = false;
-
+		
 		try {
 			if (Jenkins.getInstance().hasPermission(Item.DELETE)) {
 				try {

@@ -87,17 +87,29 @@ public class RequestDeleteJobAction implements Action {
 				String projectName = project.getFullName();
 				String projectFullName = project.getFullName();
 
-				// Check if a folder job type:
-				if (!projectFullName.contains("/job/")
-						&& projectFullName.contains("/")) {
+				// Check if a folder job type and if multiple layers of folders:
+				if (!projectFullName.contains("/job/") && projectFullName.contains("/")) {
 					projectList = projectFullName.split("/");
-					projectFullName = projectList[0] + "/job/" + projectList[1];
+					
+					// Need to add '/job/' in between all names:
+					int nameCount = projectList.length;
+					projectFullName = projectList[0];
+					for (int i = 1; i < nameCount; i++) {
+						projectFullName = projectFullName + "/job/" + projectList[i];
+					}
+					
+					//LOGGER.info("[INFO] FOLDER Found: " + projectFullName);
 				}
 
 				RequestMailSender mailSender = new RequestMailSender(
 						project.getName(), username, "A Delete Job",
 						project.getAbsoluteUrl());
 				mailSender.executeEmail();
+				if (projectName.contains("/job/") || projectName.contains("/")) {
+					String [] projectnameList = projectName.split("/");
+					int nameCount = projectnameList.length;
+					projectName = projectnameList[nameCount-1];
+				}
 				plugin.addRequest(new DeleteJobRequest("deleteJob", username,
 						projectName, projectFullName, ""));
 			}

@@ -228,11 +228,23 @@ public class RequestMailSender extends Builder {
 			msg.setContent("", "text/html");
 			msg.setFrom(new InternetAddress(userName + requestmaildomain));
 			msg.setSentDate(new Date());
-
-			Address[] addresss_TO = new Address[1];
+			
+			String[] emailAddresses = requestadminemail.split(",");
+			int addressCount = emailAddresses.length;
+			//LOGGER.info("[INFO] Email address count: " + addressCount);
+			
+			Address[] addresss_TO = new Address[addressCount];
 			Address[] addresss_CC = new Address[1];
 
-			addresss_TO[0] = new InternetAddress(requestadminemail);
+			if (requestadminemail.contains(",")) {			
+				for (int i = 0; i < addressCount; i++) {
+					addresss_TO[i] = new InternetAddress(emailAddresses[i]);
+					//LOGGER.info("[INFO] Email address: " + emailAddresses[i]);
+				}
+			} else {
+				addresss_TO[0] = new InternetAddress(requestadminemail);
+			}
+			
 			addresss_CC[0] = new InternetAddress(userName + requestmaildomain);
 
 			msg.addRecipients(Message.RecipientType.TO, addresss_TO);
