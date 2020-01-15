@@ -86,6 +86,7 @@ public class RequestDeleteJobAction implements Action {
 				String[] projectList = null;
 				String projectName = project.getFullName();
 				String projectFullName = project.getFullName();
+				StringBuffer stringBuffer = new StringBuffer();
 
 				// Check if a folder job type and if multiple layers of folders:
 				if (!projectFullName.contains("/job/") && projectFullName.contains("/")) {
@@ -95,9 +96,11 @@ public class RequestDeleteJobAction implements Action {
 					int nameCount = projectList.length;
 					projectFullName = projectList[0];
 					for (int i = 1; i < nameCount; i++) {
-						projectFullName = projectFullName + "/job/" + projectList[i];
+						stringBuffer.append("/job/");
+						stringBuffer.append(projectList[i]);
+						//projectFullName = projectFullName + "/job/" + projectList[i];
 					}
-					
+					projectFullName = stringBuffer.toString();
 					//LOGGER.info("[INFO] FOLDER Found: " + projectFullName);
 				}
 
