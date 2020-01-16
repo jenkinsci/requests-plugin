@@ -67,6 +67,20 @@ public abstract class Request {
 		}
 		return project;
 	}
+	
+	public String getProjectNameWithoutJobSeparator() {
+		String[] projectList = null;
+		if (projectFullName.contains("/job/")) {
+			projectList = projectFullName.split("/job/");
+			int nameCount = projectList.length;
+			projectFullName = projectList[0];
+			for (int i = 1; i < nameCount; i++) {
+				projectFullName = projectFullName + "/" + projectList[i];
+			}
+		}
+
+		return projectFullName;
+	}
 
 	public String getProjectFullName() {
 		String[] projectList = null;
@@ -107,36 +121,22 @@ public abstract class Request {
 
 	public boolean process(String requestType) {
 		boolean success = false;
-		String[] projectNameList = null;
-		String searchName = projectFullName;
-		LOGGER.info("[INFO] searchName: " + searchName);
+		String projectName = getProjectNameWithoutJobSeparator();
+		//LOGGER.info("[INFO] projectName: " + projectName);
 
 		try {
 
-			// Check if a folder job type:
-			if (searchName.contains("/job/")) {
-				projectNameList = searchName.split("/job/");
-				// Need to add '/job/' in between all names:
-				int nameCount = projectNameList.length;
-				projectFullName = projectNameList[0];
-				for (int i = 1; i < nameCount; i++) {
-					projectFullName = projectFullName + "/" + projectNameList[i];
-				}
-				searchName = projectFullName;
-				//LOGGER.info("[INFO] FOLDER NAME: " + projectFullName);
-			}
-
-			Item item = Jenkins.getInstance().getItemByFullName(searchName);
+			Item item = Jenkins.getInstance().getItemByFullName(projectName);
 
 			if (item != null) {
 				success = execute(item);
 			} else {
 				if (requestType.equals("deleteJob")
 						|| requestType.equals("renameJob")) {
-					errorMessage = "The job " + projectFullName
+					errorMessage = "The job " + projectName
 							+ " doesn't exist";
 				} else {
-					errorMessage = "The build for " + projectFullName
+					errorMessage = "The build for " + projectName
 							+ " doesn't exist";
 				}
 			}

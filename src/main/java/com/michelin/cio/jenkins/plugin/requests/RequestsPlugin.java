@@ -24,6 +24,7 @@
  */
 package com.michelin.cio.jenkins.plugin.requests;
 
+import com.michelin.cio.jenkins.plugin.requests.action.RequestMailSender;
 import com.michelin.cio.jenkins.plugin.requests.model.DeleteBuildRequest;
 import com.michelin.cio.jenkins.plugin.requests.model.DeleteJobRequest;
 import com.michelin.cio.jenkins.plugin.requests.model.RenameRequest;
@@ -42,8 +43,10 @@ import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
+import javax.mail.MessagingException;
 import javax.servlet.ServletException;
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -83,6 +86,36 @@ public class RequestsPlugin extends Plugin {
 		if (!alreadyRequested) {
 			requests.add(request);
 			persistPendingRequests();
+		}
+	}
+	
+	public void addRequestPlusEmail(final Request request, final String[] emailData) throws UnknownHostException, MessagingException {
+		boolean alreadyRequested = false;
+
+		for (int i = 0; i < requests.size(); i++) {
+			String projectFullName = requests.get(i).getProjectFullName();
+			String buildNumber = requests.get(i).getBuildNumber();
+			String requestType = requests.get(i).getRequestType();
+
+			// Allows a delete project, delete build and unlock build for the
+			// same build but will not submit duplicate of the same request:
+			if (projectFullName.equals(request.getProjectFullName())
+					&& buildNumber.equals(request.getBuildNumber())
+					&& requestType.equals(request.getRequestType())) {
+				alreadyRequested = true;
+				break;
+			}
+		}
+
+		if (!alreadyRequested) {
+			requests.add(request);
+			
+			RequestMailSender mailSender = new RequestMailSender(emailData[0], emailData[1], emailData[2], emailData[3]);
+			mailSender.executeEmail();
+			//LOGGER.info("[INFO] Send Email:");
+			persistPendingRequests();
+		} else {
+			//LOGGER.info("[INFO] Don't Send Email:");
 		}
 	}
 

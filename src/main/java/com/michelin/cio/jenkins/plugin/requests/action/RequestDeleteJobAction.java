@@ -81,8 +81,7 @@ public class RequestDeleteJobAction implements Action {
 				LOGGER.log(FINE, "Delete Job Request");
 				errors.clear();
 				final String username = request.getParameter("username");
-				RequestsPlugin plugin = Jenkins.getInstance()
-						.getPlugin(RequestsPlugin.class);
+				RequestsPlugin plugin = Jenkins.getInstance().getPlugin(RequestsPlugin.class);
 				String[] projectList = null;
 				String projectName = project.getFullName();
 				String projectFullName = project.getFullName();
@@ -98,23 +97,19 @@ public class RequestDeleteJobAction implements Action {
 					for (int i = 1; i < nameCount; i++) {
 						stringBuffer.append("/job/");
 						stringBuffer.append(projectList[i]);
-						//projectFullName = projectFullName + "/job/" + projectList[i];
 					}
 					projectFullName = stringBuffer.toString();
 					//LOGGER.info("[INFO] FOLDER Found: " + projectFullName);
 				}
+				
+				String[] emailData = {project.getName(), username, "A Delete Job", project.getAbsoluteUrl()};
 
-				RequestMailSender mailSender = new RequestMailSender(
-						project.getName(), username, "A Delete Job",
-						project.getAbsoluteUrl());
-				mailSender.executeEmail();
 				if (projectName.contains("/job/") || projectName.contains("/")) {
 					String [] projectnameList = projectName.split("/");
 					int nameCount = projectnameList.length;
 					projectName = projectnameList[nameCount-1];
 				}
-				plugin.addRequest(new DeleteJobRequest("deleteJob", username,
-						projectName, projectFullName, ""));
+				plugin.addRequestPlusEmail(new DeleteJobRequest("deleteJob", username, projectName, projectFullName, ""), emailData);
 			}
 
 		} catch (NullPointerException e) {

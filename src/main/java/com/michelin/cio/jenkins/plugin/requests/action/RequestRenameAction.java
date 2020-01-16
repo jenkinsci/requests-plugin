@@ -39,6 +39,7 @@ import org.kohsuke.stapler.StaplerResponse;
 import com.michelin.cio.jenkins.plugin.requests.RequestsPlugin;
 import com.michelin.cio.jenkins.plugin.requests.model.RenameRequest;
 
+import javax.mail.MessagingException;
 import javax.servlet.ServletException;
 import java.io.IOException;
 import java.util.logging.Logger;
@@ -58,7 +59,7 @@ public class RequestRenameAction implements Action {
 	}
 
 	public HttpResponse doCreateRenameRequest(StaplerRequest request,
-			StaplerResponse response) throws IOException, ServletException {
+			StaplerResponse response) throws IOException, ServletException, MessagingException {
 		try {
 			if (isIconDisplayed()) {
 				LOGGER.log(FINE, "Renaming request");
@@ -66,25 +67,38 @@ public class RequestRenameAction implements Action {
 				final String newName = request.getParameter("new-name");
 				final String username = request.getParameter("username");
 
-				RequestsPlugin plugin = Jenkins.getInstance()
-						.getPlugin(RequestsPlugin.class);
+				StringBuffer stringBuffer = new StringBuffer();
+				RequestsPlugin plugin = Jenkins.getInstance().getPlugin(RequestsPlugin.class);
 				String[] projectList = null;
 				String projectName = project.getFullName();
 				String projectFullName = project.getFullName();
 
 				// Check if a folder job type:
-				if (!projectFullName.contains("/job/")
-						&& projectFullName.contains("/")) {
+				if (!projectFullName.contains("/job/") && projectFullName.contains("/")) {
 					projectList = projectFullName.split("/");
-					projectFullName = projectList[0] + "/job/" + projectList[1];
+					
+					// Need to add '/job/' in between all names:
+					int nameCount = projectList.length;
+					stringBuffer.append(projectList[0]);
+					for (int i = 1; i < nameCount; i++) {
+						stringBuffer.append("/job/");
+						stringBuffer.append(projectList[i]);
+					}
+					projectFullName = stringBuffer.toString();
+					//LOGGER.info("[INFO] RENAME BUILD FOLDER Found: " + projectFullName + " - " + projectName);
 				}
+				
+				if (projectName.contains("/")) {
+					String [] projectnameList = projectName.split("/");
+					int nameCount = projectnameList.length;
+					projectName = projectnameList[nameCount-1];
+				}
+				
+				String[] emailData = {projectName + " -> " + newName, username, "A Rename Job", project.getAbsoluteUrl()};
 
-				// String requestType, String username, String project, String
-				// projectFullName, String buildNumber
-				plugin.addRequest(new RenameRequest("renameJob", username,
-						projectName, projectFullName, newName));
+				plugin.addRequestPlusEmail(new RenameRequest("renameJob", username, projectName, projectFullName, newName), emailData);
 				LOGGER.log(Level.INFO,
-						"The request to rename the jobs {0} in {1} has been sent to the administrator",
+						"The request to rename the job {0} to {1} has been sent to the administrator",
 						new Object[] { project.getName(), newName });
 			}
 		} catch (NullPointerException e) {

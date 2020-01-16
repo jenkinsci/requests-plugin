@@ -74,42 +74,47 @@ public class RequestUnlockAction implements Action {
 				LOGGER.log(FINE, "Unlock Build Request");
 				errors.clear();
 				final String username = request.getParameter("username");
-				RequestsPlugin plugin = Jenkins.getInstance()
-						.getPlugin(RequestsPlugin.class);
-				String[] projectNameList = null;
+				RequestsPlugin plugin = Jenkins.getInstance().getPlugin(RequestsPlugin.class);
+				String[] projectList = null;
 				String buildName = build.getDisplayName();
 				String projectFullName;
-				String projectName;
+				String projectName = null;
 				int buildNumber = build.getNumber();
 				String fullDisplayName = build.getFullDisplayName();
-				String[] namesList = null;
+				StringBuffer stringBuffer = new StringBuffer();
 
-				// Need to exract the job name:
+				// Need to extract the job name:
 				if (fullDisplayName.contains(" » ")) {
-					namesList = fullDisplayName.split(" ");
-					projectFullName = namesList[0] + "/" + namesList[2];
-					projectName = namesList[2];
+					projectList = fullDisplayName.split(" » ");
+					int nameCount = projectList.length;
+					
+					stringBuffer.append(projectList[0]);
+					for (int i = 1; i < nameCount; i++) {
+						if (i + 1 == nameCount) {						
+							stringBuffer.append("/job/");
+							stringBuffer.append(projectList[i].split(" ")[0]);
+							projectName = projectList[i].split(" ")[0];
+						} else {
+							stringBuffer.append("/job/");
+							stringBuffer.append(projectList[i]);
+						}					
+					}
+					
+					projectFullName = stringBuffer.toString();
+
 				} else {
 					projectFullName = fullDisplayName.split(" #")[0];
 					projectName = projectFullName;
 				}
 
-				// Check if a folder job type:
-				if (!projectFullName.contains("/job/")
-						&& projectFullName.contains("/")) {
-					projectNameList = projectFullName.split("/");
-					projectFullName = projectNameList[0] + "/job/"
-							+ projectNameList[1];
-				}
+				//LOGGER.info("[INFO] UNLOCK Build projectName: " + projectName);
+				//LOGGER.info("[INFO] UNLOCK Build projectFullName: " + projectFullName);
 
 				String jenkinsUrl = Jenkins.getInstance().getRootUrl();
-				String buildUrl = jenkinsUrl + build.getUrl();
-				RequestMailSender mailSender = new RequestMailSender(buildName,
-						username, "An Unlock Build", buildUrl);
-				mailSender.executeEmail();
-				plugin.addRequest(new UnlockRequest("unlockBuild", username,
-						projectName, projectFullName,
-						Integer.toString(buildNumber)));
+				String buildUrl = jenkinsUrl + build.getUrl();				
+				String[] emailData = {buildName, username, "An Unlock Build", buildUrl};
+				
+				plugin.addRequestPlusEmail(new UnlockRequest("unlockBuild", username, projectName, projectFullName, Integer.toString(buildNumber)), emailData);
 			}
 
 		} catch (NullPointerException e) {

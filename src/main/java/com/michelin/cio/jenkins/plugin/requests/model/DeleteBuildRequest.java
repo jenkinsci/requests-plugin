@@ -39,21 +39,21 @@ public class DeleteBuildRequest extends Request {
 	private static final Logger LOGGER = Logger
 			.getLogger(DeleteBuildRequest.class.getName());
 
-	public DeleteBuildRequest(String requestType, String username,
-			String project, String projectFullName, String buildNumber) {
+	public DeleteBuildRequest(String requestType, String username, String project, String projectFullName, String buildNumber) {
 		super(requestType, username, project, projectFullName, buildNumber);
 	}
 
 	@Override
 	public String getMessage() {
-		return Messages.DeleteBuildRequest_message(
-				buildNumber + " for " + projectFullName);
+		return Messages.DeleteBuildRequest_message(buildNumber + " for " + project);
 	}
 
 	public boolean execute(Item item) {
 		Jenkins jenkins = null;
 		boolean success = false;
 		String returnStatus;
+		StringBuffer stringBuffer = new StringBuffer();
+		String[] projectList = null;
 
 		try {
 			jenkins = Jenkins.getInstance();
@@ -65,13 +65,28 @@ public class DeleteBuildRequest extends Request {
 				jenkinsURL = Jenkins.getInstance().getRootUrl();
 				if (jenkinsURL == null)
 					throw new NullPointerException("Jenkins instance is null");
-				String urlString = jenkinsURL + "job/" + projectFullName + "/"
-						+ buildNumber + "/doDelete";
+				
+				if (!projectFullName.contains("/job/") && projectFullName.contains("/")) {
+					projectList = projectFullName.split("/");
+					
+					// Need to add '/job/' in between all names:
+					int nameCount = projectList.length;
+					stringBuffer.append(projectList[0]);
+					for (int i = 1; i < nameCount; i++) {
+						stringBuffer.append("/job/");
+						stringBuffer.append(projectList[i]);
+					}
+					projectFullName = stringBuffer.toString();
+					//LOGGER.info("[INFO] FOLDER Found: " + projectFullName);
+				}
+				
+				String urlString = jenkinsURL + "job/" + projectFullName + "/" + buildNumber + "/doDelete";
 				RequestsUtility requestsUtility = new RequestsUtility();
+				
+				//LOGGER.info("[INFO] Delete Build urlString: " + urlString);
 
 				try {
-					returnStatus = requestsUtility.runPostMethod(jenkinsURL,
-							urlString);
+					returnStatus = requestsUtility.runPostMethod(jenkinsURL, urlString);
 					// Check if deletion failed due to locked build:
 					if (returnStatus.contains("Forbidden")
 							|| returnStatus.contains("Bad Request")) {

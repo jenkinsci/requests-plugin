@@ -46,13 +46,15 @@ public class UnlockRequest extends Request {
 	@Override
 	public String getMessage() {
 		return Messages
-				.UnlockRequest_message(buildNumber + " for " + projectFullName);
+				.UnlockRequest_message(buildNumber + " for " + project);
 	}
 
 	public boolean execute(Item item) {
 		Jenkins jenkins = null;
 		boolean success = false;
 		String returnStatus = null;
+		StringBuffer stringBuffer = new StringBuffer();
+		String[] projectList = null;
 
 		try {
 			jenkins = Jenkins.getInstance();
@@ -73,9 +75,21 @@ public class UnlockRequest extends Request {
 						LOGGER.log(Level.SEVERE, "[ERROR] Exception: " + npe);
 						return false;
 					}
+					
+					if (!projectFullName.contains("/job/") && projectFullName.contains("/")) {
+						projectList = projectFullName.split("/");
+						
+						// Need to add '/job/' in between all names:
+						int nameCount = projectList.length;
+						stringBuffer.append(projectList[0]);
+						for (int i = 1; i < nameCount; i++) {
+							stringBuffer.append("/job/");
+							stringBuffer.append(projectList[i]);
+						}
+						projectFullName = stringBuffer.toString();
+					}
 
-					String urlString = jenkinsURL + "job/" + projectFullName
-							+ "/" + buildNumber + "/toggleLogKeep";
+					String urlString = jenkinsURL + "job/" + projectFullName + "/" + buildNumber + "/toggleLogKeep";
 					RequestsUtility requestsUtility = new RequestsUtility();
 
 					try {

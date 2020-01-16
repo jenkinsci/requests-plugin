@@ -2,6 +2,12 @@
 ## Version History
 
 
+Version 2.2.4 (January 16, 2020)
+
+-	JENKINS-60780 Include change for Delete Build, Rename Job, Unlock Build along with Delete Job.
+-	Add Email support to Rename requests.
+-	Remove multiple emails on the same request.
+
 Version 2.2.3 (January 16, 2020)
 
 -	JENKINS-60780 Additional change for this issue.
