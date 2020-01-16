@@ -2,6 +2,10 @@
 ## Version History
 
 
+Version 2.2.3 (January 16, 2020)
+
+-	JENKINS-60780 Additional change for this issue.
+
 Version 2.2.2 (January 15, 2020)
 
 -	JENKINS-60780 Fixed delete job when within multiple folders views.

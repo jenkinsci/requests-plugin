@@ -94,7 +94,7 @@ public class RequestDeleteJobAction implements Action {
 					
 					// Need to add '/job/' in between all names:
 					int nameCount = projectList.length;
-					projectFullName = projectList[0];
+					stringBuffer.append(projectList[0]);
 					for (int i = 1; i < nameCount; i++) {
 						stringBuffer.append("/job/");
 						stringBuffer.append(projectList[i]);
