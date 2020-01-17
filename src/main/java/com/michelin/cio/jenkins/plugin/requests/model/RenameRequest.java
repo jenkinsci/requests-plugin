@@ -41,21 +41,14 @@ public class RenameRequest extends Request {
 
 	private String newName;
 
-	public RenameRequest(String requestType, String username, String project,
-			String projectFullName, String newName) {
+	public RenameRequest(String requestType, String username, String project, String projectFullName, String newName) {
 		super(requestType, username, project, projectFullName, newName);
 		this.newName = newName;
 	}
 
 	@Override
 	public String getMessage() {
-		String[] projectList = null;
-		String fullNewName = newName;
-		if (project.contains("/")) {
-			projectList = project.split("/");
-			fullNewName = projectList[0] + "/" + newName;
-		}
-		return Messages.RenameRequest_message(project, fullNewName);
+		return Messages.RenameRequest_message(project, newName);
 	}
 
 	public String getNewName() {
@@ -67,8 +60,7 @@ public class RenameRequest extends Request {
 		boolean success = false;
 
 		try {
-			if (Jenkins.getInstance().hasPermission(Item.DELETE)
-					&& Jenkins.getInstance().hasPermission(Item.CREATE)) {
+			if (Jenkins.getInstance().hasPermission(Item.DELETE) && Jenkins.getInstance().hasPermission(Item.CREATE)) {
 				((Job) item).renameTo(newName);
 				success = true;
 				LOGGER.log(Level.INFO,

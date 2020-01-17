@@ -38,6 +38,7 @@ import org.kohsuke.stapler.StaplerResponse;
 
 import com.michelin.cio.jenkins.plugin.requests.RequestsPlugin;
 import com.michelin.cio.jenkins.plugin.requests.model.RenameRequest;
+import com.michelin.cio.jenkins.plugin.requests.model.RequestsUtility;
 
 import javax.mail.MessagingException;
 import javax.servlet.ServletException;
@@ -67,25 +68,14 @@ public class RequestRenameAction implements Action {
 				final String newName = request.getParameter("new-name");
 				final String username = request.getParameter("username");
 
-				StringBuffer stringBuffer = new StringBuffer();
 				RequestsPlugin plugin = Jenkins.getInstance().getPlugin(RequestsPlugin.class);
-				String[] projectList = null;
 				String projectName = project.getFullName();
 				String projectFullName = project.getFullName();
 
 				// Check if a folder job type:
 				if (!projectFullName.contains("/job/") && projectFullName.contains("/")) {
-					projectList = projectFullName.split("/");
-					
-					// Need to add '/job/' in between all names:
-					int nameCount = projectList.length;
-					stringBuffer.append(projectList[0]);
-					for (int i = 1; i < nameCount; i++) {
-						stringBuffer.append("/job/");
-						stringBuffer.append(projectList[i]);
-					}
-					projectFullName = stringBuffer.toString();
-					//LOGGER.info("[INFO] RENAME BUILD FOLDER Found: " + projectFullName + " - " + projectName);
+					RequestsUtility requestsUtility = new RequestsUtility();
+					projectFullName = requestsUtility.constructFolderJobName(projectFullName);
 				}
 				
 				if (projectName.contains("/")) {

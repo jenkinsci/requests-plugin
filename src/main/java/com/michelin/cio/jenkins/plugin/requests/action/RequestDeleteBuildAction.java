@@ -39,6 +39,8 @@ import org.kohsuke.stapler.StaplerResponse;
 
 import com.michelin.cio.jenkins.plugin.requests.RequestsPlugin;
 import com.michelin.cio.jenkins.plugin.requests.model.DeleteBuildRequest;
+import com.michelin.cio.jenkins.plugin.requests.model.RequestsUtility;
+
 import javax.mail.MessagingException;
 import javax.servlet.ServletException;
 import java.io.IOException;
@@ -78,34 +80,19 @@ public class RequestDeleteBuildAction implements Action {
 				errors.clear();
 				final String username = request.getParameter("username");
 				RequestsPlugin plugin = Jenkins.getInstance().getPlugin(RequestsPlugin.class);
-				String[] projectList = null;
+				String[] nameList = null;
 				String buildName = build.getDisplayName();
 				String projectFullName;
 				String projectName = "";
 				int buildNumber = build.getNumber();
 				String fullDisplayName = build.getFullDisplayName();
-				StringBuffer stringBuffer = new StringBuffer();
-				
-				//LOGGER.info("[INFO] Delete Build fullDisplayName: " + fullDisplayName);
 				
 				// Need to extract the job name:
 				if (fullDisplayName.contains(" » ")) {
-					projectList = fullDisplayName.split(" » ");
-					int nameCount = projectList.length;
-					
-					stringBuffer.append(projectList[0]);
-					for (int i = 1; i < nameCount; i++) {
-						if (i + 1 == nameCount) {						
-							stringBuffer.append("/job/");
-							stringBuffer.append(projectList[i].split(" ")[0]);
-							projectName = projectList[i].split(" ")[0];
-						} else {
-							stringBuffer.append("/job/");
-							stringBuffer.append(projectList[i]);
-						}					
-					}
-					
-					projectFullName = stringBuffer.toString();
+					RequestsUtility requestsUtility = new RequestsUtility();
+					nameList = requestsUtility.constructFolderJobNameAndFull(fullDisplayName);
+					projectName = nameList[0];
+					projectFullName = nameList[1];
 
 				} else {
 					projectFullName = fullDisplayName.split(" #")[0];

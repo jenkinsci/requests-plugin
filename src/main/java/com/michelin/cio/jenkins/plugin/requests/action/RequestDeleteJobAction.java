@@ -42,6 +42,7 @@ import org.kohsuke.stapler.StaplerResponse;
 
 import com.michelin.cio.jenkins.plugin.requests.RequestsPlugin;
 import com.michelin.cio.jenkins.plugin.requests.model.DeleteJobRequest;
+import com.michelin.cio.jenkins.plugin.requests.model.RequestsUtility;
 
 import javax.mail.MessagingException;
 import javax.servlet.ServletException;
@@ -82,29 +83,18 @@ public class RequestDeleteJobAction implements Action {
 				errors.clear();
 				final String username = request.getParameter("username");
 				RequestsPlugin plugin = Jenkins.getInstance().getPlugin(RequestsPlugin.class);
-				String[] projectList = null;
 				String projectName = project.getFullName();
 				String projectFullName = project.getFullName();
-				StringBuffer stringBuffer = new StringBuffer();
 
 				// Check if a folder job type and if multiple layers of folders:
 				if (!projectFullName.contains("/job/") && projectFullName.contains("/")) {
-					projectList = projectFullName.split("/");
-					
-					// Need to add '/job/' in between all names:
-					int nameCount = projectList.length;
-					stringBuffer.append(projectList[0]);
-					for (int i = 1; i < nameCount; i++) {
-						stringBuffer.append("/job/");
-						stringBuffer.append(projectList[i]);
-					}
-					projectFullName = stringBuffer.toString();
-					//LOGGER.info("[INFO] FOLDER Found: " + projectFullName);
+					RequestsUtility requestsUtility = new RequestsUtility();
+					projectFullName = requestsUtility.constructFolderJobName(projectFullName);
 				}
 				
 				String[] emailData = {project.getName(), username, "A Delete Job", project.getAbsoluteUrl()};
 
-				if (projectName.contains("/job/") || projectName.contains("/")) {
+				if (projectName.contains("/")) {
 					String [] projectnameList = projectName.split("/");
 					int nameCount = projectnameList.length;
 					projectName = projectnameList[nameCount-1];

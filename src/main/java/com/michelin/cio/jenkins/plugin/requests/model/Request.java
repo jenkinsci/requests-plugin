@@ -60,7 +60,7 @@ public abstract class Request {
 	}
 
 	public String getProject() {
-		if (project.contains("/job/") || projectFullName.contains("/")) {
+		if (projectFullName.contains("/")) {
 			String [] projectList = projectFullName.split("/");
 			int nameCount = projectList.length;
 			project = projectList[nameCount-1];

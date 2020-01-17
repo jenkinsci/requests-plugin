@@ -113,6 +113,50 @@ public class RequestsUtility {
 		}
 		return returnStatus;
 	}
+	
+	public String constructFolderJobName(String inputName) {
+		String[] projectNameList = null;
+		StringBuffer stringBuffer = new StringBuffer();
+		projectNameList = inputName.split("/");
+		
+		// Need to add '/job/' in between all names:
+		int nameCount = projectNameList.length;
+		stringBuffer.append(projectNameList[0]);
+		for (int i = 1; i < nameCount; i++) {
+			stringBuffer.append("/job/");
+			stringBuffer.append(projectNameList[i]);
+		}
+
+		//LOGGER.info("[INFO] FULL FOLDER PROJECT NAME: " + stringBuffer.toString());
+		
+		return stringBuffer.toString();
+	}
+	
+	public String[] constructFolderJobNameAndFull(String inputName) {
+		String[] projectNameList = null;
+		String[] returnNameList = new String[2];
+		StringBuffer stringBuffer = new StringBuffer();
+		String projectName = "";
+		projectNameList = inputName.split(" » ");
+		int nameCount = projectNameList.length;
+		
+		stringBuffer.append(projectNameList[0]);
+		for (int i = 1; i < nameCount; i++) {
+			if (i + 1 == nameCount) {						
+				stringBuffer.append("/job/");
+				stringBuffer.append(projectNameList[i].split(" ")[0]);
+				projectName = projectNameList[i].split(" ")[0];
+			} else {
+				stringBuffer.append("/job/");
+				stringBuffer.append(projectNameList[i]);
+			}					
+		}
+		
+		returnNameList[0] = projectName;
+		returnNameList[1] = stringBuffer.toString();
+		
+		return returnNameList;
+	}
 
 	public String[] getCrumb(URL url) {
 		String[] crumbArray = new String[2];
