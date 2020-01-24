@@ -412,9 +412,19 @@ public class RequestMailSender extends Builder {
 				msg.setContent("", "text/html");
 				msg.setFrom(new InternetAddress(requestadminemail));
 				msg.setSentDate(new Date());
+				
+				String[] emailAddresses = requestadminemail.split(",");
+				int addressCount = emailAddresses.length;				
+				Address[] addresss_TO = new Address[addressCount];
 
-				Address[] addresss_TO = new Address[1];
-				addresss_TO[0] = new InternetAddress(testEmailAddress);
+				if (requestadminemail.contains(",")) {			
+					for (int i = 0; i < addressCount; i++) {
+						addresss_TO[i] = new InternetAddress(emailAddresses[i]);
+					}
+				} else {
+					addresss_TO[0] = new InternetAddress(requestadminemail);
+				}
+
 				msg.addRecipients(Message.RecipientType.TO, addresss_TO);
 
 			} catch (MessagingException me) {

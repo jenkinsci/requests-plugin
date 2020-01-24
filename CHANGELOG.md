@@ -2,6 +2,10 @@
 ## Version History
 
 
+Version 2.2.5 (January 24, 2020)
+
+-	Add multiple email support to test email configuration.
+
 Version 2.2.4 (January 16, 2020)
 
 -	JENKINS-60780 Include change for Delete Build, Rename Job, Unlock Build along with Delete Job.
