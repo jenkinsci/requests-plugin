@@ -21,28 +21,22 @@ review the request and then apply the changes with just a click of a button.
 
 For users who don't have permissions to Delete a Job, Rename a Job,
 Delete a Build, Unlock a Build, Rename a Folder, or Delete a Folder, the following 6 actions are
-available if enabled.
+available if enabled. If a user does have the correct permissions to perform one of the actions, they will not see the links.
 
+
+Sidebar link added to Job page:
 -   Request For Job Deletion
--   Request For Build Deletion
--   Request For Folder Deletion
--   Request To Unlock Build
 -   Request For Job Rename
--	Request For Folder Rename
 
-  
 
-###                               Project page                                               Project page                                                                           Build page
+Sidebar link added to Build page:
+-   Request For Build Deletion
+-   Request To Unlock Build
 
-                       
-  ![](docs/images/jobAction.png){.confluence-embedded-image
-width="231"}       
- ![](docs/images/renameJob.png){.confluence-embedded-image
-width="210"}                                      
-  ![](docs/images/build-page.png){.confluence-embedded-image
-width="200"}       
-  ![](docs/images/deleteFolder.png){.confluence-embedded-image
-width="200"}                       
+
+Sidebar link added to Folder page:
+-   Request For Folder Deletion
+-	Request For Folder Rename                      
 
   
 
@@ -87,19 +81,19 @@ width="700"}
 
                         
 
-#### In order to see Action                      Not Authorized
+#### Required permissions in order to see the sidebar links:
 
-Delete Job Request						Job.Delete = 0, Job.Configure = 1
+[Delete Job Request] 	Job.Delete = 0, Job.Configure = 1
 
-Delete Build Request						Run.Delete = 0
+[Delete Build Request] 	Run.Delete = 0
 
-Delete Folder Request					Run.Delete = 0, Job.Configure = 1
+[Delete Folder Request] 	Run.Delete = 0, Job.Configure = 1
 
-Unlock Build Request						Run.Delete = 0
+[Unlock Build Request] 	Run.Delete = 0
 
-Rename Job Request						Job.Create = 1, Job.Delete = 0, Job.Configure = 0 OR Job.Create = 0, Job.Delete = 1, Job.Configure = 0
+[Rename Job Request] 	Job.Create = 1, Job.Delete = 0, Job.Configure = 0 OR Job.Create = 0, Job.Delete = 1, Job.Configure = 0
 
-Rename Folder Request					Job.Create = 1, Job.Delete = 0, Job.Configure = 0 OR Job.Create = 0, Job.Delete = 1, Job.Configure = 0
+[Rename Folder Request] 	Job.Create = 1, Job.Delete = 0, Job.Configure = 0 OR Job.Create = 0, Job.Delete = 1, Job.Configure = 0
 
   
 
