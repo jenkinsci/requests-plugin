@@ -1,4 +1,4 @@
-Requests Plugin
+## Requests Plugin
 
 This plugin sets up a request center for non-admin users to be able to
 ask that their job to be renamed or deleted, a build to be unlocked or
