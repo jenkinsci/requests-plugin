@@ -24,25 +24,25 @@
 
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt" xmlns:p="/lib/hudson/project">
-    <l:layout title="RequestRenameAction.layout.title" permission="${it.CONFIGURE}">
+    <l:layout title="RequestRenameJobAction.layout.title" permission="${it.CONFIGURE}">
         <st:include it="${it.project}" page="sidepanel.jelly" />
         <l:main-panel>
-        <h1>${%RequestRenameAction.rename.title}</h1>
+        <h1>${%RequestRenameJobAction.rename.title}</h1>
 
-            <form method="post" action="createRenameRequest">
+            <form method="post" action="createRenameJobRequest">
                 <input type="hidden" name="username" value="${app.authentication.name}" />                
                 <table border="0px">
                     <tr>
-                        <td>${%RequestRenameAction.rename.oldname}</td>
+                        <td>${%RequestRenameJobAction.rename.oldname}</td>
                         <td><input type="text" name="old-name" value="${it.project.name}" size="80" readonly="readonly"/></td>
                     </tr>
                     <tr>
-                        <td>${%RequestRenameAction.rename.newname}</td>
+                        <td>${%RequestRenameJobAction.rename.newname}</td>
                         <td><input type="text" name="new-name" value="${it.project.name}" size="80"/></td>
                     </tr>
                 </table>
 
-                <f:submit value="${%RequestRenameAction.rename.send}" />
+                <f:submit value="${%RequestRenameJobAction.rename.send}" />
             </form>
         </l:main-panel>
     </l:layout>

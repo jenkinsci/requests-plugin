@@ -27,9 +27,11 @@ package com.michelin.cio.jenkins.plugin.requests;
 import com.michelin.cio.jenkins.plugin.requests.action.RequestMailSender;
 import com.michelin.cio.jenkins.plugin.requests.model.DeleteBuildRequest;
 import com.michelin.cio.jenkins.plugin.requests.model.DeleteJobRequest;
-import com.michelin.cio.jenkins.plugin.requests.model.RenameRequest;
+import com.michelin.cio.jenkins.plugin.requests.model.RenameJobRequest;
+import com.michelin.cio.jenkins.plugin.requests.model.RenameFolderRequest;
 import com.michelin.cio.jenkins.plugin.requests.model.Request;
 import com.michelin.cio.jenkins.plugin.requests.model.UnlockRequest;
+import com.michelin.cio.jenkins.plugin.requests.model.DeleteFolderRequest;
 
 import hudson.Extension;
 import hudson.Plugin;
@@ -213,7 +215,9 @@ public class RequestsPlugin extends Plugin {
 		Hudson.XSTREAM.alias("UnlockRequest", UnlockRequest.class);
 		Hudson.XSTREAM.alias("DeleteJobRequest", DeleteJobRequest.class);
 		Hudson.XSTREAM.alias("DeleteBuildRequest", DeleteBuildRequest.class);
-		Hudson.XSTREAM.alias("RenameRequest", RenameRequest.class);
+		Hudson.XSTREAM.alias("RenameJobRequest", RenameJobRequest.class);
+		Hudson.XSTREAM.alias("RenameFolderRequest", RenameFolderRequest.class);
+		Hudson.XSTREAM.alias("DeleteFolderRequest", DeleteFolderRequest.class);
 		Hudson.XSTREAM.alias("RequestsPlugin", RequestsPlugin.class);
 
 		load();

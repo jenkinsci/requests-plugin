@@ -1,8 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright (c) 2011-2012, Manufacture Francaise des Pneumatiques Michelin, Daniel Petisme, Romain Seguy
- * Portions Copyright 2019 Lexmark
+ * Copyright 2020 Lexmark
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,19 +24,25 @@
 
 package com.michelin.cio.jenkins.plugin.requests.action;
 
+import hudson.Extension;
 import hudson.Functions;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.logging.Level;
 import hudson.model.Item;
-import hudson.model.Job;
 import jenkins.model.Jenkins;
+import jenkins.model.TransientActionFactory;
 import hudson.model.Action;
 import org.kohsuke.stapler.HttpRedirect;
 import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
+import com.cloudbees.hudson.plugins.folder.Folder;
 import com.michelin.cio.jenkins.plugin.requests.RequestsPlugin;
-import com.michelin.cio.jenkins.plugin.requests.model.RenameRequest;
+import com.michelin.cio.jenkins.plugin.requests.model.RenameFolderRequest;
 import com.michelin.cio.jenkins.plugin.requests.model.RequestsUtility;
 
 import javax.mail.MessagingException;
@@ -48,22 +53,20 @@ import java.util.logging.Logger;
 import static java.util.logging.Level.FINE;
 
 // Represents the "Ask for renaming" action appearing on a given project's page.
-//
-// @author Daniel Petisme <daniel.petisme@gmail.com> <http://danielpetisme.blogspot.com/>
-//
-public class RequestRenameAction implements Action {
 
-	private Job<?, ?> project;
+public class RequestRenameFolderAction implements Action {
 
-	public RequestRenameAction(Job<?, ?> target) {
+	private Folder project;
+
+	public RequestRenameFolderAction(Folder target) {
 		this.project = target;
 	}
 
-	public HttpResponse doCreateRenameRequest(StaplerRequest request,
+	public HttpResponse doCreateRenameFolderRequest(StaplerRequest request,
 			StaplerResponse response) throws IOException, ServletException, MessagingException {
 		try {
 			if (isIconDisplayed()) {
-				LOGGER.log(FINE, "Renaming request");
+				LOGGER.log(FINE, "Renaming folder request");
 
 				final String newName = request.getParameter("new-name");
 				final String username = request.getParameter("username");
@@ -84,11 +87,11 @@ public class RequestRenameAction implements Action {
 					projectName = projectnameList[nameCount-1];
 				}
 				
-				String[] emailData = {projectName + " -> " + newName, username, "A Rename Job", project.getAbsoluteUrl()};
+				String[] emailData = {projectName + " -> " + newName, username, "A Rename Folder", project.getAbsoluteUrl()};
 
-				plugin.addRequestPlusEmail(new RenameRequest("renameJob", username, projectName, projectFullName, newName), emailData);
+				plugin.addRequestPlusEmail(new RenameFolderRequest("renameFolder", username, projectName, projectFullName, newName), emailData);
 				LOGGER.log(Level.INFO,
-						"The request to rename the job {0} to {1} has been sent to the administrator",
+						"The request to rename the folder {0} to {1} has been sent to the administrator",
 						new Object[] { project.getName(), newName });
 			}
 		} catch (NullPointerException e) {
@@ -103,7 +106,7 @@ public class RequestRenameAction implements Action {
 
 	public String getDisplayName() {
 		if (isIconDisplayed()) {
-			return Messages.RequestRenameAction_DisplayName();
+			return Messages.RequestRenameFolderAction_DisplayName();
 		}
 		return null;
 	}
@@ -115,12 +118,12 @@ public class RequestRenameAction implements Action {
 		return null;
 	}
 
-	public Job<?, ?> getProject() {
+	public Folder getProject() {
 		return project;
 	}
 
 	public String getUrlName() {
-		return "request-rename";
+		return "request-rename-folder";
 	}
 
 	/*
@@ -161,7 +164,29 @@ public class RequestRenameAction implements Action {
 		return Functions.hasPermission(project, Item.DELETE);
 	}
 
-	private static final Logger LOGGER = Logger
-			.getLogger(RequestRenameAction.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(RequestRenameFolderAction.class.getName());
+	
+	@Extension
+    public static class TransientFolderActionFactoryImpl extends TransientActionFactory<Folder> {
+
+		@Override
+		public Collection<? extends Action> createFor(Folder target) {
+			RequestMailSender.DescriptorEmailImpl descriptorEmailImpl = new RequestMailSender.DescriptorEmailImpl();
+			List<Action> adminActions = new ArrayList<Action>();
+
+			// Note: that a restart is required after making a change since this is
+			// loaded at start up time:
+			if (descriptorEmailImpl.isEnableRenameFolder()) {
+				adminActions.add(new RequestRenameFolderAction(target));
+			}
+
+			return adminActions;
+		}
+
+		@Override
+		public Class<Folder> type() {
+			return Folder.class;
+		}
+    }
 
 }

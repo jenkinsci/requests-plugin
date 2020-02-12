@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright (c) 2011-2012, Manufacture Francaise des Pneumatiques Michelin, Daniel Petisme
+ * Copyright 2020 Lexmark
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,68 +33,63 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-// Represents a renaming request sent by a user to the administrator.
-//
-// @author Daniel Petisme <daniel.petisme@gmail.com> <http://danielpetisme.blogspot.com/>
-//
-public class RenameRequest extends Request {
+// Represents a folder deletion request sent by a user to the administrator.
 
-	private String newName;
+public class DeleteFolderRequest extends Request {
 
-	public RenameRequest(String requestType, String username, String project, String projectFullName, String newName) {
-		super(requestType, username, project, projectFullName, newName);
-		this.newName = newName;
+	private static final Logger LOGGER = Logger.getLogger(DeleteFolderRequest.class.getName());
+	
+	public DeleteFolderRequest(String requestType, String username, String project, String projectFullName, String buildNumber) {
+		super(requestType, username, project, projectFullName, buildNumber);
 	}
 
 	@Override
 	public String getMessage() {
-		return Messages.RenameRequest_message(project, newName);
-	}
-
-	public String getNewName() {
-		return newName;
+		return Messages.DeleteFolderRequest_message(project);
 	}
 
 	@Override
 	public boolean execute(Item item) {
 		boolean success = false;
-
+		
 		try {
-			if (Jenkins.getInstance().hasPermission(Item.DELETE) && Jenkins.getInstance().hasPermission(Item.CREATE)) {
-				((Job) item).renameTo(newName);
-				success = true;
-				LOGGER.log(Level.INFO,
-						"The jobs {0} has been properly renamed in {1}",
-						new Object[] { item.getName(), newName });
-
+			if (Jenkins.getInstance().hasPermission(Item.DELETE)) {
+				try {
+					item.delete();
+					success = true;
+					errorMessage = "The Folder " + item.getFullName()
+							+ " has been properly Deleted";
+					LOGGER.log(Level.INFO,
+							"The folder {0} has been properly deleted",
+							item.getFullName());
+				} catch (IOException e) {
+					errorMessage = e.getMessage();
+					LOGGER.log(Level.SEVERE,
+							"Unable to delete the folder " + item.getFullName(),
+							e);
+				} catch (InterruptedException e) {
+					errorMessage = e.getMessage();
+					LOGGER.log(Level.SEVERE,
+							"Unable to delete the folder " + item.getFullName(),
+							e);
+				}
 			} else {
 				errorMessage = "The current user " + username
-						+ " has no permission to rename the job";
+						+ " does not have permission to delete the folder";
 				LOGGER.log(Level.FINE,
-						"The current user {0} has no permission to RENAME the job",
+						"The current user {0} does not have permission to DELETE the folder",
 						new Object[] { username });
 			}
+
 		} catch (NullPointerException e) {
 			errorMessage = e.getMessage();
-			LOGGER.log(Level.SEVERE,
-					"Unable to rename the job " + item.getName(),
-					e.getMessage());
-		} catch (IOException e) {
-			errorMessage = e.getMessage();
-			LOGGER.log(Level.SEVERE,
-					"Unable to rename the job " + item.getName(),
-					e.getMessage());
-		} catch (IllegalArgumentException e) {
-			errorMessage = e.getMessage();
-			LOGGER.log(Level.SEVERE,
-					"Unable to rename the job " + item.getName(),
-					e.getMessage());
+			LOGGER.log(Level.SEVERE, "Unable to Delete the folder "
+					+ projectFullName + ":" + buildNumber, e.getMessage());
+
+			return false;
 		}
 
 		return success;
 	}
-
-	private static final Logger LOGGER = Logger
-			.getLogger(RenameRequest.class.getName());
 
 }

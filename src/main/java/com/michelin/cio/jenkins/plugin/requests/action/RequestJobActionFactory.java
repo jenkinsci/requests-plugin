@@ -59,7 +59,7 @@ public class RequestJobActionFactory extends TransientActionFactory<Job> {
 		// Note: that a restart is required after making a change since this is
 		// loaded at start up time:
 		if (descriptorEmailImpl.isEnableRenameJob()) {
-			adminActions.add(new RequestRenameAction(target));
+			adminActions.add(new RequestRenameJobAction(target));
 		}
 
 		return adminActions;

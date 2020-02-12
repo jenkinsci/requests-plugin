@@ -131,13 +131,14 @@ public abstract class Request {
 			if (item != null) {
 				success = execute(item);
 			} else {
-				if (requestType.equals("deleteJob")
-						|| requestType.equals("renameJob")) {
-					errorMessage = "The job " + projectName
-							+ " doesn't exist";
-				} else {
-					errorMessage = "The build for " + projectName
-							+ " doesn't exist";
+				if (requestType.equals("deleteJob") || requestType.equals("renameJob")) {
+					errorMessage = "The job " + projectName + " doesn't exist";
+				} 
+				if (requestType.equals("deleteFolder") || requestType.equals("renameFolder")){
+					errorMessage = "The folder " + projectName + " doesn't exist";
+				}
+				else {
+					errorMessage = "The build for " + projectName + " doesn't exist";
 				}
 			}
 

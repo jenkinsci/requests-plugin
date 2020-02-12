@@ -276,6 +276,8 @@ public class RequestMailSender extends Builder {
 		private boolean enableDeleteBuild;
 		private boolean enableUnlockBuild;
 		private boolean enableRenameJob;
+		private boolean enableRenameFolder;
+		private boolean enableDeleteFolder;
 		private boolean enableEmails;
 
 		@DataBoundConstructor
@@ -357,9 +359,17 @@ public class RequestMailSender extends Builder {
 		public boolean isEnableRenameJob() {
 			return enableRenameJob;
 		}
+		
+		public boolean isEnableRenameFolder() {
+			return enableRenameFolder;
+		}
 
 		public boolean isEnableEmails() {
 			return enableEmails;
+		}
+		
+		public boolean isEnableDeleteFolder() {
+			return enableDeleteFolder;
 		}
 
 		@DataBoundSetter
@@ -378,6 +388,16 @@ public class RequestMailSender extends Builder {
 		@DataBoundSetter
 		public void setEnableRenameJob(boolean enableRenameJob) {
 			this.enableRenameJob = enableRenameJob;
+		}
+		
+		@DataBoundSetter
+		public void setEnableRenameFolder(boolean enableRenameFolder) {
+			this.enableRenameFolder = enableRenameFolder;
+		}
+		
+		@DataBoundSetter
+		public void setEnableDeleteFolder(boolean enableDeleteFolder) {
+			this.enableDeleteFolder = enableDeleteFolder;
 		}
 
 		public void setEnableEmails(boolean enableEmails) {
