@@ -79,7 +79,7 @@
        );
     }
         </script>
-    <l:layout secured="true">
+    <l:layout permission="${it.requiredPermission}">
         <st:include it="${app}" page="sidepanel.jelly"/>
         <l:main-panel>            
             <h1>${%requests.plugin.title}</h1>
