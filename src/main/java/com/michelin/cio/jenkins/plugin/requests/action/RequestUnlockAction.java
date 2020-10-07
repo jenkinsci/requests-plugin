@@ -40,6 +40,9 @@ import org.kohsuke.stapler.HttpRedirect;
 import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
+import org.kohsuke.stapler.interceptor.RequirePOST;
+import org.kohsuke.stapler.verb.POST;
+
 import com.michelin.cio.jenkins.plugin.requests.RequestsPlugin;
 import com.michelin.cio.jenkins.plugin.requests.model.RequestsUtility;
 import com.michelin.cio.jenkins.plugin.requests.model.UnlockRequest;
@@ -67,6 +70,7 @@ public class RequestUnlockAction implements Action {
 		errors.add(errorString);
 	}
 
+	@POST
 	public HttpResponse doCreateUnlockRequest(StaplerRequest request,
 			StaplerResponse response)
 			throws IOException, ServletException, MessagingException {
@@ -75,7 +79,7 @@ public class RequestUnlockAction implements Action {
 				LOGGER.log(FINE, "Unlock Build Request");
 				errors.clear();
 				final String username = request.getParameter("username");
-				RequestsPlugin plugin = Jenkins.getInstance().getPlugin(RequestsPlugin.class);
+				RequestsPlugin plugin = Jenkins.get().getPlugin(RequestsPlugin.class);
 				String buildName = build.getDisplayName();
 				String projectFullName;
 				String[] nameList;
@@ -98,7 +102,7 @@ public class RequestUnlockAction implements Action {
 				//LOGGER.info("[INFO] UNLOCK Build projectName: " + projectName);
 				//LOGGER.info("[INFO] UNLOCK Build projectFullName: " + projectFullName);
 
-				String jenkinsUrl = Jenkins.getInstance().getRootUrl();
+				String jenkinsUrl = Jenkins.get().getRootUrl();
 				String buildUrl = jenkinsUrl + build.getUrl();				
 				String[] emailData = {buildName, username, "An Unlock Build", buildUrl};
 				

@@ -26,59 +26,9 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
          xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt" xmlns:p="/lib/hudson/project">
-    <style>
-                #tab {
-                margin: 10px 0;
-                text-align: center;
-                border-collapse: collapse;
-                border-bottom: 1px solid #999;                
-                }
 
-                #tab th {
-                font-size: 13px;
-                font-weight: bold;
-                padding: 8px;
-                border: 1px solid #999;
-                vertical-align:text-top;
-                }
-
-                #tab td {
-                padding: 8px;
-                border-left: 1px solid #999;
-                border-right: 1px solid #999;
-                }
-
-                #tab tbody tr:hover { background: #CCD9E3; border:1px solid #999}
-               
-                .name_column{
-                padding: 3px;
-                width: 20%;
-                }                                
-                
-                #button-container{
-                width: 800px;
-                margin-bottom : 10px;
-                }
-                
-                input.button{
-                height: 25px;
-                }
-                #errors {
-                color: #CC0000;
-                font-weight: bold;
-                min-height: 16px;                
-                }                                               
-    </style>
-    <script types="text/javascript">
-    
-    function toogleAll(){
-       $$('.checkbox').each(
-          function(e){
-             e.checked = $('checkbox_reference').checked
-          }
-       );
-    }
-        </script>
+<link rel="stylesheet" href="${rootURL}/plugin/requests/CSS/requests.css" type="text/css" />	
+    <script type="text/javascript" src="${rootURL}/plugin/requests/js/requests-plugin.js"></script>
     <l:layout permission="${it.requiredPermission}">
         <st:include it="${app}" page="sidepanel.jelly"/>
         <l:main-panel>            
@@ -103,10 +53,9 @@
                 </j:when>
 
                 <j:otherwise>
-                    <form method="POST" name="pendingRequests" action="manageRequests">
+                    <form name="pendingRequests" action="manageRequests">
                         <div id="button-container">
-                            <input type="submit" class="button" style="margin-left: 100px; margin-right:100px"
-                                   name="discard" value="${%requests.plugin.button.discard}"/>
+                            <input type="submit" class="button" style="margin-left: 100px; margin-right:100px" name="discard" value="${%requests.plugin.button.discard}"/>
                             <input type="submit" class="button" name="apply" value="${%requests.plugin.button.apply}"/>
                         </div>
                         <table id="tab" cellpadding="3" cellspacing="3">

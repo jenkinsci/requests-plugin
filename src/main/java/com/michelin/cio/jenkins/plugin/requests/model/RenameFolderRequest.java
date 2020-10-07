@@ -60,7 +60,7 @@ public class RenameFolderRequest extends Request {
 		boolean success = false;
 
 		try {
-			if (Jenkins.getInstance().hasPermission(Item.DELETE) && Jenkins.getInstance().hasPermission(Item.CREATE)) {
+			if (Jenkins.get().hasPermission(Item.DELETE) && Jenkins.get().hasPermission(Item.CREATE)) {
 				((Folder) item).renameTo(newName);
 				success = true;
 				LOGGER.log(Level.INFO,

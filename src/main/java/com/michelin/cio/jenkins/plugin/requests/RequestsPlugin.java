@@ -44,6 +44,8 @@ import org.kohsuke.stapler.HttpRedirect;
 import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
+import org.kohsuke.stapler.interceptor.RequirePOST;
+import org.kohsuke.stapler.verb.POST;
 
 import javax.mail.MessagingException;
 import javax.servlet.ServletException;
@@ -121,12 +123,10 @@ public class RequestsPlugin extends Plugin {
 		}
 	}
 
-	public HttpResponse doManageRequests(StaplerRequest request,
-			StaplerResponse response) throws IOException, ServletException {
-		Jenkins.getInstance().checkPermission(Jenkins.ADMINISTER);
 
+	public HttpResponse doManageRequests(StaplerRequest request, StaplerResponse response) throws IOException, ServletException {
+		Jenkins.get().checkPermission(Jenkins.ADMINISTER);
 		errors.clear();
-
 		String[] selectedRequests = request.getParameterValues("selected");
 		ArrayList<Integer> selectedIndexs = new ArrayList<Integer>();
 		// Store the request once they have been applied

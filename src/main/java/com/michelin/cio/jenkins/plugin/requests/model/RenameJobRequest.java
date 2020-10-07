@@ -60,7 +60,7 @@ public class RenameJobRequest extends Request {
 		boolean success = false;
 
 		try {
-			if (Jenkins.getInstance().hasPermission(Item.DELETE) && Jenkins.getInstance().hasPermission(Item.CREATE)) {
+			if (Jenkins.get().hasPermission(Item.DELETE) && Jenkins.get().hasPermission(Item.CREATE)) {
 				((Job) item).renameTo(newName);
 				success = true;
 				LOGGER.log(Level.INFO,

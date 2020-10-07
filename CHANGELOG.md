@@ -1,10 +1,6 @@
 
 ## Version History
 
-Version 2.2.6 (February 12, 2020)
-
--	Add New Delete Folder request [JIRA] (JENKINS-61011)
--	Add New Rename Folder request [JIRA] (JENKINS-61011)
 
 Version 2.2.5 (January 24, 2020)
 

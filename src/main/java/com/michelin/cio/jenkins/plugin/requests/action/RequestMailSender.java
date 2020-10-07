@@ -433,16 +433,16 @@ public class RequestMailSender extends Builder {
 				msg.setFrom(new InternetAddress(requestadminemail));
 				msg.setSentDate(new Date());
 				
-				String[] emailAddresses = requestadminemail.split(",");
+				String[] emailAddresses = testEmailAddress.split(",");
 				int addressCount = emailAddresses.length;				
 				Address[] addresss_TO = new Address[addressCount];
 
-				if (requestadminemail.contains(",")) {			
+				if (testEmailAddress.contains(",")) {			
 					for (int i = 0; i < addressCount; i++) {
 						addresss_TO[i] = new InternetAddress(emailAddresses[i]);
 					}
 				} else {
-					addresss_TO[0] = new InternetAddress(requestadminemail);
+					addresss_TO[0] = new InternetAddress(testEmailAddress);
 				}
 
 				msg.addRecipients(Message.RecipientType.TO, addresss_TO);

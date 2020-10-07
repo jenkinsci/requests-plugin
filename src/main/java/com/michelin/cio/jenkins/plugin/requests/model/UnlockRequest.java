@@ -57,17 +57,17 @@ public class UnlockRequest extends Request {
 		String[] projectList = null;
 
 		try {
-			jenkins = Jenkins.getInstance();
+			jenkins = Jenkins.get();
 			if (jenkins == null)
 				throw new NullPointerException("Jenkins instance is null");
 
-			if (Jenkins.getInstance() != null
-					&& Jenkins.getInstance().hasPermission(Run.DELETE)) {
+			if (Jenkins.get() != null
+					&& Jenkins.get().hasPermission(Run.DELETE)) {
 				try {
 					String jenkinsURL = null;
 
 					try {
-						jenkinsURL = Jenkins.getInstance().getRootUrl();
+						jenkinsURL = Jenkins.get().getRootUrl();
 						if (jenkinsURL == null)
 							throw new NullPointerException(
 									"Jenkins instance is null");

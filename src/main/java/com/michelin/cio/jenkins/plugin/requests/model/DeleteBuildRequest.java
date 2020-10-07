@@ -39,13 +39,15 @@ public class DeleteBuildRequest extends Request {
 	private static final Logger LOGGER = Logger
 			.getLogger(DeleteBuildRequest.class.getName());
 
-	public DeleteBuildRequest(String requestType, String username, String project, String projectFullName, String buildNumber) {
+	public DeleteBuildRequest(String requestType, String username,
+			String project, String projectFullName, String buildNumber) {
 		super(requestType, username, project, projectFullName, buildNumber);
 	}
 
 	@Override
 	public String getMessage() {
-		return Messages.DeleteBuildRequest_message(buildNumber + " for " + project);
+		return Messages
+				.DeleteBuildRequest_message(buildNumber + " for " + project);
 	}
 
 	public boolean execute(Item item) {
@@ -54,21 +56,23 @@ public class DeleteBuildRequest extends Request {
 		String returnStatus;
 		StringBuffer stringBuffer = new StringBuffer();
 		String[] projectList = null;
+		LOGGER.info("[DEBUG] : " + project);
 
 		try {
-			jenkins = Jenkins.getInstance();
+			jenkins = Jenkins.get();
 			if (jenkins == null)
 				throw new NullPointerException("Jenkins instance is null");
 
-			if (Jenkins.getInstance().hasPermission(Run.DELETE)) {
+			if (Jenkins.get().hasPermission(Run.DELETE)) {
 				String jenkinsURL = null;
-				jenkinsURL = Jenkins.getInstance().getRootUrl();
+				jenkinsURL = Jenkins.get().getRootUrl();
 				if (jenkinsURL == null)
 					throw new NullPointerException("Jenkins instance is null");
-				
-				if (!projectFullName.contains("/job/") && projectFullName.contains("/")) {
+
+				if (!projectFullName.contains("/job/")
+						&& projectFullName.contains("/")) {
 					projectList = projectFullName.split("/");
-					
+
 					// Need to add '/job/' in between all names:
 					int nameCount = projectList.length;
 					stringBuffer.append(projectList[0]);
@@ -77,16 +81,18 @@ public class DeleteBuildRequest extends Request {
 						stringBuffer.append(projectList[i]);
 					}
 					projectFullName = stringBuffer.toString();
-					//LOGGER.info("[INFO] FOLDER Found: " + projectFullName);
+					// LOGGER.info("[INFO] FOLDER Found: " + projectFullName);
 				}
-				
-				String urlString = jenkinsURL + "job/" + projectFullName + "/" + buildNumber + "/doDelete";
+
+				String urlString = jenkinsURL + "job/" + projectFullName + "/"
+						+ buildNumber + "/doDelete";
 				RequestsUtility requestsUtility = new RequestsUtility();
-				
-				//LOGGER.info("[INFO] Delete Build urlString: " + urlString);
+
+				LOGGER.info("[INFO] Delete Build urlString: " + urlString);
 
 				try {
-					returnStatus = requestsUtility.runPostMethod(jenkinsURL, urlString);
+					returnStatus = requestsUtility.runPostMethod(jenkinsURL,
+							urlString);
 					// Check if deletion failed due to locked build:
 					if (returnStatus.contains("Forbidden")
 							|| returnStatus.contains("Bad Request")) {

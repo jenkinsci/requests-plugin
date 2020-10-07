@@ -39,6 +39,8 @@ import org.kohsuke.stapler.HttpRedirect;
 import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
+import org.kohsuke.stapler.interceptor.RequirePOST;
+import org.kohsuke.stapler.verb.POST;
 
 import com.michelin.cio.jenkins.plugin.requests.RequestsPlugin;
 import com.michelin.cio.jenkins.plugin.requests.model.DeleteJobRequest;
@@ -74,6 +76,7 @@ public class RequestDeleteJobAction implements Action {
 		errors.add(errorString);
 	}
 
+	@POST
 	public HttpResponse doCreateDeleteJobRequest(StaplerRequest request,
 			StaplerResponse response)
 			throws IOException, ServletException, MessagingException {
@@ -82,7 +85,7 @@ public class RequestDeleteJobAction implements Action {
 				LOGGER.log(FINE, "Delete Job Request");
 				errors.clear();
 				final String username = request.getParameter("username");
-				RequestsPlugin plugin = Jenkins.getInstance().getPlugin(RequestsPlugin.class);
+				RequestsPlugin plugin = Jenkins.get().getPlugin(RequestsPlugin.class);
 				String projectName = project.getFullName();
 				String projectFullName = project.getFullName();
 

@@ -36,6 +36,8 @@ import org.kohsuke.stapler.HttpRedirect;
 import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
+import org.kohsuke.stapler.interceptor.RequirePOST;
+import org.kohsuke.stapler.verb.POST;
 
 import com.michelin.cio.jenkins.plugin.requests.RequestsPlugin;
 import com.michelin.cio.jenkins.plugin.requests.model.DeleteBuildRequest;
@@ -71,6 +73,7 @@ public class RequestDeleteBuildAction implements Action {
 		errors.add(errorString);
 	}
 
+	@RequirePOST
 	public HttpResponse doCreateDeleteBuildRequest(StaplerRequest request,
 			StaplerResponse response)
 			throws IOException, ServletException, MessagingException {
@@ -79,7 +82,7 @@ public class RequestDeleteBuildAction implements Action {
 				LOGGER.log(FINE, "Delete Build request");
 				errors.clear();
 				final String username = request.getParameter("username");
-				RequestsPlugin plugin = Jenkins.getInstance().getPlugin(RequestsPlugin.class);
+				RequestsPlugin plugin = Jenkins.get().getPlugin(RequestsPlugin.class);
 				String[] nameList = null;
 				String buildName = build.getDisplayName();
 				String projectFullName;
@@ -102,7 +105,7 @@ public class RequestDeleteBuildAction implements Action {
 				//LOGGER.info("[INFO] Delete Build projectName: " + projectName);
 				//LOGGER.info("[INFO] Delete Build projectFullName: " + projectFullName);
 
-				String jenkinsUrl = Jenkins.getInstance().getRootUrl();
+				String jenkinsUrl = Jenkins.get().getRootUrl();
 				String buildUrl = jenkinsUrl + build.getUrl();
 				String[] emailData = {buildName, username, "A Delete Build", buildUrl};
 			

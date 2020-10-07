@@ -41,24 +41,18 @@ import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import javax.net.ssl.HttpsURLConnection;
-import javax.xml.bind.DatatypeConverter;
-
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URI;
-import java.net.URL;
 import java.util.logging.Logger;
+
+
 
 // @author John Flynn <john.trixmot.flynn@gmail.com>
 
 public class RequestsUtility {
 
-	private static final Logger LOGGER = Logger
-			.getLogger(RequestsUtility.class.getName());
-
+	private static final Logger LOGGER = Logger.getLogger(RequestsUtility.class.getName());
+	
 	public String runPostMethod(String jenkinsURL, String urlString)
 			throws ClientProtocolException, IOException {
 		LOGGER.info("[INFO] urlString: " + urlString);
@@ -81,19 +75,6 @@ public class RequestsUtility {
 		CloseableHttpClient httpClient = HttpClients.custom()
 				.setDefaultCredentialsProvider(credsProvider).build();
 		HttpPost httpPost = new HttpPost(uri);
-
-		// Get the jenkins crumb for the Post call:
-		// URL crumbURL = new URL(jenkinsURL +
-		// "crumbIssuer/api/xml?xpath=concat(//crumbRequestField,%22:%22,//crumb)");
-		// String[] crumbArray = getCrumb(crumbURL);
-
-		// if (crumbArray[2].equals("true")) {
-		// httpPost.addHeader(crumbArray[0], crumbArray[1]);
-		// LOGGER.info("[INFO] Crumb value set: ");
-		// } else {
-		// Jenkins system without a crumb:
-		// LOGGER.info("[INFO] No Crumb value set: ");
-		// }
 
 		// Add AuthCache to the execution context
 		HttpClientContext localContext = HttpClientContext.create();
@@ -156,65 +137,6 @@ public class RequestsUtility {
 		returnNameList[1] = stringBuffer.toString();
 		
 		return returnNameList;
-	}
-
-	public String[] getCrumb(URL url) {
-		String[] crumbArray = new String[2];
-		String[] returnValues = new String[3];
-		String crumbAvailable = "false";
-
-		BufferedReader reader = null;
-
-		try {
-			DescriptorEmailImpl descriptorEmailImpl = new DescriptorEmailImpl();
-			String authStr = descriptorEmailImpl.getUnlockuser() + ":"
-					+ descriptorEmailImpl.getUnlockpassword();
-			String basicAuth = "Basic " + DatatypeConverter
-					.printBase64Binary(authStr.getBytes("utf-8"));
-			HttpsURLConnection httpsURLConnection = (HttpsURLConnection) url
-					.openConnection();
-			httpsURLConnection.setRequestMethod("GET");
-			httpsURLConnection.setUseCaches(false);
-			httpsURLConnection.setDoInput(true);
-			httpsURLConnection.setDoOutput(true);
-			httpsURLConnection.setRequestProperty("Authorization", basicAuth);
-
-			InputStream inputStream = httpsURLConnection.getInputStream();
-			reader = new BufferedReader(
-					new InputStreamReader(inputStream, "UTF-8"));
-			StringBuilder out = new StringBuilder();
-			String line;
-
-			while ((line = reader.readLine()) != null) {
-				out.append(line);
-			}
-
-			String crumbValue = out.toString();
-			crumbArray = crumbValue.split(":");
-			inputStream.close();
-			crumbAvailable = "true";
-
-		} catch (IOException ioe) {
-			crumbArray[0] = "";
-			crumbArray[1] = "";
-			crumbAvailable = "false";
-			LOGGER.warning("No crumb available: " + ioe.getMessage());
-
-		} finally {
-			try {
-				if (reader != null)
-					reader.close();
-			} catch (IOException e) {
-				LOGGER.warning(
-						"[ERROR]: Unable to close reader" + e.getMessage());
-			}
-		}
-
-		returnValues[0] = crumbArray[0];
-		returnValues[1] = crumbArray[1];
-		returnValues[2] = crumbAvailable;
-
-		return returnValues;
 	}
 
 }

@@ -46,11 +46,9 @@ public abstract class Request {
 	private static String dateFormat = "yyyy-MM-dd HH:mm:ss";
 	private static final FastDateFormat yyyymmdd = FastDateFormat
 			.getInstance(dateFormat);
-	private static final Logger LOGGER = Logger
-			.getLogger(RequestsUtility.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(RequestsUtility.class.getName());
 
-	public Request(String requestType, String username, String project,
-			String projectFullName, String buildNumber) {
+	public Request(String requestType, String username, String project, String projectFullName, String buildNumber) {
 		this.requestType = requestType;
 		this.username = username;
 		this.project = project;
@@ -122,11 +120,10 @@ public abstract class Request {
 	public boolean process(String requestType) {
 		boolean success = false;
 		String projectName = getProjectNameWithoutJobSeparator();
-		//LOGGER.info("[INFO] projectName: " + projectName);
 
 		try {
 
-			Item item = Jenkins.getInstance().getItemByFullName(projectName);
+			Item item = Jenkins.get().getItemByFullName(projectName);
 
 			if (item != null) {
 				success = execute(item);

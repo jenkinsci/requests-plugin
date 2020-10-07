@@ -53,7 +53,7 @@ public class DeleteFolderRequest extends Request {
 		boolean success = false;
 		
 		try {
-			if (Jenkins.getInstance().hasPermission(Item.DELETE)) {
+			if (Jenkins.get().hasPermission(Item.DELETE)) {
 				try {
 					item.delete();
 					success = true;

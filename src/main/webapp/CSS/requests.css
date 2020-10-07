@@ -1,0 +1,45 @@
+#tab {
+	margin: 10px 0;
+	text-align: center;
+	border-collapse: collapse;
+	border-bottom: 1px solid #999;
+}
+
+#tab th {
+	font-size: 13px;
+	font-weight: bold;
+	padding: 8px;
+	border: 1px solid #999;
+	vertical-align: text-top;
+}
+
+#tab td {
+	padding: 8px;
+	border-left: 1px solid #999;
+	border-right: 1px solid #999;
+}
+
+#tab tbody tr:hover {
+	background: #CCD9E3;
+	border: 1px solid #999
+}
+
+.name_column {
+	padding: 3px;
+	width: 20%;
+}
+
+#button-container {
+	width: 800px;
+	margin-bottom: 10px;
+}
+
+input.button {
+	height: 25px;
+}
+
+#errors {
+	color: #CC0000;
+	font-weight: bold;
+	min-height: 16px;
+}
