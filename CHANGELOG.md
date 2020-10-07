@@ -1,6 +1,16 @@
 
 ## Version History
 
+Version 2.2.7 (October 07, 2020)
+
+-       Fix Post error on Process Requests that started with Jenkins 2.249.1 for CSRF changes
+-       Fix for test email address
+-       Dependency updates
+
+Version 2.2.6 (February 12, 2020)
+
+-	Add New Delete Folder request [JIRA] (JENKINS-61011)
+-	Add New Rename Folder request [JIRA] (JENKINS-61011)
 
 Version 2.2.5 (January 24, 2020)
 
