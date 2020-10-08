@@ -133,11 +133,6 @@
 					<javadocExecutable>/Library/Java/JavaVirtualMachines/jdk-11.0.5.jdk/Contents/Home/bin/javadoc</javadocExecutable>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>com.github.spotbugs</groupId>
-				<artifactId>spotbugs-maven-plugin</artifactId>
-				<version>4.1.3</version>
-			</plugin>
 		</plugins>
 	</reporting>
 	<build>
