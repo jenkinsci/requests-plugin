@@ -73,10 +73,11 @@ public class RequestDeleteBuildAction implements Action {
 		errors.add(errorString);
 	}
 
-	@RequirePOST
+	@POST
 	public HttpResponse doCreateDeleteBuildRequest(StaplerRequest request,
 			StaplerResponse response)
 			throws IOException, ServletException, MessagingException {
+
 		try {
 			if (isIconDisplayed()) {
 				LOGGER.log(FINE, "Delete Build request");

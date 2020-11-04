@@ -80,6 +80,7 @@ public class RequestDeleteJobAction implements Action {
 	public HttpResponse doCreateDeleteJobRequest(StaplerRequest request,
 			StaplerResponse response)
 			throws IOException, ServletException, MessagingException {
+
 		try {
 			if (isIconDisplayed()) {
 				LOGGER.log(FINE, "Delete Job Request");

@@ -1,6 +1,11 @@
 
 ## Version History
 
+Version 2.2.8 (November 04, 2020)
+
+- 		Changes to address issues with SECURITY-2136
+-		Fix project names that require encoding for POST urls
+
 Version 2.2.7 (October 07, 2020)
 
 -       Fix Post error on Process Requests that started with Jenkins 2.249.1 for CSRF changes

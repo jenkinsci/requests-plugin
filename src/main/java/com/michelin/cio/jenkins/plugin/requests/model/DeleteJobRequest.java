@@ -124,10 +124,12 @@ public class DeleteJobRequest extends Request {
 					//LOGGER.info("[INFO] FOLDER Found: " + projectFullName);
 				}
 				
-				String urlString = jenkinsURL + "job/" + projectFullName + "/doDelete";
 				RequestsUtility requestsUtility = new RequestsUtility();
+				projectFullName = requestsUtility.encodeValue(projectFullName);
+				projectFullName = projectFullName.replace("+", "%20");
+				String urlString = jenkinsURL + "job/" + projectFullName + "/doDelete";
 				
-				//LOGGER.info("[INFO] Delete Build urlString: " + urlString);
+				LOGGER.info("[INFO] Delete Build urlString: " + urlString);
 
 				try {
 					returnStatus = requestsUtility.runPostMethod(jenkinsURL, urlString);

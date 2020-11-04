@@ -39,6 +39,7 @@ import org.kohsuke.stapler.HttpRedirect;
 import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
+import org.kohsuke.stapler.verb.POST;
 
 import com.cloudbees.hudson.plugins.folder.Folder;
 import com.michelin.cio.jenkins.plugin.requests.RequestsPlugin;
@@ -62,8 +63,10 @@ public class RequestRenameFolderAction implements Action {
 		this.project = target;
 	}
 
+	@POST
 	public HttpResponse doCreateRenameFolderRequest(StaplerRequest request,
 			StaplerResponse response) throws IOException, ServletException, MessagingException {
+
 		try {
 			if (isIconDisplayed()) {
 				LOGGER.log(FINE, "Renaming folder request");
@@ -71,7 +74,7 @@ public class RequestRenameFolderAction implements Action {
 				final String newName = request.getParameter("new-name");
 				final String username = request.getParameter("username");
 
-				RequestsPlugin plugin = Jenkins.getInstance().getPlugin(RequestsPlugin.class);
+				RequestsPlugin plugin = Jenkins.get().getPlugin(RequestsPlugin.class);
 				String projectName = project.getFullName();
 				String projectFullName = project.getFullName();
 

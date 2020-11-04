@@ -43,6 +43,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.verb.POST;
 
 import hudson.Extension;
 import hudson.model.AbstractProject;
@@ -52,6 +53,7 @@ import net.sf.json.JSONObject;
 import hudson.tasks.Builder;
 import hudson.util.FormValidation;
 import hudson.util.Secret;
+import jenkins.model.Jenkins;
 
 // Option to email an admin user/group for delete request:
 // @author John Flynn <john.trixmot.flynn@gmail.com>
@@ -414,9 +416,11 @@ public class RequestMailSender extends Builder {
 			return "Requests";
 		}
 
+		@POST
 		public FormValidation doTestEmail(
 				@QueryParameter("testEmailAddress") final String testEmailAddress)
 				throws MessagingException, UnknownHostException {
+			Jenkins.get().checkPermission(Jenkins.ADMINISTER);
 			String emailHost = getRequestemailhost();
 			String returnMessage = "Unable to create email message";
 			if (emailHost == null || requestemailserver.equals("")) {

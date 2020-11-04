@@ -84,10 +84,10 @@ public class DeleteBuildRequest extends Request {
 					// LOGGER.info("[INFO] FOLDER Found: " + projectFullName);
 				}
 
-				String urlString = jenkinsURL + "job/" + projectFullName + "/"
-						+ buildNumber + "/doDelete";
 				RequestsUtility requestsUtility = new RequestsUtility();
-
+				projectFullName = requestsUtility.encodeValue(projectFullName);
+				projectFullName = projectFullName.replace("+", "%20");
+				String urlString = jenkinsURL + "job/" + projectFullName + "/" + buildNumber + "/doDelete";			
 				LOGGER.info("[INFO] Delete Build urlString: " + urlString);
 
 				try {

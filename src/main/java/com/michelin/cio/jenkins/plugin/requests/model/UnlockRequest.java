@@ -89,8 +89,10 @@ public class UnlockRequest extends Request {
 						projectFullName = stringBuffer.toString();
 					}
 
-					String urlString = jenkinsURL + "job/" + projectFullName + "/" + buildNumber + "/toggleLogKeep";
 					RequestsUtility requestsUtility = new RequestsUtility();
+					projectFullName = requestsUtility.encodeValue(projectFullName);
+					projectFullName = projectFullName.replace("+", "%20");
+					String urlString = jenkinsURL + "job/" + projectFullName + "/" + buildNumber + "/toggleLogKeep";
 
 					try {
 						returnStatus = requestsUtility.runPostMethod(jenkinsURL,

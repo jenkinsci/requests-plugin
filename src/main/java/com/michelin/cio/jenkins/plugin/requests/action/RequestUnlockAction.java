@@ -74,6 +74,7 @@ public class RequestUnlockAction implements Action {
 	public HttpResponse doCreateUnlockRequest(StaplerRequest request,
 			StaplerResponse response)
 			throws IOException, ServletException, MessagingException {
+
 		try {
 			if (isIconDisplayed()) {
 				LOGGER.log(FINE, "Unlock Build Request");

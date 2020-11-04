@@ -64,6 +64,7 @@ public class RequestRenameJobAction implements Action {
 	@POST
 	public HttpResponse doCreateRenameJobRequest(StaplerRequest request,
 			StaplerResponse response) throws IOException, ServletException, MessagingException {
+
 		try {
 			if (isIconDisplayed()) {
 				LOGGER.log(FINE, "Renaming job request");

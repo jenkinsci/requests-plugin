@@ -123,7 +123,6 @@ public class RequestsPlugin extends Plugin {
 		}
 	}
 
-
 	public HttpResponse doManageRequests(StaplerRequest request, StaplerResponse response) throws IOException, ServletException {
 		Jenkins.get().checkPermission(Jenkins.ADMINISTER);
 		errors.clear();
