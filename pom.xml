@@ -19,14 +19,14 @@
 	<artifactId>requests</artifactId>
 	<packaging>hpi</packaging>
 	<name>requests-plugin</name>
-	<version>2.2.9-SNAPSHOT</version>
+	<version>2.2.9</version>
 	<url>http://wiki.jenkins-ci.org/display/JENKINS/Requests+Plugin</url>
 
 	<scm>
 		<connection>scm:git:git@github.com:jenkinsci/requests-plugin.git</connection>
 		<developerConnection>scm:git:git@github.com:jenkinsci/requests-plugin.git</developerConnection>
 		<url>https://github.com/jenkinsci/requests-plugin</url>
-		<tag>requests-2.2.8</tag>
+		<tag>requests-2.2.9</tag>
 	</scm>
 
 	<dependencies>
