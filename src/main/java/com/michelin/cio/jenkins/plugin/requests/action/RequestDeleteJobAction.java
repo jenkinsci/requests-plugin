@@ -83,7 +83,6 @@ public class RequestDeleteJobAction implements Action {
 
 		try {
 			if (isIconDisplayed()) {
-				LOGGER.log(FINE, "Delete Job Request");
 				errors.clear();
 				final String username = request.getParameter("username");
 				RequestsPlugin plugin = Jenkins.get().getPlugin(RequestsPlugin.class);
@@ -103,6 +102,7 @@ public class RequestDeleteJobAction implements Action {
 					int nameCount = projectnameList.length;
 					projectName = projectnameList[nameCount-1];
 				}
+				LOGGER.info("Delete Job Request: " + projectName + " - " + projectFullName);
 				plugin.addRequestPlusEmail(new DeleteJobRequest("deleteJob", username, projectName, projectFullName, ""), emailData);
 			}
 

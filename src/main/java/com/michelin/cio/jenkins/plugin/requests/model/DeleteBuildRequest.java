@@ -46,8 +46,7 @@ public class DeleteBuildRequest extends Request {
 
 	@Override
 	public String getMessage() {
-		return Messages
-				.DeleteBuildRequest_message(buildNumber + " for " + project);
+		return Messages.DeleteBuildRequest_message(buildNumber + " for " + project);
 	}
 
 	public boolean execute(Item item) {
@@ -56,7 +55,6 @@ public class DeleteBuildRequest extends Request {
 		String returnStatus;
 		StringBuffer stringBuffer = new StringBuffer();
 		String[] projectList = null;
-		LOGGER.info("[DEBUG] : " + project);
 
 		try {
 			jenkins = Jenkins.get();
@@ -85,8 +83,11 @@ public class DeleteBuildRequest extends Request {
 				}
 
 				RequestsUtility requestsUtility = new RequestsUtility();
-				projectFullName = requestsUtility.encodeValue(projectFullName);
-				projectFullName = projectFullName.replace("+", "%20");
+				if (!projectFullName.contains("/job/")) {
+					projectFullName = requestsUtility.encodeValue(projectFullName);
+					projectFullName = projectFullName.replace("+", "%20");
+				}
+				
 				String urlString = jenkinsURL + "job/" + projectFullName + "/" + buildNumber + "/doDelete";			
 				LOGGER.info("[INFO] Delete Build urlString: " + urlString);
 

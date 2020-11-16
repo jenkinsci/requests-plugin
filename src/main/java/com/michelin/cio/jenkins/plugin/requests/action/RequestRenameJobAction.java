@@ -67,8 +67,6 @@ public class RequestRenameJobAction implements Action {
 
 		try {
 			if (isIconDisplayed()) {
-				LOGGER.log(FINE, "Renaming job request");
-
 				final String newName = request.getParameter("new-name");
 				final String username = request.getParameter("username");
 
@@ -88,6 +86,7 @@ public class RequestRenameJobAction implements Action {
 					projectName = projectnameList[nameCount-1];
 				}
 				
+				LOGGER.info("Rename Job Request: " + projectName + " - " + projectFullName);
 				String[] emailData = {projectName + " -> " + newName, username, "A Rename Job", project.getAbsoluteUrl()};
 
 				plugin.addRequestPlusEmail(new RenameJobRequest("renameJob", username, projectName, projectFullName, newName), emailData);

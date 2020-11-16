@@ -83,14 +83,11 @@ public class RequestDeleteFolderAction extends FolderProperty<Folder> implements
 
 		try {
 			if (isIconDisplayed()) {
-				LOGGER.log(FINE, "Delete Folder Request");
 				errors.clear();
 				final String username = request.getParameter("username");
 				RequestsPlugin plugin = Jenkins.get().getPlugin(RequestsPlugin.class);
 				String projectName = project.getFullName();
 				String projectFullName = project.getFullName();
-				
-				LOGGER.info(projectName + " - " + projectFullName);
 
 				// Check if a folder job type and if multiple layers of folders:
 				if (!projectFullName.contains("/job/") && projectFullName.contains("/")) {
@@ -105,8 +102,8 @@ public class RequestDeleteFolderAction extends FolderProperty<Folder> implements
 					int nameCount = projectnameList.length;
 					projectName = projectnameList[nameCount-1];
 				}
-				LOGGER.info("After split - " + projectName);
 				
+				LOGGER.info("Delete Folder Request: " + projectName + " - " + projectFullName);
 				plugin.addRequestPlusEmail(new DeleteFolderRequest("deleteFolder", username, projectName, projectFullName, ""), emailData);
 			}
 

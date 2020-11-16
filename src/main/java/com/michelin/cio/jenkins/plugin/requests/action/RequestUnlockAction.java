@@ -77,7 +77,6 @@ public class RequestUnlockAction implements Action {
 
 		try {
 			if (isIconDisplayed()) {
-				LOGGER.log(FINE, "Unlock Build Request");
 				errors.clear();
 				final String username = request.getParameter("username");
 				RequestsPlugin plugin = Jenkins.get().getPlugin(RequestsPlugin.class);
@@ -100,8 +99,7 @@ public class RequestUnlockAction implements Action {
 					projectName = projectFullName;
 				}
 
-				//LOGGER.info("[INFO] UNLOCK Build projectName: " + projectName);
-				//LOGGER.info("[INFO] UNLOCK Build projectFullName: " + projectFullName);
+				LOGGER.info("Unlock Build Request: " + projectName + " - " + projectFullName);
 
 				String jenkinsUrl = Jenkins.get().getRootUrl();
 				String buildUrl = jenkinsUrl + build.getUrl();				

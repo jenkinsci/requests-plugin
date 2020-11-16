@@ -1,6 +1,10 @@
 
 ## Version History
 
+Version 2.2.9 (November 16, 2020)
+
+-       Fix issue with Folders related to encoding from previous release
+
 Version 2.2.8 (November 04, 2020)
 
 - 		Changes to address issues with SECURITY-2136

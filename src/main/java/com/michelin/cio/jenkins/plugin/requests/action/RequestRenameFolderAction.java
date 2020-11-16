@@ -69,8 +69,6 @@ public class RequestRenameFolderAction implements Action {
 
 		try {
 			if (isIconDisplayed()) {
-				LOGGER.log(FINE, "Renaming folder request");
-
 				final String newName = request.getParameter("new-name");
 				final String username = request.getParameter("username");
 
@@ -90,6 +88,7 @@ public class RequestRenameFolderAction implements Action {
 					projectName = projectnameList[nameCount-1];
 				}
 				
+				LOGGER.info("Rename Folder Request: " + projectName + " - " + projectFullName);
 				String[] emailData = {projectName + " -> " + newName, username, "A Rename Folder", project.getAbsoluteUrl()};
 
 				plugin.addRequestPlusEmail(new RenameFolderRequest("renameFolder", username, projectName, projectFullName, newName), emailData);

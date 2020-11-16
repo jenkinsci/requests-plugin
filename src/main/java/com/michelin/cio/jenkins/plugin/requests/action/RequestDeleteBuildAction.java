@@ -80,7 +80,6 @@ public class RequestDeleteBuildAction implements Action {
 
 		try {
 			if (isIconDisplayed()) {
-				LOGGER.log(FINE, "Delete Build request");
 				errors.clear();
 				final String username = request.getParameter("username");
 				RequestsPlugin plugin = Jenkins.get().getPlugin(RequestsPlugin.class);
@@ -103,8 +102,7 @@ public class RequestDeleteBuildAction implements Action {
 					projectName = projectFullName;
 				}
 
-				//LOGGER.info("[INFO] Delete Build projectName: " + projectName);
-				//LOGGER.info("[INFO] Delete Build projectFullName: " + projectFullName);
+				LOGGER.info("Delete Build Request: " + projectName + " - " + projectFullName);
 
 				String jenkinsUrl = Jenkins.get().getRootUrl();
 				String buildUrl = jenkinsUrl + build.getUrl();
