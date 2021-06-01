@@ -125,10 +125,10 @@ public class DeleteJobRequest extends Request {
 				}
 				
 				RequestsUtility requestsUtility = new RequestsUtility();
-				if (!projectFullName.contains("/job/")) {
-					projectFullName = requestsUtility.encodeValue(projectFullName);
-					projectFullName = projectFullName.replace("+", "%20");
-				}
+				//if (!projectFullName.contains("/job/")) {
+				//	projectFullName = requestsUtility.encodeValue(projectFullName);
+					projectFullName = projectFullName.replace(" ", "%20");
+				//}
 				
 				String urlString = jenkinsURL + "job/" + projectFullName + "/doDelete";
 				LOGGER.info("[INFO] Delete Build urlString: " + urlString);

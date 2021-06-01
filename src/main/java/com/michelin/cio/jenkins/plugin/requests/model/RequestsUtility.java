@@ -46,6 +46,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
@@ -116,28 +117,40 @@ public class RequestsUtility {
 		return stringBuffer.toString();
 	}
 	
-	public String[] constructFolderJobNameAndFull(String inputName) {
-		String[] projectNameList = null;
+	public String[] constructFolderJobNameAndFull(String buildURL) {
+		String[] project_and_BuildList = null;
 		String[] returnNameList = new String[2];
-		StringBuffer stringBuffer = new StringBuffer();
-		String projectName = "";
-		projectNameList = inputName.split(" » ");
-		int nameCount = projectNameList.length;
+		//Use StringBuffer instead of concatenate strings:
+		StringBuffer stringBuffer = new StringBuffer(); 
+		String projectName = "";	
+
+		LOGGER.log(Level.INFO,"[INFO] constructFolderJobNameAndFull inputName: " + buildURL);
 		
-		stringBuffer.append(projectNameList[0]);
-		for (int i = 1; i < nameCount; i++) {
-			if (i + 1 == nameCount) {						
-				stringBuffer.append("/job/");
-				stringBuffer.append(projectNameList[i].split(" ")[0]);
-				projectName = projectNameList[i].split(" ")[0];
-			} else {
-				stringBuffer.append("/job/");
-				stringBuffer.append(projectNameList[i]);
-			}					
+		buildURL = buildURL.replace("%20", " ");
+		
+		//view/JOHN/job/Utilities/job/FolderLayer_2/job/folderlayerjob/1/
+		//Split on "/job/" ignore index 0 and last:
+		project_and_BuildList = buildURL.split("/job/");	
+		int nameCount = project_and_BuildList.length;
+		LOGGER.log(Level.INFO,"[INFO] constructFolderJobNameAndFull nameCount: " + nameCount);
+		String firstFolderName = project_and_BuildList[1];
+		stringBuffer.append(firstFolderName);
+		
+		//Skip first index /job/ and the buildname from the end:
+		for (int i = 2; i < nameCount; i++) {
+			stringBuffer.append("/job/");
+			if (i == nameCount -1) {
+				String[] projectBuild = project_and_BuildList[i].split("/");
+				stringBuffer.append(projectBuild[0]);
+				projectName = projectBuild[0];
+			} else
+			{
+				stringBuffer.append(project_and_BuildList[i]);
+			}						
 		}
 		
-		returnNameList[0] = projectName;
-		returnNameList[1] = stringBuffer.toString();
+		returnNameList[0] = projectName; 				//projectName
+		returnNameList[1] = stringBuffer.toString(); 	//projectFullName == foldername1/job/foldername2/job/projectname
 		
 		return returnNameList;
 	}

@@ -90,7 +90,7 @@ public class RequestUnlockAction implements Action {
 				// Need to extract the job name:
 				if (fullDisplayName.contains(" » ")) {
 					RequestsUtility requestsUtility = new RequestsUtility();
-					nameList = requestsUtility.constructFolderJobNameAndFull(fullDisplayName);
+					nameList = requestsUtility.constructFolderJobNameAndFull(build.getUrl());
 					projectName = nameList[0];
 					projectFullName = nameList[1];
 

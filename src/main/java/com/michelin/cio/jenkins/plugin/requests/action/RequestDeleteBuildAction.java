@@ -89,11 +89,14 @@ public class RequestDeleteBuildAction implements Action {
 				String projectName = "";
 				int buildNumber = build.getNumber();
 				String fullDisplayName = build.getFullDisplayName();
+				LOGGER.info("Delete Build Request: fullDisplayName " + fullDisplayName);
+				
+				LOGGER.info("Delete Build Request: getURL: " + build.getUrl());
 				
 				// Need to extract the job name:
 				if (fullDisplayName.contains(" » ")) {
 					RequestsUtility requestsUtility = new RequestsUtility();
-					nameList = requestsUtility.constructFolderJobNameAndFull(fullDisplayName);
+					nameList = requestsUtility.constructFolderJobNameAndFull(build.getUrl());
 					projectName = nameList[0];
 					projectFullName = nameList[1];
 

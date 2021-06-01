@@ -1,6 +1,10 @@
 
 ## Version History
 
+Version 2.2.10 (June 01, 2021)
+
+-       Fix issue with spaces in names
+
 Version 2.2.9 (November 16, 2020)
 
 -       Fix issue with Folders related to encoding from previous release

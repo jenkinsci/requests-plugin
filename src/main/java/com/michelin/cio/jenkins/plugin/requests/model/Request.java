@@ -29,6 +29,8 @@ import jenkins.model.Jenkins;
 
 import java.util.Calendar;
 import org.apache.commons.lang.time.FastDateFormat;
+
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 // @author Daniel Petisme <daniel.petisme@gmail.com> <http://danielpetisme.blogspot.com/>
@@ -82,6 +84,7 @@ public abstract class Request {
 
 	public String getProjectFullName() {
 		String[] projectList = null;
+		LOGGER.log(Level.INFO,"[INFO] projectFullName before: " + projectFullName);
 		if (!projectFullName.contains("/job/") && projectFullName.contains("/")) {
 			projectList = projectFullName.split("/");
 			// Need to add '/job/' in between all names:
@@ -90,6 +93,7 @@ public abstract class Request {
 			for (int i = 1; i < nameCount; i++) {
 				projectFullName = projectFullName + "/job/" + projectList[i];
 			}
+			//LOGGER.log(Level.INFO,"[INFO] projectFullName after: " + projectFullName);
 		}
 
 		return projectFullName;
