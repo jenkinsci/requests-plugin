@@ -1,6 +1,12 @@
 
 ## Version History
 
+Version 2.2.11 (June 08, 2021)
+
+-       Security fix: Bumped httpclient from 4.3.6 to 4.5.13.
+-       Security fix: Bumped httpcore from 4.4.3 to 4.4.13.
+
+
 Version 2.2.10 (June 01, 2021)
 
 -       Fix issue with spaces in names

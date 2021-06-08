@@ -84,7 +84,7 @@ public abstract class Request {
 
 	public String getProjectFullName() {
 		String[] projectList = null;
-		LOGGER.log(Level.INFO,"[INFO] projectFullName before: " + projectFullName);
+		//LOGGER.log(Level.INFO,"[INFO] projectFullName before: " + projectFullName);
 		if (!projectFullName.contains("/job/") && projectFullName.contains("/")) {
 			projectList = projectFullName.split("/");
 			// Need to add '/job/' in between all names:
