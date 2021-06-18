@@ -1,6 +1,11 @@
 
 ## Version History
 
+Version 2.2.12 (June 18, 2021)
+
+-       Fix path issue with Delete Build and Unlock Build requests
+
+
 Version 2.2.11 (June 08, 2021)
 
 -       Security fix: Bumped httpclient from 4.3.6 to 4.5.13.

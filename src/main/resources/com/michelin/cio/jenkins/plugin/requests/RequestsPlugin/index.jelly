@@ -24,8 +24,8 @@
   -->
   
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
-         xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt" xmlns:p="/lib/hudson/project">
+
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt" xmlns:p="/lib/hudson/project">
 
 <link rel="stylesheet" href="${rootURL}/plugin/requests/CSS/requests.css" type="text/css" />	
     <script type="text/javascript" src="${rootURL}/plugin/requests/js/requests-plugin.js"></script>
@@ -55,8 +55,8 @@
                 <j:otherwise>
                     <form name="pendingRequests" action="manageRequests">
                         <div id="button-container">
-                            <input type="submit" class="button" style="margin-left: 100px; margin-right:100px" name="discard" value="${%requests.plugin.button.discard}"/>
-                            <input type="submit" class="button" name="apply" value="${%requests.plugin.button.apply}"/>
+                            <f:submit class="button" style="margin-left: 100px; margin-right:100px" name="discard" value="${%requests.plugin.button.discard}"/>
+                            <f:submit class="button" name="apply" value="${%requests.plugin.button.apply}"/>
                         </div>
                         <table id="tab" cellpadding="3" cellspacing="3">
                             <thead class="fixedHeader">

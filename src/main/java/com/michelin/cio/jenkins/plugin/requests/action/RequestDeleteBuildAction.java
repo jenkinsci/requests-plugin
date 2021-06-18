@@ -85,13 +85,13 @@ public class RequestDeleteBuildAction implements Action {
 				RequestsPlugin plugin = Jenkins.get().getPlugin(RequestsPlugin.class);
 				String[] nameList = null;
 				String buildName = build.getDisplayName();
-				String projectFullName;
+				String projectFullName = "";
 				String projectName = "";
 				int buildNumber = build.getNumber();
 				String fullDisplayName = build.getFullDisplayName();
-				//LOGGER.info("Delete Build Request: fullDisplayName " + fullDisplayName);
+				LOGGER.info("Delete Build Action: fullDisplayName " + fullDisplayName);
 				
-				//LOGGER.info("Delete Build Request: getURL: " + build.getUrl());
+				LOGGER.info("Delete Build Request: getURL: " + build.getUrl());
 				
 				// Need to extract the job name:
 				if (fullDisplayName.contains(" » ")) {
@@ -101,7 +101,12 @@ public class RequestDeleteBuildAction implements Action {
 					projectFullName = nameList[1];
 
 				} else {
-					projectFullName = fullDisplayName.split(" #")[0];
+					if (fullDisplayName.contains(" #")){
+						projectFullName = fullDisplayName.split(" #")[0];
+					} else if (fullDisplayName.contains(" ")) {
+						projectFullName = fullDisplayName.split(" ")[0];
+					}
+					
 					projectName = projectFullName;
 				}
 
@@ -110,7 +115,7 @@ public class RequestDeleteBuildAction implements Action {
 				String jenkinsUrl = Jenkins.get().getRootUrl();
 				String buildUrl = jenkinsUrl + build.getUrl();
 				String[] emailData = {buildName, username, "A Delete Build", buildUrl};
-			
+				LOGGER.info("[DEBUG] Delete Build Action: " + projectName + " : " + projectFullName);
 				plugin.addRequestPlusEmail(new DeleteBuildRequest("deleteBuild", username, projectName, projectFullName, Integer.toString(buildNumber)), emailData);
 			}
 		} catch (NullPointerException e) {

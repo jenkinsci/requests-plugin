@@ -61,6 +61,8 @@ public class DeleteBuildRequest extends Request {
 			if (jenkins == null)
 				throw new NullPointerException("Jenkins instance is null");
 
+			LOGGER.info("[DEBUG] DeleteBuildRequest triggered: ");
+			
 			if (Jenkins.get().hasPermission(Run.DELETE)) {
 				String jenkinsURL = null;
 				jenkinsURL = Jenkins.get().getRootUrl();
@@ -92,18 +94,15 @@ public class DeleteBuildRequest extends Request {
 				LOGGER.info("[INFO] Delete Build urlString: " + urlString);
 
 				try {
-					returnStatus = requestsUtility.runPostMethod(jenkinsURL,
-							urlString);
+					returnStatus = requestsUtility.runPostMethod(jenkinsURL, urlString);
 					// Check if deletion failed due to locked build:
-					if (returnStatus.contains("Forbidden")
-							|| returnStatus.contains("Bad Request")) {
+					if (returnStatus.contains("Forbidden") || returnStatus.contains("Bad Request")) {
 						String unlockUrlString = jenkinsURL + "job/"
 								+ projectFullName + "/" + buildNumber
 								+ "/toggleLogKeep";
 
 						try {
-							returnStatus = requestsUtility
-									.runPostMethod(jenkinsURL, unlockUrlString);
+							returnStatus = requestsUtility.runPostMethod(jenkinsURL, unlockUrlString);
 
 							if (returnStatus.equals("success")) {
 								errorMessage = "Build number " + buildNumber

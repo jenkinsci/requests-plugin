@@ -81,7 +81,7 @@ public class RequestUnlockAction implements Action {
 				final String username = request.getParameter("username");
 				RequestsPlugin plugin = Jenkins.get().getPlugin(RequestsPlugin.class);
 				String buildName = build.getDisplayName();
-				String projectFullName;
+				String projectFullName = null;
 				String[] nameList;
 				String projectName = null;
 				int buildNumber = build.getNumber();
@@ -95,7 +95,12 @@ public class RequestUnlockAction implements Action {
 					projectFullName = nameList[1];
 
 				} else {
-					projectFullName = fullDisplayName.split(" #")[0];
+					if (fullDisplayName.contains(" #")){
+						projectFullName = fullDisplayName.split(" #")[0];
+					} else if (fullDisplayName.contains(" ")) {
+						projectFullName = fullDisplayName.split(" ")[0];
+					}
+					
 					projectName = projectFullName;
 				}
 
