@@ -1,6 +1,11 @@
 
 ## Version History
 
+Version 2.2.13 (June 21, 2021)
+
+-       Fix index.jelly layout issue
+
+
 Version 2.2.12 (June 18, 2021)
 
 -       Fix path issue with Delete Build and Unlock Build requests
