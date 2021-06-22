@@ -91,14 +91,15 @@ width="700"}
 
 #### In order to see Action                      Not Authorized
 
-Delete Job Request                         Job.Delete = 0
+Delete Job Request                         Job.Delete
 
-Delete Build Request                       Run.Delete =0
+Delete Build Request                       Run.Delete
 
-Unlock Build Request                      Run.Delete = 0
+Unlock Build Request                      Run.Delete
 
-Rename Job Request                      Job.Create = 1, Job.Delete = 0,
-Job.Configure = 0 OR Job.Create = 0, Job.Delete = 1, Job.Configure = 0
+Rename Job Request                      Job.Delete, Job.Configure 
+                                  OR    Job.Create, Job.Delete
+                                  OR    Job.Create, Job.Delete, Job.Configure
 
   
 
