@@ -138,10 +138,9 @@ public class RequestRenameJobAction implements Action {
 	private boolean isIconDisplayed() {
 		boolean isDisplayed = false;
 		try {
-			isDisplayed = ((hasCreatePermission() && !hasDeletePermission()
-					&& !hasConfigurePermission())
-					|| (hasDeletePermission() && !hasCreatePermission()
-							&& !hasConfigurePermission()));
+			isDisplayed = (!hasDeletePermission() && !hasConfigurePermission() && hasCreatePermission())
+					   || (!hasCreatePermission() && !hasConfigurePermission() && hasDeletePermission())
+					   || (!hasDeletePermission() && !hasCreatePermission() && !hasConfigurePermission());
 
 		} catch (IOException | ServletException e) {
 			LOGGER.log(Level.WARNING,

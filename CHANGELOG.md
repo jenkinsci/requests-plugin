@@ -1,6 +1,11 @@
 
 ## Version History
 
+Version 2.2.14 (June 22, 2021)
+
+-       Correct permissions on Rename so links appear
+
+
 Version 2.2.13 (June 21, 2021)
 
 -       Fix index.jelly layout issue
