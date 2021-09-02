@@ -65,8 +65,7 @@ public class RequestsPlugin extends Plugin {
 	// The requests are unique (to avoid duplication problems like delete a job
 	// already deleted)
 	private List<Request> requests = new ArrayList<Request>();
-	private static final Logger LOGGER = Logger
-			.getLogger(RequestsPlugin.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(RequestsPlugin.class.getName());
 	private transient List<String> errors = new ArrayList<String>();
 
 	public void addRequest(final Request request) {
@@ -79,9 +78,7 @@ public class RequestsPlugin extends Plugin {
 
 			// Allows a delete project, delete build and unlock build for the
 			// same build but will not submit duplicate of the same request:
-			if (projectFullName.equals(request.getProjectFullName())
-					&& buildNumber.equals(request.getBuildNumber())
-					&& requestType.equals(request.getRequestType())) {
+			if (projectFullName.equals(request.getProjectFullName()) && buildNumber.equals(request.getBuildNumber()) && requestType.equals(request.getRequestType())) {
 				alreadyRequested = true;
 				break;
 			}
@@ -92,7 +89,7 @@ public class RequestsPlugin extends Plugin {
 			persistPendingRequests();
 		}
 	}
-	
+
 	public void addRequestPlusEmail(final Request request, final String[] emailData) throws UnknownHostException, MessagingException {
 		boolean alreadyRequested = false;
 
@@ -103,9 +100,7 @@ public class RequestsPlugin extends Plugin {
 
 			// Allows a delete project, delete build and unlock build for the
 			// same build but will not submit duplicate of the same request:
-			if (projectFullName.equals(request.getProjectFullName())
-					&& buildNumber.equals(request.getBuildNumber())
-					&& requestType.equals(request.getRequestType())) {
+			if (projectFullName.equals(request.getProjectFullName()) && buildNumber.equals(request.getBuildNumber()) && requestType.equals(request.getRequestType())) {
 				alreadyRequested = true;
 				break;
 			}
@@ -113,13 +108,13 @@ public class RequestsPlugin extends Plugin {
 
 		if (!alreadyRequested) {
 			requests.add(request);
-			
+
 			RequestMailSender mailSender = new RequestMailSender(emailData[0], emailData[1], emailData[2], emailData[3]);
 			mailSender.executeEmail();
-			//LOGGER.info("[INFO] Send Email:");
+			// LOGGER.info("[INFO] Send Email:");
 			persistPendingRequests();
 		} else {
-			//LOGGER.info("[INFO] Don't Send Email:");
+			// LOGGER.info("[INFO] Don't Send Email:");
 		}
 	}
 
@@ -141,30 +136,31 @@ public class RequestsPlugin extends Plugin {
 
 					if (StringUtils.isNotBlank(request.getParameter("apply"))) {
 						String requestType = currentRequest.getRequestType();
+
 						if (currentRequest.process(requestType)) {
 							// Store to remove
 							requestsToRemove.add(currentRequest);
 
 						} else {
-							errors.add(currentRequest.getErrorMessage());
-							LOGGER.log(Level.WARNING,
-									"The request \"{0}\" can not be processed",
-									currentRequest.getMessage());
+							if (requestType.equals("deleteBuild")) {
+								errors.add("Unable to Delete the Build. The build may be Locked.");
+							} else {
+								errors.add(currentRequest.getErrorMessage());
+							}
+							
+							LOGGER.info("[WARNING] The request can not be processed: " + currentRequest.getMessage());
 						}
 					} else {
 						requestsToRemove.add(currentRequest);
-						LOGGER.log(Level.INFO,
-								"The request \"{0}\" has been discarded",
-								currentRequest.getMessage());
+						LOGGER.info("[INFO] The request has been discarded: " + currentRequest.getMessage());
 					}
 
 				} else {
-					LOGGER.log(Level.WARNING,
-							"The request index is not defined");
+					LOGGER.info("[WARNING] The request index is not defined");
 				}
 			}
 		} else {
-			LOGGER.log(Level.FINE, "Nothing selected");
+			LOGGER.info("[INFO] Nothing selected");
 		}
 
 		// Once it has done the work, it removes the applied requests
@@ -192,7 +188,7 @@ public class RequestsPlugin extends Plugin {
 		try {
 			save();
 		} catch (IOException e) {
-			LOGGER.log(Level.WARNING, "Failed to persist the pending requests");
+			LOGGER.info("[WARNING] Failed to persist the pending requests");
 		}
 	}
 

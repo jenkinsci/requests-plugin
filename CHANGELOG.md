@@ -1,6 +1,11 @@
 
 ## Version History
 
+Version 2.2.15 (September 02, 2021)
+
+-       Fix path issue with Delete Build and Unlock Build requests
+
+
 Version 2.2.14 (June 22, 2021)
 
 -       Correct permissions on Rename so links appear

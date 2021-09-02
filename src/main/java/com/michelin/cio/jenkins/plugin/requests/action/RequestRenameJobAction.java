@@ -73,7 +73,7 @@ public class RequestRenameJobAction implements Action {
 				RequestsPlugin plugin = Jenkins.get().getPlugin(RequestsPlugin.class);
 				String projectName = project.getFullName();
 				String projectFullName = project.getFullName();
-
+				LOGGER.info("Rename Job Request Before: " + projectName + " - " + projectFullName);
 				// Check if a folder job type:
 				if (!projectFullName.contains("/job/") && projectFullName.contains("/")) {
 					RequestsUtility requestsUtility = new RequestsUtility();
@@ -86,7 +86,7 @@ public class RequestRenameJobAction implements Action {
 					projectName = projectnameList[nameCount-1];
 				}
 				
-				LOGGER.info("Rename Job Request: " + projectName + " - " + projectFullName);
+				LOGGER.info("Rename Job Request After: " + projectName + " - " + projectFullName);
 				String[] emailData = {projectName + " -> " + newName, username, "A Rename Job", project.getAbsoluteUrl()};
 
 				plugin.addRequestPlusEmail(new RenameJobRequest("renameJob", username, projectName, projectFullName, newName), emailData);

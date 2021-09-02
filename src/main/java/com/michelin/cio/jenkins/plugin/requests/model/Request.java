@@ -30,8 +30,7 @@ import jenkins.model.Jenkins;
 import java.util.Calendar;
 import org.apache.commons.lang.time.FastDateFormat;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+//import java.util.logging.Logger;
 
 // @author Daniel Petisme <daniel.petisme@gmail.com> <http://danielpetisme.blogspot.com/>
 
@@ -46,9 +45,8 @@ public abstract class Request {
 	private String creationDate;
 
 	private static String dateFormat = "yyyy-MM-dd HH:mm:ss";
-	private static final FastDateFormat yyyymmdd = FastDateFormat
-			.getInstance(dateFormat);
-	private static final Logger LOGGER = Logger.getLogger(RequestsUtility.class.getName());
+	private static final FastDateFormat yyyymmdd = FastDateFormat.getInstance(dateFormat);
+	//private static final Logger LOGGER = Logger.getLogger(RequestsUtility.class.getName());
 
 	public Request(String requestType, String username, String project, String projectFullName, String buildNumber) {
 		this.requestType = requestType;
@@ -61,41 +59,32 @@ public abstract class Request {
 
 	public String getProject() {
 		if (projectFullName.contains("/")) {
-			String [] projectList = projectFullName.split("/");
+			String[] projectList = projectFullName.split("/");
 			int nameCount = projectList.length;
-			project = projectList[nameCount-1];
+			project = projectList[nameCount - 1];
 		}
 		return project;
 	}
-	
+
 	public String getProjectNameWithoutJobSeparator() {
 		String[] projectList = null;
+		String projectFullNameWithoutJobSeparator;
+		
 		if (projectFullName.contains("/job/")) {
 			projectList = projectFullName.split("/job/");
 			int nameCount = projectList.length;
-			projectFullName = projectList[0];
+			projectFullNameWithoutJobSeparator = projectList[0];
 			for (int i = 1; i < nameCount; i++) {
-				projectFullName = projectFullName + "/" + projectList[i];
+				projectFullNameWithoutJobSeparator = projectFullNameWithoutJobSeparator + "/" + projectList[i];
 			}
+		} else {
+			projectFullNameWithoutJobSeparator = projectFullName;
 		}
-
-		return projectFullName;
+		
+		return projectFullNameWithoutJobSeparator;
 	}
 
 	public String getProjectFullName() {
-		String[] projectList = null;
-		//LOGGER.log(Level.INFO,"[INFO] projectFullName before: " + projectFullName);
-		if (!projectFullName.contains("/job/") && projectFullName.contains("/")) {
-			projectList = projectFullName.split("/");
-			// Need to add '/job/' in between all names:
-			int nameCount = projectList.length;
-			projectFullName = projectList[0];
-			for (int i = 1; i < nameCount; i++) {
-				projectFullName = projectFullName + "/job/" + projectList[i];
-			}
-			//LOGGER.log(Level.INFO,"[INFO] projectFullName after: " + projectFullName);
-		}
-
 		return projectFullName;
 	}
 
@@ -134,11 +123,10 @@ public abstract class Request {
 			} else {
 				if (requestType.equals("deleteJob") || requestType.equals("renameJob")) {
 					errorMessage = "The job " + projectName + " doesn't exist";
-				} 
-				if (requestType.equals("deleteFolder") || requestType.equals("renameFolder")){
-					errorMessage = "The folder " + projectName + " doesn't exist";
 				}
-				else {
+				if (requestType.equals("deleteFolder") || requestType.equals("renameFolder")) {
+					errorMessage = "The folder " + projectName + " doesn't exist";
+				} else {
 					errorMessage = "The build for " + projectName + " doesn't exist";
 				}
 			}

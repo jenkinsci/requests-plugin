@@ -57,8 +57,7 @@ public class RequestDeleteBuildAction implements Action {
 
 	private Run<?, ?> build;
 	private transient List<String> errors = new ArrayList<String>();
-	private static final Logger LOGGER = Logger
-			.getLogger(RequestDeleteBuildAction.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(RequestDeleteBuildAction.class.getName());
 
 	public RequestDeleteBuildAction(Run<?, ?> target) {
 		this.build = target;
@@ -74,47 +73,52 @@ public class RequestDeleteBuildAction implements Action {
 	}
 
 	@POST
-	public HttpResponse doCreateDeleteBuildRequest(StaplerRequest request,
-			StaplerResponse response)
-			throws IOException, ServletException, MessagingException {
+	public HttpResponse doCreateDeleteBuildRequest(StaplerRequest request, StaplerResponse response) throws IOException, ServletException, MessagingException {
 
 		try {
 			if (isIconDisplayed()) {
 				errors.clear();
 				final String username = request.getParameter("username");
 				RequestsPlugin plugin = Jenkins.get().getPlugin(RequestsPlugin.class);
-				String[] nameList = null;
 				String buildName = build.getDisplayName();
 				String projectFullName = "";
 				String projectName = "";
 				int buildNumber = build.getNumber();
 				String fullDisplayName = build.getFullDisplayName();
+				StringBuffer stringBuffer = new StringBuffer();
+				
 				LOGGER.info("Delete Build Action: fullDisplayName " + fullDisplayName);
-				
-				LOGGER.info("Delete Build Request: getURL: " + build.getUrl());
-				
-				// Need to extract the job name:
-				if (fullDisplayName.contains(" » ")) {
-					RequestsUtility requestsUtility = new RequestsUtility();
-					nameList = requestsUtility.constructFolderJobNameAndFull(build.getUrl());
-					projectName = nameList[0];
-					projectFullName = nameList[1];
 
+				// Need to extract the folder name(s) and job name:
+				if (fullDisplayName.contains(" » ")) {
+					String[] Folder_project_BuildList = null;
+					Folder_project_BuildList = fullDisplayName.split(" » ");
+					int folderCount = Folder_project_BuildList.length;
+
+					// Cat together folder names with /job/ except for the last value:
+					for (int i = 0; i < folderCount - 1; i++) {
+						stringBuffer.append(Folder_project_BuildList[i] + "/job/");
+					}
+
+					projectName = Folder_project_BuildList[folderCount - 1].split(" #")[0];
+					// Cat in the job name
+					stringBuffer.append(projectName);
+					projectFullName = stringBuffer.toString();
+
+					// Need to extract the job name:
 				} else {
-					if (fullDisplayName.contains(" #")){
+					if (fullDisplayName.contains(" #")) {
 						projectFullName = fullDisplayName.split(" #")[0];
 					} else if (fullDisplayName.contains(" ")) {
 						projectFullName = fullDisplayName.split(" ")[0];
 					}
-					
+
 					projectName = projectFullName;
 				}
 
-				LOGGER.info("Delete Build Request: " + projectName + " - " + projectFullName);
-
 				String jenkinsUrl = Jenkins.get().getRootUrl();
 				String buildUrl = jenkinsUrl + build.getUrl();
-				String[] emailData = {buildName, username, "A Delete Build", buildUrl};
+				String[] emailData = { buildName, username, "A Delete Build", buildUrl };
 				LOGGER.info("[DEBUG] Delete Build Action: " + projectName + " : " + projectFullName);
 				plugin.addRequestPlusEmail(new DeleteBuildRequest("deleteBuild", username, projectName, projectFullName, Integer.toString(buildNumber)), emailData);
 			}
@@ -125,8 +129,7 @@ public class RequestDeleteBuildAction implements Action {
 			return null;
 		}
 
-		return new HttpRedirect(
-				request.getContextPath() + '/' + build.getUrl());
+		return new HttpRedirect(request.getContextPath() + '/' + build.getUrl());
 	}
 
 	public String getDisplayName() {
@@ -159,8 +162,7 @@ public class RequestDeleteBuildAction implements Action {
 		try {
 			isDisplayed = !hasDeletePermission();
 		} catch (Exception e) {
-			LOGGER.log(Level.WARNING,
-					"Impossible to know if the icon has to be displayed", e);
+			LOGGER.log(Level.WARNING, "Impossible to know if the icon has to be displayed", e);
 		}
 
 		return isDisplayed;

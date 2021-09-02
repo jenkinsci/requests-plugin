@@ -46,19 +46,15 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-
-
 
 // @author John Flynn <john.trixmot.flynn@gmail.com>
 
 public class RequestsUtility {
 
 	private static final Logger LOGGER = Logger.getLogger(RequestsUtility.class.getName());
-	
-	public String runPostMethod(String jenkinsURL, String urlString)
-			throws ClientProtocolException, IOException {
+
+	public String runPostMethod(String jenkinsURL, String urlString) throws ClientProtocolException, IOException {
 		LOGGER.info("[INFO] urlString: " + urlString);
 		String returnStatus;
 		DescriptorEmailImpl descriptorEmailImpl = new DescriptorEmailImpl();
@@ -66,44 +62,37 @@ public class RequestsUtility {
 		// The password must be a Jenkins User Token:
 		Secret password = descriptorEmailImpl.getUnlockpassword();
 		URI uri = URI.create(urlString);
-		HttpHost host = new HttpHost(uri.getHost(), uri.getPort(),
-				uri.getScheme());
+		HttpHost host = new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme());
 		CredentialsProvider credsProvider = new BasicCredentialsProvider();
-		credsProvider.setCredentials(
-				new AuthScope(uri.getHost(), uri.getPort()),
-				new UsernamePasswordCredentials(username,
-						password.getPlainText()));
+		credsProvider.setCredentials(new AuthScope(uri.getHost(), uri.getPort()), new UsernamePasswordCredentials(username, password.getPlainText()));
 		AuthCache authCache = new BasicAuthCache();
 		BasicScheme basicAuth = new BasicScheme();
 		authCache.put(host, basicAuth);
-		CloseableHttpClient httpClient = HttpClients.custom()
-				.setDefaultCredentialsProvider(credsProvider).build();
+		CloseableHttpClient httpClient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).build();
 		HttpPost httpPost = new HttpPost(uri);
 
 		// Add AuthCache to the execution context
 		HttpClientContext localContext = HttpClientContext.create();
 		localContext.setAuthCache(authCache);
 
-		HttpResponse response = httpClient.execute(host, httpPost,
-				localContext);
+		HttpResponse response = httpClient.execute(host, httpPost, localContext);
 		int responseCode = response.getStatusLine().getStatusCode();
 		LOGGER.info("[INFO] responseCode: " + responseCode);
 
 		if ((responseCode > 199) && (responseCode < 400)) {
 			returnStatus = "success";
 		} else {
-			LOGGER.info("[ERROR] httpClient getReasonPhrase: "
-					+ response.getStatusLine().getReasonPhrase());
+			LOGGER.info("[ERROR] httpClient getReasonPhrase: " + response.getStatusLine().getReasonPhrase());
 			returnStatus = response.getStatusLine().getReasonPhrase();
 		}
 		return returnStatus;
 	}
-	
+
 	public String constructFolderJobName(String inputName) {
 		String[] projectNameList = null;
 		StringBuffer stringBuffer = new StringBuffer();
 		projectNameList = inputName.split("/");
-		
+
 		// Need to add '/job/' in between all names:
 		int nameCount = projectNameList.length;
 		stringBuffer.append(projectNameList[0]);
@@ -112,56 +101,18 @@ public class RequestsUtility {
 			stringBuffer.append(projectNameList[i]);
 		}
 
-		//LOGGER.info("[INFO] FULL FOLDER PROJECT NAME: " + stringBuffer.toString());
-		
+		LOGGER.info("[INFO] FULL FOLDER PROJECT NAME: " + stringBuffer.toString());
+
 		return stringBuffer.toString();
 	}
-	
-	public String[] constructFolderJobNameAndFull(String buildURL) {
-		String[] project_and_BuildList = null;
-		String[] returnNameList = new String[2];
-		//Use StringBuffer instead of concatenate strings:
-		StringBuffer stringBuffer = new StringBuffer(); 
-		String projectName = "";	
 
-		LOGGER.log(Level.INFO,"[INFO] constructFolderJobNameAndFull inputName: " + buildURL);
-		
-		buildURL = buildURL.replace("%20", " ");
-		
-		//view/JOHN/job/Utilities/job/FolderLayer_2/job/folderlayerjob/1/
-		//Split on "/job/" ignore index 0 and last:
-		project_and_BuildList = buildURL.split("/job/");	
-		int nameCount = project_and_BuildList.length;
-		LOGGER.log(Level.INFO,"[INFO] constructFolderJobNameAndFull nameCount: " + nameCount);
-		String firstFolderName = project_and_BuildList[1];
-		stringBuffer.append(firstFolderName);
-		
-		//Skip first index /job/ and the buildname from the end:
-		for (int i = 2; i < nameCount; i++) {
-			stringBuffer.append("/job/");
-			if (i == nameCount -1) {
-				String[] projectBuild = project_and_BuildList[i].split("/");
-				stringBuffer.append(projectBuild[0]);
-				projectName = projectBuild[0];
-			} else
-			{
-				stringBuffer.append(project_and_BuildList[i]);
-			}						
-		}
-		
-		returnNameList[0] = projectName; 				//projectName
-		returnNameList[1] = stringBuffer.toString(); 	//projectFullName == foldername1/job/foldername2/job/projectname
-		
-		return returnNameList;
-	}
-	
 	// Encode project name for url using `UTF-8` encoding scheme:
-    public String encodeValue (String value) {
-        try {
-            return URLEncoder.encode(value, StandardCharsets.UTF_8.toString());
-        } catch (UnsupportedEncodingException ex) {
-            throw new RuntimeException(ex.getCause());
-        }
-    }
+	public String encodeValue(String value) {
+		try {
+			return URLEncoder.encode(value, StandardCharsets.UTF_8.toString());
+		} catch (UnsupportedEncodingException ex) {
+			throw new RuntimeException(ex.getCause());
+		}
+	}
 
 }
