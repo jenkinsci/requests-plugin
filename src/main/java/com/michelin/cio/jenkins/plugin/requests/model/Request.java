@@ -69,14 +69,18 @@ public abstract class Request {
 	public String getProjectNameWithoutJobSeparator() {
 		String[] projectList = null;
 		String projectFullNameWithoutJobSeparator;
+		StringBuffer stringBuffer = new StringBuffer();
 		
 		if (projectFullName.contains("/job/")) {
 			projectList = projectFullName.split("/job/");
 			int nameCount = projectList.length;
-			projectFullNameWithoutJobSeparator = projectList[0];
+			stringBuffer.append(projectList[0]);
 			for (int i = 1; i < nameCount; i++) {
-				projectFullNameWithoutJobSeparator = projectFullNameWithoutJobSeparator + "/" + projectList[i];
+				stringBuffer.append("/" + projectList[i]);
 			}
+			
+			projectFullNameWithoutJobSeparator = stringBuffer.toString();
+			
 		} else {
 			projectFullNameWithoutJobSeparator = projectFullName;
 		}
