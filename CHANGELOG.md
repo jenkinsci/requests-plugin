@@ -1,6 +1,12 @@
 
 ## Version History
 
+Version 2.2.16 (March 04, 2022)
+
+-       Update POM dependencies
+-		Improve error return messages
+
+
 Version 2.2.15 (September 02, 2021)
 
 -       Fix path issue with Delete Build and Unlock Build requests
