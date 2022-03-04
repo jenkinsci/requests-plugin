@@ -60,41 +60,25 @@ public class RenameJobRequest extends Request {
 		boolean success = false;
 
 		try {
-			if (Jenkins.get().hasPermission(Item.DELETE) && Jenkins.get().hasPermission(Item.CREATE)) {
+			if ((Jenkins.get().hasPermission(Item.DELETE) && !Jenkins.get().hasPermission(Item.CREATE) && Jenkins.get().hasPermission(Item.CONFIGURE)) || 
+				(!Jenkins.get().hasPermission(Item.DELETE) && Jenkins.get().hasPermission(Item.CREATE) && Jenkins.get().hasPermission(Item.CONFIGURE)) ||
+				(Jenkins.get().hasPermission(Item.DELETE) && Jenkins.get().hasPermission(Item.CREATE) && Jenkins.get().hasPermission(Item.CONFIGURE))) {
 				((Job) item).renameTo(newName);
 				success = true;
-				LOGGER.log(Level.INFO,
-						"The jobs {0} has been properly renamed in {1}",
-						new Object[] { item.getName(), newName });
+				LOGGER.log(Level.INFO, "The Job {0} has been properly renamed in {1}", new Object[] { item.getName(), newName });
 
 			} else {
-				errorMessage = "The current user " + username
-						+ " has no permission to rename the job";
-				LOGGER.log(Level.FINE,
-						"The current user {0} has no permission to RENAME the job",
-						new Object[] { username });
+				errorMessage = "The current user " + username + " has no permission to RENAME the Job";
+				LOGGER.log(Level.FINE, "The current user {0} has no permission to RENAME the Job", new Object[] { username });
 			}
-		} catch (NullPointerException e) {
-			errorMessage = e.getMessage();
-			LOGGER.log(Level.SEVERE,
-					"Unable to rename the job " + item.getName(),
-					e.getMessage());
-		} catch (IOException e) {
-			errorMessage = e.getMessage();
-			LOGGER.log(Level.SEVERE,
-					"Unable to rename the job " + item.getName(),
-					e.getMessage());
-		} catch (IllegalArgumentException e) {
-			errorMessage = e.getMessage();
-			LOGGER.log(Level.SEVERE,
-					"Unable to rename the job " + item.getName(),
-					e.getMessage());
+		} catch (Exception e) {
+			errorMessage = "Unable to RENAME the Job " + e.getMessage().toString();
+			LOGGER.log(Level.SEVERE, "Unable to RENAME the Job " + item.getName(), e.getMessage().toString());
 		}
 
 		return success;
 	}
 
-	private static final Logger LOGGER = Logger
-			.getLogger(RenameJobRequest.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(RenameJobRequest.class.getName());
 
 }

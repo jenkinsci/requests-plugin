@@ -135,8 +135,8 @@ public abstract class Request {
 				}
 			}
 
-		} catch (NullPointerException e) {
-			errorMessage = e.getMessage();
+		} catch (Exception e) {
+			errorMessage = e.getMessage().toString();
 
 			return false;
 		}

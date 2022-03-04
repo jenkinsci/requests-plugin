@@ -78,7 +78,8 @@ public class RequestsPlugin extends Plugin {
 
 			// Allows a delete project, delete build and unlock build for the
 			// same build but will not submit duplicate of the same request:
-			if (projectFullName.equals(request.getProjectFullName()) && buildNumber.equals(request.getBuildNumber()) && requestType.equals(request.getRequestType())) {
+			if (projectFullName.equals(request.getProjectFullName()) && buildNumber.equals(request.getBuildNumber())
+					&& requestType.equals(request.getRequestType())) {
 				alreadyRequested = true;
 				break;
 			}
@@ -90,7 +91,8 @@ public class RequestsPlugin extends Plugin {
 		}
 	}
 
-	public void addRequestPlusEmail(final Request request, final String[] emailData) throws UnknownHostException, MessagingException {
+	public void addRequestPlusEmail(final Request request, final String[] emailData)
+			throws UnknownHostException, MessagingException {
 		boolean alreadyRequested = false;
 
 		for (int i = 0; i < requests.size(); i++) {
@@ -100,7 +102,8 @@ public class RequestsPlugin extends Plugin {
 
 			// Allows a delete project, delete build and unlock build for the
 			// same build but will not submit duplicate of the same request:
-			if (projectFullName.equals(request.getProjectFullName()) && buildNumber.equals(request.getBuildNumber()) && requestType.equals(request.getRequestType())) {
+			if (projectFullName.equals(request.getProjectFullName()) && buildNumber.equals(request.getBuildNumber())
+					&& requestType.equals(request.getRequestType())) {
 				alreadyRequested = true;
 				break;
 			}
@@ -109,7 +112,8 @@ public class RequestsPlugin extends Plugin {
 		if (!alreadyRequested) {
 			requests.add(request);
 
-			RequestMailSender mailSender = new RequestMailSender(emailData[0], emailData[1], emailData[2], emailData[3]);
+			RequestMailSender mailSender = new RequestMailSender(emailData[0], emailData[1], emailData[2],
+					emailData[3]);
 			mailSender.executeEmail();
 			// LOGGER.info("[INFO] Send Email:");
 			persistPendingRequests();
@@ -119,7 +123,8 @@ public class RequestsPlugin extends Plugin {
 	}
 
 	@RequirePOST
-	public HttpResponse doManageRequests(StaplerRequest request, StaplerResponse response) throws IOException, ServletException {
+	public HttpResponse doManageRequests(StaplerRequest request, StaplerResponse response)
+			throws IOException, ServletException {
 		Jenkins.get().checkPermission(Jenkins.ADMINISTER);
 		errors.clear();
 		String[] selectedRequests = request.getParameterValues("selected");
@@ -138,21 +143,17 @@ public class RequestsPlugin extends Plugin {
 						String requestType = currentRequest.getRequestType();
 
 						if (currentRequest.process(requestType)) {
-							// Store to remove
+							// Success, store to remove:
 							requestsToRemove.add(currentRequest);
 
 						} else {
-							if (requestType.equals("deleteBuild")) {
-								errors.add("Unable to Delete the Build. The build may be Locked.");
-							} else {
-								errors.add(currentRequest.getErrorMessage());
-							}
-							
-							LOGGER.info("[WARNING] The request can not be processed: " + currentRequest.getMessage());
+							// Failed, show error message:
+							errors.add(currentRequest.getErrorMessage().toString());
+							LOGGER.info("[WARNING] The request can not be processed: " + currentRequest.getMessage().toString());
 						}
 					} else {
 						requestsToRemove.add(currentRequest);
-						LOGGER.info("[INFO] The request has been discarded: " + currentRequest.getMessage());
+						LOGGER.info("[INFO] The request has been discarded: " + currentRequest.getMessage().toString());
 					}
 
 				} else {

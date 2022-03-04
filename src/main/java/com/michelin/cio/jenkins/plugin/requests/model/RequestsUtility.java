@@ -46,6 +46,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 // @author John Flynn <john.trixmot.flynn@gmail.com>
@@ -57,34 +58,44 @@ public class RequestsUtility {
 	public String runPostMethod(String jenkinsURL, String urlString) throws ClientProtocolException, IOException {
 		LOGGER.info("[INFO] urlString: " + urlString);
 		String returnStatus;
-		DescriptorEmailImpl descriptorEmailImpl = new DescriptorEmailImpl();
-		String username = descriptorEmailImpl.getUnlockuser();
-		// The password must be a Jenkins User Token:
-		Secret password = descriptorEmailImpl.getUnlockpassword();
-		URI uri = URI.create(urlString);
-		HttpHost host = new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme());
-		CredentialsProvider credsProvider = new BasicCredentialsProvider();
-		credsProvider.setCredentials(new AuthScope(uri.getHost(), uri.getPort()), new UsernamePasswordCredentials(username, password.getPlainText()));
-		AuthCache authCache = new BasicAuthCache();
-		BasicScheme basicAuth = new BasicScheme();
-		authCache.put(host, basicAuth);
-		CloseableHttpClient httpClient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).build();
-		HttpPost httpPost = new HttpPost(uri);
 
-		// Add AuthCache to the execution context
-		HttpClientContext localContext = HttpClientContext.create();
-		localContext.setAuthCache(authCache);
+		try {
+			DescriptorEmailImpl descriptorEmailImpl = new DescriptorEmailImpl();
+			String username = descriptorEmailImpl.getUnlockuser();
+			// The password must be a Jenkins User Token:
+			Secret password = descriptorEmailImpl.getUnlockpassword();
+			URI uri = URI.create(urlString);
+			HttpHost host = new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme());
+			CredentialsProvider credsProvider = new BasicCredentialsProvider();
+			credsProvider.setCredentials(new AuthScope(uri.getHost(), uri.getPort()),
+					new UsernamePasswordCredentials(username, password.getPlainText()));
+			AuthCache authCache = new BasicAuthCache();
+			BasicScheme basicAuth = new BasicScheme();
+			authCache.put(host, basicAuth);
+			CloseableHttpClient httpClient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).build();
+			HttpPost httpPost = new HttpPost(uri);
 
-		HttpResponse response = httpClient.execute(host, httpPost, localContext);
-		int responseCode = response.getStatusLine().getStatusCode();
-		LOGGER.info("[INFO] responseCode: " + responseCode);
+			// Add AuthCache to the execution context
+			HttpClientContext localContext = HttpClientContext.create();
+			localContext.setAuthCache(authCache);
 
-		if ((responseCode > 199) && (responseCode < 400)) {
-			returnStatus = "success";
-		} else {
-			LOGGER.info("[ERROR] httpClient getReasonPhrase: " + response.getStatusLine().getReasonPhrase());
-			returnStatus = response.getStatusLine().getReasonPhrase();
+			HttpResponse response = httpClient.execute(host, httpPost, localContext);
+			int responseCode = response.getStatusLine().getStatusCode();
+			LOGGER.info("[INFO] responseCode: " + responseCode);
+
+			if ((responseCode > 199) && (responseCode < 400)) {
+				returnStatus = "success";
+			} else {
+				LOGGER.info("[ERROR] httpClient getReasonPhrase: " + response.getStatusLine().getReasonPhrase());
+				returnStatus = response.getStatusLine().getReasonPhrase();
+			}
+
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "Unable to Delete the build " + e.getMessage().toString());
+
+			returnStatus = e.getMessage().toString();
 		}
+
 		return returnStatus;
 	}
 

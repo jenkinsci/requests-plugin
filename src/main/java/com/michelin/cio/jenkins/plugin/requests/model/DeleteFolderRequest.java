@@ -38,7 +38,7 @@ import java.util.logging.Logger;
 public class DeleteFolderRequest extends Request {
 
 	private static final Logger LOGGER = Logger.getLogger(DeleteFolderRequest.class.getName());
-	
+
 	public DeleteFolderRequest(String requestType, String username, String project, String projectFullName, String buildNumber) {
 		super(requestType, username, project, projectFullName, buildNumber);
 	}
@@ -51,42 +51,32 @@ public class DeleteFolderRequest extends Request {
 	@Override
 	public boolean execute(Item item) {
 		boolean success = false;
-		
+
 		try {
 			if (Jenkins.get().hasPermission(Item.DELETE)) {
 				try {
 					item.delete();
 					success = true;
-					errorMessage = "The Folder " + item.getFullName()
-							+ " has been properly Deleted";
-					LOGGER.log(Level.INFO,
-							"The folder {0} has been properly deleted",
-							item.getFullName());
-				} catch (IOException e) {
-					errorMessage = e.getMessage();
-					LOGGER.log(Level.SEVERE,
-							"Unable to delete the folder " + item.getFullName(),
-							e);
-				} catch (InterruptedException e) {
-					errorMessage = e.getMessage();
-					LOGGER.log(Level.SEVERE,
-							"Unable to delete the folder " + item.getFullName(),
-							e);
+					errorMessage = "The Folder " + item.getFullName() + " has been properly Deleted";
+					LOGGER.log(Level.INFO, "The Folder {0} has been properly deleted", item.getFullName());
+					
+				} catch (Exception e) {
+					errorMessage = e.getMessage().toString();
+					LOGGER.log(Level.SEVERE, "Unable to DELETE the Folder " + item.getFullName(), e);
+					success = false;
 				}
+				
 			} else {
-				errorMessage = "The current user " + username
-						+ " does not have permission to delete the folder";
-				LOGGER.log(Level.FINE,
-						"The current user {0} does not have permission to DELETE the folder",
-						new Object[] { username });
+				errorMessage = "The current user " + username + " does not have permission to DELETE the Folder";
+				LOGGER.log(Level.FINE, "The current user {0} does not have permission to DELETE the Folder", new Object[] { username });
+				success = false;
 			}
 
-		} catch (NullPointerException e) {
-			errorMessage = e.getMessage();
-			LOGGER.log(Level.SEVERE, "Unable to Delete the folder "
-					+ projectFullName + ":" + buildNumber, e.getMessage());
+		} catch (Exception e) {
+			errorMessage = e.getMessage().toString();
+			LOGGER.log(Level.SEVERE, "Unable to DELETE the Folder " + projectFullName + ":" + buildNumber, e.getMessage().toString());
 
-			return false;
+			success = false;
 		}
 
 		return success;

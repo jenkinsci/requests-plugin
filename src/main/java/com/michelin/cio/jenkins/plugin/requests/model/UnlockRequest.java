@@ -64,8 +64,8 @@ public class UnlockRequest extends Request {
 						jenkinsURL = Jenkins.get().getRootUrl();
 						if (jenkinsURL == null)
 							throw new NullPointerException("Jenkins instance is null");
-					} catch (NullPointerException npe) {
-						LOGGER.log(Level.SEVERE, "[ERROR] Exception: " + npe);
+					} catch (Exception npe) {
+						LOGGER.log(Level.SEVERE, "[ERROR] Exception: " + npe.getMessage().toString());
 						return false;
 					}
 
@@ -77,36 +77,42 @@ public class UnlockRequest extends Request {
 					try {
 						returnStatus = requestsUtility.runPostMethod(jenkinsURL, urlString);
 
-						if (returnStatus.equals("success")) {
-							errorMessage = "Build number " + buildNumber + " has been properly Unlocked for " + projectFullName;
-							LOGGER.log(Level.INFO, "Build {0} has been properly Unlocked", projectFullName + ":" + buildNumber);
-							success = true;
-						} else {
-							errorMessage = "Unlock Build call has failed for " + projectFullName + ":" + buildNumber + " : " + returnStatus;
-							LOGGER.log(Level.INFO, "Unlock Build call has failed: ", projectFullName + ":" + buildNumber + " : " + returnStatus);
-
-							return false;
-						}
-
-					} catch (IOException e) {
-						errorMessage = e.getMessage();
-						LOGGER.log(Level.SEVERE, "Unable to Unlock the build " + projectFullName + ":" + buildNumber, e.getMessage());
+					} catch (Exception e) {
+						errorMessage = "Unable to Unlock the build: " + e.getMessage();
+						LOGGER.log(Level.SEVERE, "Unable to Unlock the build " + projectFullName + ":" + buildNumber, e.getMessage().toString());
 
 						return false;
 					}
 
+					if (returnStatus.equals("success")) {
+						errorMessage = "Build number " + buildNumber + " has been properly Unlocked for " + projectFullName;
+						LOGGER.log(Level.INFO, "Build {0} has been properly Unlocked", projectFullName + ":" + buildNumber);
+						success = true;
+
+					} else if (returnStatus.contains("Forbidden")) {
+						errorMessage = "The current user " + username + " does not have permission to Unlock the Build";
+						LOGGER.log(Level.SEVERE, "The current user {0} does not have permission to Unlock the Build", new Object[] { username });
+						success = false;
+						
+					} else {
+						errorMessage = "UNLOCK Build request has failed for " + projectFullName + ":" + buildNumber + " : " + returnStatus.toString();
+						LOGGER.log(Level.INFO, "UNLOCK Build call has failed: ", projectFullName + ":" + buildNumber + " : " + returnStatus.toString());
+
+						success = false;
+					}
+
 				} catch (Exception e) {
-					errorMessage = e.getMessage();
-					LOGGER.log(Level.SEVERE, "Unable to Unlock the build " + projectFullName + ":" + buildNumber, e.getMessage());
+					errorMessage = "Unable to UNLOCK the Build: " + e.getMessage();
+					LOGGER.log(Level.SEVERE, "Unable to UNLOCK the Build " + projectFullName + ":" + buildNumber, e.getMessage().toString());
 				}
 
 			} else {
-				errorMessage = "The current user " + username + " does not have permission to Unlock the job";
-				LOGGER.log(Level.FINE, "The current user {0} does not have permission to UNLOCK the job", new Object[] { username });
+				errorMessage = "The current user " + username + " does not have permission to UNLOCK the Build";
+				LOGGER.log(Level.FINE, "The current user {0} does not have permission to UNLOCK the Build", new Object[] { username });
 			}
 
-		} catch (NullPointerException npe) {
-			LOGGER.log(Level.SEVERE, "[ERROR] Exception: " + npe);
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "[ERROR] Exception: " + e.getMessage().toString());
 			return false;
 		}
 
