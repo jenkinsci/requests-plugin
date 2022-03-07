@@ -79,81 +79,71 @@ public class DeleteJobRequest extends Request {
 	}
 
 	public boolean execute(Item item) {
-		Jenkins jenkins = null;
 		boolean success = false;
 		String returnStatus;
 		StringBuffer stringBuffer = new StringBuffer();
 		String[] projectList = null;
 
-		try {
-			jenkins = Jenkins.get();
-			if (jenkins == null)
-				throw new NullPointerException("Jenkins instance is null");
+		if (Jenkins.get().hasPermission(Job.DELETE)) {
+			String jenkinsURL = Jenkins.get().getRootUrl();
+			if (jenkinsURL == null) {
+				LOGGER.log(Level.SEVERE, "Jenkins instance is null: ");
 
-			if (Jenkins.get().hasPermission(Job.DELETE)) {
-				String jenkinsURL = null;
-				jenkinsURL = Jenkins.get().getRootUrl();
-				if (jenkinsURL == null)
-					throw new NullPointerException("Jenkins instance is null");
+				return false;
+			}
 
-				if (!projectFullName.contains("/job/") && projectFullName.contains("/")) {
-					projectList = projectFullName.split("/");
+			if (!projectFullName.contains("/job/") && projectFullName.contains("/")) {
+				projectList = projectFullName.split("/");
 
-					// Need to add '/job/' in between all names:
-					int nameCount = projectList.length;
-					stringBuffer.append(projectList[0]);
-					for (int i = 1; i < nameCount; i++) {
-						stringBuffer.append("/job/");
-						stringBuffer.append(projectList[i]);
-					}
-					projectFullName = stringBuffer.toString();
-					// LOGGER.info("[INFO] FOLDER Found: " + projectFullName);
+				// Need to add '/job/' in between all names:
+				int nameCount = projectList.length;
+				stringBuffer.append(projectList[0]);
+				for (int i = 1; i < nameCount; i++) {
+					stringBuffer.append("/job/");
+					stringBuffer.append(projectList[i]);
 				}
+				projectFullName = stringBuffer.toString();
+				// LOGGER.info("[INFO] FOLDER Found: " + projectFullName);
+			}
 
-				RequestsUtility requestsUtility = new RequestsUtility();
-				// if (!projectFullName.contains("/job/")) {
-				// projectFullName = requestsUtility.encodeValue(projectFullName);
-				projectFullName = projectFullName.replace(" ", "%20");
-				// }
+			RequestsUtility requestsUtility = new RequestsUtility();
+			// if (!projectFullName.contains("/job/")) {
+			// projectFullName = requestsUtility.encodeValue(projectFullName);
+			projectFullName = projectFullName.replace(" ", "%20");
+			// }
 
-				String urlString = jenkinsURL + "job/" + projectFullName + "/doDelete";
-				LOGGER.info("[INFO] Delete Build urlString: " + urlString);
+			String urlString = jenkinsURL + "job/" + projectFullName + "/doDelete";
+			LOGGER.info("[INFO] Delete Build urlString: " + urlString);
 
-				try {
-					returnStatus = requestsUtility.runPostMethod(jenkinsURL, urlString);
+			try {
+				returnStatus = requestsUtility.runPostMethod(jenkinsURL, urlString);
 
-				} catch (IOException e) {
-					errorMessage = e.getMessage();
-					LOGGER.log(Level.SEVERE, "Unable to DELETE the Build " + projectFullName + ":" + buildNumber, e.getMessage().toString());
+			} catch (IOException e) {
+				errorMessage = e.getMessage();
+				LOGGER.log(Level.SEVERE, "Unable to DELETE the Build " + projectFullName + ":" + buildNumber, e.getMessage().toString());
 
-					return false;
-				}
+				return false;
+			}
 
-				if (returnStatus.equals("success")) {
-					errorMessage = "Job : " + projectFullName + " has been properly Deleted";
-					LOGGER.log(Level.INFO, "Job {0} has been properly Deleted", projectFullName);
-					success = true;
+			if (returnStatus.equals("success")) {
+				errorMessage = "Job : " + projectFullName + " has been properly Deleted";
+				LOGGER.log(Level.INFO, "Job {0} has been properly Deleted", projectFullName);
+				success = true;
 
-				} else if (returnStatus.contains("Forbidden")) {
-					errorMessage = "The current user " + username + " does not have permission to DELETE the Job";
-					LOGGER.log(Level.SEVERE, "The current user {0} does not have permission to DELETE the Job", new Object[] { username });
-					success = false;
-					
-				} else {
-					errorMessage = "DELETE Job request has failed for " + projectFullName + " : " + returnStatus.toString();
-					LOGGER.log(Level.INFO, "DELETE Job request has failed: ", projectFullName + " : " + returnStatus.toString());
-					success = false;
-				}
+			} else if (returnStatus.contains("Forbidden")) {
+				errorMessage = "The current user " + username + " does not have permission to DELETE the Job";
+				LOGGER.log(Level.SEVERE, "The current user {0} does not have permission to DELETE the Job", new Object[] { username });
+				success = false;
 
 			} else {
-				errorMessage = "The current user " + username + " does not have permission to DELETE the Job";
-				LOGGER.log(Level.FINE, "The current user {0} does not have permission to DELETE the Job", new Object[] { username });
+				errorMessage = "DELETE Job request has failed for " + projectFullName + " : " + returnStatus.toString();
+				LOGGER.log(Level.INFO, "DELETE Job request has failed: ", projectFullName + " : " + returnStatus.toString());
 				success = false;
 			}
-		} catch (NullPointerException e) {
-			errorMessage = e.getMessage().toString();
-			LOGGER.log(Level.SEVERE, "Unable to Delete the Job " + projectFullName, e.getMessage().toString());
 
+		} else {
+			errorMessage = "The current user " + username + " does not have permission to DELETE the Job";
+			LOGGER.log(Level.FINE, "The current user {0} does not have permission to DELETE the Job", new Object[] { username });
 			success = false;
 		}
 

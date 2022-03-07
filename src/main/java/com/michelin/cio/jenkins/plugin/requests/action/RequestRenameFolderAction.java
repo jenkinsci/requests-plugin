@@ -32,6 +32,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 import hudson.model.Item;
+import hudson.model.Job;
 import jenkins.model.Jenkins;
 import jenkins.model.TransientActionFactory;
 import hudson.model.Action;
@@ -58,9 +59,11 @@ import static java.util.logging.Level.FINE;
 public class RequestRenameFolderAction implements Action {
 
 	private Folder project;
+	private Folder project2;
 
 	public RequestRenameFolderAction(Folder target) {
-		this.project = target;
+		project2 = (Folder) target.getTarget();
+		this.project = project2;
 	}
 
 	@POST
@@ -73,6 +76,9 @@ public class RequestRenameFolderAction implements Action {
 				final String username = request.getParameter("username");
 
 				RequestsPlugin plugin = Jenkins.get().getPlugin(RequestsPlugin.class);
+				if (plugin == null) {
+					return null;
+				}
 				String projectName = project.getFullName();
 				String projectFullName = project.getFullName();
 
@@ -96,7 +102,7 @@ public class RequestRenameFolderAction implements Action {
 						"The request to rename the folder {0} to {1} has been sent to the administrator",
 						new Object[] { project.getName(), newName });
 			}
-		} catch (NullPointerException e) {
+		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "[ERROR] Exception: " + e.getMessage());
 
 			return null;
@@ -121,7 +127,8 @@ public class RequestRenameFolderAction implements Action {
 	}
 
 	public Folder getProject() {
-		return project;
+		Folder project2a = (Folder) project2.getTarget();
+		return project2a;
 	}
 
 	public String getUrlName() {

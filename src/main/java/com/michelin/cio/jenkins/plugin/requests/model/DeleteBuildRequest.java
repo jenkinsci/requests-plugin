@@ -52,24 +52,22 @@ public class DeleteBuildRequest extends Request {
 	}
 
 	public boolean execute(Item item) {
-		Jenkins jenkins = null;
 		boolean success = false;
 		String returnStatus;
 
 		try {
-			jenkins = Jenkins.get();
-			if (jenkins == null)
-				throw new NullPointerException("Jenkins instance is null");
-
+			Jenkins jenkins = Jenkins.get();
 			LOGGER.info("[DEBUG] DeleteBuildRequest triggered - projectFullName: " + projectFullName);
 			Permission permission = Item.DELETE;
 			jenkins.getACL().checkPermission(permission);
 			
 			if (jenkins.hasPermission(permission)) {
-				String jenkinsURL = null;
-				jenkinsURL = Jenkins.get().getRootUrl();
-				if (jenkinsURL == null)
-					throw new NullPointerException("Jenkins instance is null");
+				String jenkinsURL = Jenkins.get().getRootUrl();
+				if (jenkinsURL == null) {
+					LOGGER.log(Level.SEVERE, "Jenkins instance is null: ");
+					
+					return false;
+				}
 
 				RequestsUtility requestsUtility = new RequestsUtility();
 				// projectFullName = requestsUtility.encodeValue(projectFullName);

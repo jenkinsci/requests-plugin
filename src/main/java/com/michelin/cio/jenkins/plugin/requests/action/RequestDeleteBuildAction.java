@@ -54,82 +54,70 @@ import static java.util.logging.Level.FINE;
 // @author John Flynn <john.trixmot.flynn1@gmail.com>
 
 public class RequestDeleteBuildAction implements Action {
-
-	private Run<?, ?> build;
-	private transient List<String> errors = new ArrayList<String>();
 	private static final Logger LOGGER = Logger.getLogger(RequestDeleteBuildAction.class.getName());
+	private String buildName;
+	private int buildNumber;
+	private String fullDisplayName;
+	private String build_Url;
 
 	public RequestDeleteBuildAction(Run<?, ?> target) {
-		this.build = target;
-	}
-
-	public List<String> getErrors() {
-		return errors;
-	}
-
-	public void setErrors(String errorString) {
-		errors.clear();
-		errors.add(errorString);
-	}
+		buildName = target.getDisplayName();
+		buildNumber = target.getNumber();
+		fullDisplayName = target.getFullDisplayName();
+		build_Url = target.getUrl();
+	} 
 
 	@POST
 	public HttpResponse doCreateDeleteBuildRequest(StaplerRequest request, StaplerResponse response) throws IOException, ServletException, MessagingException {
 
-		try {
-			if (isIconDisplayed()) {
-				errors.clear();
-				final String username = request.getParameter("username");
-				RequestsPlugin plugin = Jenkins.get().getPlugin(RequestsPlugin.class);
-				String buildName = build.getDisplayName();
-				String projectFullName = "";
-				String projectName = "";
-				int buildNumber = build.getNumber();
-				String fullDisplayName = build.getFullDisplayName();
-				StringBuffer stringBuffer = new StringBuffer();
-				
-				LOGGER.info("Delete Build Action: fullDisplayName " + fullDisplayName);
+		if (isIconDisplayed()) {
+			final String username = request.getParameter("username");
+			RequestsPlugin plugin = Jenkins.get().getPlugin(RequestsPlugin.class);
+			if (plugin == null) {
+				return null;
+			}
 
-				// Need to extract the folder name(s) and job name:
-				if (fullDisplayName.contains(" » ")) {
-					String[] Folder_project_BuildList = null;
-					Folder_project_BuildList = fullDisplayName.split(" » ");
-					int folderCount = Folder_project_BuildList.length;
+			String projectFullName = "";
+			String projectName = "";
+			StringBuffer stringBuffer = new StringBuffer();
 
-					// Cat together folder names with /job/ except for the last value:
-					for (int i = 0; i < folderCount - 1; i++) {
-						stringBuffer.append(Folder_project_BuildList[i] + "/job/");
-					}
+			LOGGER.info("Delete Build Action: fullDisplayName " + fullDisplayName);
 
-					projectName = Folder_project_BuildList[folderCount - 1].split(" #")[0];
-					// Cat in the job name
-					stringBuffer.append(projectName);
-					projectFullName = stringBuffer.toString();
+			// Need to extract the folder name(s) and job name:
+			if (fullDisplayName.contains(" » ")) {
+				String[] Folder_project_BuildList = null;
+				Folder_project_BuildList = fullDisplayName.split(" » ");
+				int folderCount = Folder_project_BuildList.length;
 
-					// Need to extract the job name:
-				} else {
-					if (fullDisplayName.contains(" #")) {
-						projectFullName = fullDisplayName.split(" #")[0];
-					} else if (fullDisplayName.contains(" ")) {
-						projectFullName = fullDisplayName.split(" ")[0];
-					}
-
-					projectName = projectFullName;
+				// Cat together folder names with /job/ except for the last value:
+				for (int i = 0; i < folderCount - 1; i++) {
+					stringBuffer.append(Folder_project_BuildList[i] + "/job/");
 				}
 
-				String jenkinsUrl = Jenkins.get().getRootUrl();
-				String buildUrl = jenkinsUrl + build.getUrl();
-				String[] emailData = { buildName, username, "A Delete Build", buildUrl };
-				LOGGER.info("[DEBUG] Delete Build Action: " + projectName + " : " + projectFullName);
-				plugin.addRequestPlusEmail(new DeleteBuildRequest("deleteBuild", username, projectName, projectFullName, Integer.toString(buildNumber)), emailData);
+				projectName = Folder_project_BuildList[folderCount - 1].split(" #")[0];
+				// Cat in the job name
+				stringBuffer.append(projectName);
+				projectFullName = stringBuffer.toString();
+
+				// Need to extract the job name:
+			} else {
+				if (fullDisplayName.contains(" #")) {
+					projectFullName = fullDisplayName.split(" #")[0];
+				} else if (fullDisplayName.contains(" ")) {
+					projectFullName = fullDisplayName.split(" ")[0];
+				}
+
+				projectName = projectFullName;
 			}
-		} catch (NullPointerException e) {
 
-			LOGGER.log(Level.SEVERE, "Exception: " + e.getMessage());
-
-			return null;
+			String jenkinsUrl = Jenkins.get().getRootUrl();
+			String buildUrl = jenkinsUrl + build_Url;
+			String[] emailData = { buildName, username, "A Delete Build", buildUrl };
+			LOGGER.info("[DEBUG] Delete Build Action: " + projectName + " : " + projectFullName);
+			plugin.addRequestPlusEmail(new DeleteBuildRequest("deleteBuild", username, projectName, projectFullName, Integer.toString(buildNumber)), emailData);
 		}
 
-		return new HttpRedirect(request.getContextPath() + '/' + build.getUrl());
+		return new HttpRedirect(request.getContextPath() + '/' + build_Url);
 	}
 
 	public String getDisplayName() {
@@ -146,9 +134,9 @@ public class RequestDeleteBuildAction implements Action {
 		return null;
 	}
 
-	public Run<?, ?> getBuild() {
-		return build;
-	}
+	// public Run<?, ?> getBuild() {
+	// return build;
+	// }
 
 	public String getUrlName() {
 		return "request-delete-build";

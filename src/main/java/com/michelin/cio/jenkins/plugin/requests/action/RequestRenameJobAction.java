@@ -29,6 +29,7 @@ import hudson.Functions;
 import java.util.logging.Level;
 import hudson.model.Item;
 import hudson.model.Job;
+import hudson.model.Run;
 import jenkins.model.Jenkins;
 import hudson.model.Action;
 import org.kohsuke.stapler.HttpRedirect;
@@ -56,9 +57,11 @@ import static java.util.logging.Level.FINE;
 public class RequestRenameJobAction implements Action {
 
 	private Job<?, ?> project;
+	private Job<?, ?> project2;
 
 	public RequestRenameJobAction(Job<?, ?> target) {
-		this.project = target;
+		project2 = (Job<?, ?>) target.getTarget();
+		this.project = project2;
 	}
 
 	@POST
@@ -71,6 +74,9 @@ public class RequestRenameJobAction implements Action {
 				final String username = request.getParameter("username");
 
 				RequestsPlugin plugin = Jenkins.get().getPlugin(RequestsPlugin.class);
+				if (plugin == null) {
+					return null;
+				}
 				String projectName = project.getFullName();
 				String projectFullName = project.getFullName();
 				LOGGER.info("Rename Job Request Before: " + projectName + " - " + projectFullName);
@@ -94,7 +100,7 @@ public class RequestRenameJobAction implements Action {
 						"The request to rename the job {0} to {1} has been sent to the administrator",
 						new Object[] { project.getName(), newName });
 			}
-		} catch (NullPointerException e) {
+		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "[ERROR] Exception: " + e.getMessage());
 
 			return null;
@@ -119,7 +125,9 @@ public class RequestRenameJobAction implements Action {
 	}
 
 	public Job<?, ?> getProject() {
-		return project;
+		Job<?, ?> project2a;
+		project2a = (Job<?, ?>) project2.getTarget();
+		return project2a;
 	}
 
 	public String getUrlName() {

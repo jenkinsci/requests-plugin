@@ -59,33 +59,25 @@ import static java.util.logging.Level.FINE;
 public class RequestDeleteJobAction implements Action {
 
 	private Job<?, ?> project;
-	private transient List<String> errors = new ArrayList<String>();
-	private static final Logger LOGGER = Logger
-			.getLogger(RequestDeleteJobAction.class.getName());
+	private Job<?, ?> project2;
+	private static final Logger LOGGER = Logger.getLogger(RequestDeleteJobAction.class.getName());
 
 	public RequestDeleteJobAction(Job<?, ?> target) {
-		this.project = target;
-	}
-
-	public List<String> getErrors() {
-		return errors;
-	}
-
-	public void setErrors(String errorString) {
-		errors.clear();
-		errors.add(errorString);
+		project2 = (Job<?, ?>) target.getTarget();
+		this.project = project2;
 	}
 
 	@POST
-	public HttpResponse doCreateDeleteJobRequest(StaplerRequest request,
-			StaplerResponse response)
-			throws IOException, ServletException, MessagingException {
+	public HttpResponse doCreateDeleteJobRequest(StaplerRequest request, StaplerResponse response) throws IOException, ServletException, MessagingException {
 
 		try {
 			if (isIconDisplayed()) {
-				errors.clear();
+				//errors.clear();
 				final String username = request.getParameter("username");
 				RequestsPlugin plugin = Jenkins.get().getPlugin(RequestsPlugin.class);
+				if (plugin == null) {
+					return null;
+				}
 				String projectName = project.getFullName();
 				String projectFullName = project.getFullName();
 
@@ -94,26 +86,25 @@ public class RequestDeleteJobAction implements Action {
 					RequestsUtility requestsUtility = new RequestsUtility();
 					projectFullName = requestsUtility.constructFolderJobName(projectFullName);
 				}
-				
-				String[] emailData = {project.getName(), username, "A Delete Job", project.getAbsoluteUrl()};
+
+				String[] emailData = { project.getName(), username, "A Delete Job", project.getAbsoluteUrl() };
 
 				if (projectName.contains("/")) {
-					String [] projectnameList = projectName.split("/");
+					String[] projectnameList = projectName.split("/");
 					int nameCount = projectnameList.length;
-					projectName = projectnameList[nameCount-1];
+					projectName = projectnameList[nameCount - 1];
 				}
 				LOGGER.info("Delete Job Request: " + projectName + " - " + projectFullName);
 				plugin.addRequestPlusEmail(new DeleteJobRequest("deleteJob", username, projectName, projectFullName, ""), emailData);
 			}
 
-		} catch (NullPointerException e) {
+		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "[ERROR] Exception: " + e.getMessage());
 
 			return null;
 		}
 
-		return new HttpRedirect(
-				request.getContextPath() + '/' + project.getUrl());
+		return new HttpRedirect(request.getContextPath() + '/' + project.getUrl());
 	}
 
 	public String getDisplayName() {
@@ -131,7 +122,9 @@ public class RequestDeleteJobAction implements Action {
 	}
 
 	public Job<?, ?> getProject() {
-		return project;
+		Job<?, ?> project2a;
+		project2a = (Job<?, ?>) project2.getTarget();
+		return project2a;
 	}
 
 	public String getUrlName() {
@@ -144,19 +137,18 @@ public class RequestDeleteJobAction implements Action {
 	private boolean isIconDisplayed() {
 		boolean isDisplayed = false;
 		try {
-			isDisplayed = hasConfigurePermission() && !hasDeletePermission();
+			//isDisplayed = hasConfigurePermission() && !hasDeletePermission();
+			isDisplayed = !hasDeletePermission();
 		} catch (Exception e) {
-			LOGGER.log(Level.WARNING,
-					"Impossible to know if the icon has to be displayed", e);
+			LOGGER.log(Level.WARNING, "Impossible to know if the icon has to be displayed", e);
 		}
 
 		return isDisplayed;
 	}
 
-	private boolean hasConfigurePermission()
-			throws IOException, ServletException {
-		return Functions.hasPermission(project, Item.CONFIGURE);
-	}
+	//private boolean hasConfigurePermission() throws IOException, ServletException {
+	//	return Functions.hasPermission(project, Item.CONFIGURE);
+	//}
 
 	private boolean hasDeletePermission() throws IOException, ServletException {
 		return Functions.hasPermission(project, Item.DELETE);

@@ -62,11 +62,11 @@ import java.util.logging.Logger;
 
 public class RequestsPlugin extends Plugin {
 
-	// The requests are unique (to avoid duplication problems like delete a job
-	// already deleted)
+	// The requests are unique (to avoid duplication problems like delete a job already deleted)
 	private List<Request> requests = new ArrayList<Request>();
 	private static final Logger LOGGER = Logger.getLogger(RequestsPlugin.class.getName());
 	private transient List<String> errors = new ArrayList<String>();
+	
 
 	public void addRequest(final Request request) {
 		boolean alreadyRequested = false;
@@ -91,8 +91,7 @@ public class RequestsPlugin extends Plugin {
 		}
 	}
 
-	public void addRequestPlusEmail(final Request request, final String[] emailData)
-			throws UnknownHostException, MessagingException {
+	public void addRequestPlusEmail(final Request request, final String[] emailData) throws UnknownHostException, MessagingException {
 		boolean alreadyRequested = false;
 
 		for (int i = 0; i < requests.size(); i++) {
@@ -112,8 +111,7 @@ public class RequestsPlugin extends Plugin {
 		if (!alreadyRequested) {
 			requests.add(request);
 
-			RequestMailSender mailSender = new RequestMailSender(emailData[0], emailData[1], emailData[2],
-					emailData[3]);
+			RequestMailSender mailSender = new RequestMailSender(emailData[0], emailData[1], emailData[2], emailData[3]);
 			mailSender.executeEmail();
 			// LOGGER.info("[INFO] Send Email:");
 			persistPendingRequests();
@@ -123,8 +121,7 @@ public class RequestsPlugin extends Plugin {
 	}
 
 	@RequirePOST
-	public HttpResponse doManageRequests(StaplerRequest request, StaplerResponse response)
-			throws IOException, ServletException {
+	public HttpResponse doManageRequests(StaplerRequest request, StaplerResponse response) throws IOException, ServletException {
 		Jenkins.get().checkPermission(Jenkins.ADMINISTER);
 		errors.clear();
 		String[] selectedRequests = request.getParameterValues("selected");
@@ -157,10 +154,12 @@ public class RequestsPlugin extends Plugin {
 					}
 
 				} else {
+					errors.add("The request index is not defined");
 					LOGGER.info("[WARNING] The request index is not defined");
 				}
 			}
 		} else {
+			errors.add("No Requests selected");
 			LOGGER.info("[INFO] Nothing selected");
 		}
 
@@ -173,11 +172,15 @@ public class RequestsPlugin extends Plugin {
 	}
 
 	public List<Request> getRequests() {
-		return requests;
+		List<Request> requests2 = new ArrayList<Request>();
+		requests2.addAll(requests);
+		return requests2;
 	}
 
 	public List<String> getErrors() {
-		return errors;
+		List<String> errors2 = new ArrayList<String>();
+		errors2.addAll(errors);
+		return errors2;
 	}
 
 	public void setErrors(String errorString) {

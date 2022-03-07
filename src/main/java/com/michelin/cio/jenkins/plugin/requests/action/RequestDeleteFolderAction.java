@@ -61,20 +61,14 @@ import static java.util.logging.Level.FINE;
 public class RequestDeleteFolderAction extends FolderProperty<Folder> implements Action {
 
 	private Folder project;
-	private transient List<String> errors = new ArrayList<String>();
+	private Folder project2;
+
 
 	public RequestDeleteFolderAction(Folder target) {
-		this.project = target;
+		project2 = (Folder) target.getTarget();
+		this.project = project2;
 	}
 	
-	public List<String> getErrors() {
-		return errors;
-	}
-
-	public void setErrors(String errorString) {
-		errors.clear();
-		errors.add(errorString);
-	}
 
 	@POST
 	public HttpResponse doCreateDeleteFolderRequest(StaplerRequest request,
@@ -83,9 +77,11 @@ public class RequestDeleteFolderAction extends FolderProperty<Folder> implements
 
 		try {
 			if (isIconDisplayed()) {
-				errors.clear();
 				final String username = request.getParameter("username");
 				RequestsPlugin plugin = Jenkins.get().getPlugin(RequestsPlugin.class);
+				if (plugin == null) {
+					return null;
+				}
 				String projectName = project.getFullName();
 				String projectFullName = project.getFullName();
 
@@ -107,7 +103,7 @@ public class RequestDeleteFolderAction extends FolderProperty<Folder> implements
 				plugin.addRequestPlusEmail(new DeleteFolderRequest("deleteFolder", username, projectName, projectFullName, ""), emailData);
 			}
 
-		} catch (NullPointerException e) {
+		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "[ERROR] Exception: " + e.getMessage());
 
 			return null;
@@ -132,7 +128,8 @@ public class RequestDeleteFolderAction extends FolderProperty<Folder> implements
 	}
 
 	public Folder getProject() {
-		return project;
+		Folder project2a = (Folder) project2.getTarget();
+		return project2a;
 	}
 
 	public String getUrlName() {
@@ -151,7 +148,7 @@ public class RequestDeleteFolderAction extends FolderProperty<Folder> implements
 	private boolean isIconDisplayed() {
 		boolean isDisplayed = false;
 		try {
-			isDisplayed = hasConfigurePermission() && !hasDeletePermission();
+			isDisplayed = !hasDeletePermission();
 		} catch (Exception e) {
 			LOGGER.log(Level.WARNING,
 					"Impossible to know if the icon has to be displayed", e);
@@ -160,10 +157,10 @@ public class RequestDeleteFolderAction extends FolderProperty<Folder> implements
 		return isDisplayed;
 	}
 
-	private boolean hasConfigurePermission()
-			throws IOException, ServletException {
-		return Functions.hasPermission(project, Item.CONFIGURE);
-	}
+	//private boolean hasConfigurePermission()
+	//		throws IOException, ServletException {
+	//	return Functions.hasPermission(project, Item.CONFIGURE);
+	//}
 
 	private boolean hasDeletePermission() throws IOException, ServletException {
 		return Functions.hasPermission(project, Item.DELETE);

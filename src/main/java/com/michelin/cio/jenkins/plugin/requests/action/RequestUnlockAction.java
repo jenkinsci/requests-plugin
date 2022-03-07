@@ -26,6 +26,7 @@ package com.michelin.cio.jenkins.plugin.requests.action;
 import hudson.Functions;
 import hudson.model.Action;
 import hudson.model.Run;
+import io.jenkins.cli.shaded.org.apache.commons.lang.SerializationUtils;
 import jenkins.model.Jenkins;
 
 import java.io.IOException;
@@ -53,79 +54,69 @@ import static java.util.logging.Level.FINE;
 
 public class RequestUnlockAction implements Action {
 	public static final Logger LOGGER = Logger.getLogger(RequestUnlockAction.class.getName());
-	private transient List<String> errors = new ArrayList<String>();
-	private Run<?, ?> build;
+	private String buildName;
+	private int buildNumber;
+	private String fullDisplayName;
+	private String build_Url;
 
 	public RequestUnlockAction(Run<?, ?> target) {
-		this.build = target;
-	}
-
-	public List<String> getErrors() {
-		return errors;
-	}
-
-	public void setErrors(String errorString) {
-		errors.clear();
-		errors.add(errorString);
+		buildName = target.getDisplayName();
+		buildNumber = target.getNumber();
+		fullDisplayName = target.getFullDisplayName();
+		build_Url = target.getUrl();
 	}
 
 	@POST
-	public HttpResponse doCreateUnlockRequest(StaplerRequest request, StaplerResponse response) throws IOException, ServletException, MessagingException {
+	public HttpResponse doCreateUnlockRequest(StaplerRequest request, StaplerResponse response)
+			throws IOException, ServletException, MessagingException {
 
-		try {
-			if (isIconDisplayed()) {
-				errors.clear();
-				final String username = request.getParameter("username");
-				RequestsPlugin plugin = Jenkins.get().getPlugin(RequestsPlugin.class);
-				String buildName = build.getDisplayName();
-				String projectFullName = null;
-				String projectName = null;
-				int buildNumber = build.getNumber();
-				String fullDisplayName = build.getFullDisplayName();
-				StringBuffer stringBuffer = new StringBuffer();
-
-				// Need to extract the folder name(s) and the job name:
-				if (fullDisplayName.contains(" » ")) {
-					String[] Folder_project_BuildList = null;
-					Folder_project_BuildList = fullDisplayName.split(" » ");
-					int folderCount = Folder_project_BuildList.length;
-
-					// Cat together folder names with /job/ except for the last value:
-					for (int i = 0; i < folderCount - 1; i++) {
-						stringBuffer.append(Folder_project_BuildList[i] + "/job/");
-					}
-					projectName = Folder_project_BuildList[folderCount - 1].split(" #")[0];
-					// Cat in the job name:
-					stringBuffer.append(projectName);
-					projectFullName = stringBuffer.toString();
-
-					// Need to extract the job name:
-				} else {
-					if (fullDisplayName.contains(" #")) {
-						projectFullName = fullDisplayName.split(" #")[0];
-					} else if (fullDisplayName.contains(" ")) {
-						projectFullName = fullDisplayName.split(" ")[0];
-					}
-
-					projectName = projectFullName;
-				}
-
-				LOGGER.info("Unlock Build Request: " + projectName + " - " + projectFullName);
-
-				String jenkinsUrl = Jenkins.get().getRootUrl();
-				String buildUrl = jenkinsUrl + build.getUrl();
-				String[] emailData = { buildName, username, "An Unlock Build", buildUrl };
-
-				plugin.addRequestPlusEmail(new UnlockRequest("unlockBuild", username, projectName, projectFullName, Integer.toString(buildNumber)), emailData);
+		if (isIconDisplayed()) {
+			final String username = request.getParameter("username");
+			RequestsPlugin plugin = Jenkins.get().getPlugin(RequestsPlugin.class);
+			String projectFullName = null;
+			String projectName = null;
+			StringBuffer stringBuffer = new StringBuffer();
+			
+			if (plugin == null) {
+				return null;
 			}
 
-		} catch (NullPointerException e) {
-			LOGGER.log(Level.SEVERE, "[ERROR] Exception: " + e.getMessage());
+			// Need to extract the folder name(s) and the job name:
+			if (fullDisplayName.contains(" » ")) {
+				String[] Folder_project_BuildList = null;
+				Folder_project_BuildList = fullDisplayName.split(" » ");
+				int folderCount = Folder_project_BuildList.length;
 
-			return null;
+				// Cat together folder names with /job/ except for the last value:
+				for (int i = 0; i < folderCount - 1; i++) {
+					stringBuffer.append(Folder_project_BuildList[i] + "/job/");
+				}
+				projectName = Folder_project_BuildList[folderCount - 1].split(" #")[0];
+				// Cat in the job name:
+				stringBuffer.append(projectName);
+				projectFullName = stringBuffer.toString();
+
+				// Need to extract the job name:
+			} else {
+				if (fullDisplayName.contains(" #")) {
+					projectFullName = fullDisplayName.split(" #")[0];
+				} else if (fullDisplayName.contains(" ")) {
+					projectFullName = fullDisplayName.split(" ")[0];
+				}
+
+				projectName = projectFullName;
+			}
+
+			LOGGER.info("Unlock Build Request: " + projectName + " - " + projectFullName);
+
+			String jenkinsUrl = Jenkins.get().getRootUrl();
+			String buildUrl = jenkinsUrl + build_Url;
+			String[] emailData = { buildName, username, "An Unlock Build", buildUrl };
+
+			plugin.addRequestPlusEmail(new UnlockRequest("unlockBuild", username, projectName, projectFullName, Integer.toString(buildNumber)), emailData);
 		}
 
-		return new HttpRedirect(request.getContextPath() + '/' + build.getUrl());
+		return new HttpRedirect(request.getContextPath() + '/' + build_Url);
 	}
 
 	public String getDisplayName() {
@@ -142,9 +133,9 @@ public class RequestUnlockAction implements Action {
 		return null;
 	}
 
-	public Run<?, ?> getBuild() {
-		return build;
-	}
+	// public Run<?, ?> getBuild() {
+	// return build;
+	// }
 
 	public String getUrlName() {
 		return "request-unlock";

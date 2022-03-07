@@ -1,10 +1,11 @@
 
 ## Version History
 
-Version 2.2.16 (March 04, 2022)
+Version 2.2.16 (March 07, 2022)
 
 -       Update POM dependencies
 -		Improve error return messages
+-		Changes to comply with latest Spotbugs
 
 
 Version 2.2.15 (September 02, 2021)
