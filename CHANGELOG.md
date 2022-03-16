@@ -1,6 +1,11 @@
 
 ## Version History
 
+Version 2.2.17 (March 16, 2022)
+
+-       Fix for SECURITY-2650
+
+
 Version 2.2.16 (March 07, 2022)
 
 -       Update POM dependencies

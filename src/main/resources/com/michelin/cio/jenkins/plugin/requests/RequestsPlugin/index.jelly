@@ -26,7 +26,7 @@
 <?jelly escape-by-default='true'?>
 
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt" xmlns:p="/lib/hudson/project">	
-    <l:layout permission="${it.requiredPermission}">
+    <l:layout permission="${app.ADMINISTER}">
         <st:include it="${app}" page="sidepanel.jelly"/>
         <link rel="stylesheet" href="${rootURL}/plugin/requests/CSS/requests.css" type="text/css" />
         <script type="text/javascript" src="${rootURL}/plugin/requests/js/requests-plugin.js"></script>

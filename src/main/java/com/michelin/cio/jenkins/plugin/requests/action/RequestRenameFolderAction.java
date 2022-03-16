@@ -144,6 +144,9 @@ public class RequestRenameFolderAction implements Action {
 	 * So, the action has to be enabled when: Create AND !Delete AND !Configure
 	 * OR Delete AND !Create AND !Configure
 	 */
+	
+	// If a Folder is created (Create access) by a user but does not have Configure or Delete, the custom sidebar link will not appear.
+	// The user will be able to use the standard Jenkins rename sidebar link:
 	private boolean isIconDisplayed() {
 		boolean isDisplayed = false;
 		try {
