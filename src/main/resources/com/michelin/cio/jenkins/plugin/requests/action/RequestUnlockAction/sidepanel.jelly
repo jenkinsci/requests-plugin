@@ -40,7 +40,7 @@
   
   <l:side-panel>
     <l:tasks>
-      <l:task icon="plugin/requests/img/up.gif" href="#" onclick="RedirectView();return false;" title="${%Back to Build}" />
+      <l:task icon="icon-up icon-md" href="#" onclick="RedirectView();return false;" title="${%Back to Build}" />
     </l:tasks>
  </l:side-panel>
 </j:jelly>

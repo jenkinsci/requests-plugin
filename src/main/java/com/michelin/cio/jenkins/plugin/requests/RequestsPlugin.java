@@ -233,7 +233,11 @@ public class RequestsPlugin extends Plugin {
 
 		@Override
 		public String getIconFileName() {
-			return "/images/48x48/clipboard.png";
+			return null;
+		}
+
+		public String getIconClassName() {
+			return "icon-clipboard";
 		}
 
 		public String getDisplayName() {

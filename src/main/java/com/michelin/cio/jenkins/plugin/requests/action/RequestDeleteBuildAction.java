@@ -127,9 +127,14 @@ public class RequestDeleteBuildAction implements Action {
 		return null;
 	}
 
+	@Override
 	public String getIconFileName() {
+		return null;
+	}
+
+	public String getIconClassname() {
 		if (isIconDisplayed()) {
-			return "/images/24x24/edit-delete.png";
+			return "icon-edit-delete";
 		}
 		return null;
 	}
