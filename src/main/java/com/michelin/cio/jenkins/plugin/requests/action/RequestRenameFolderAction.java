@@ -119,9 +119,14 @@ public class RequestRenameFolderAction implements Action {
 		return null;
 	}
 
+	@Override
 	public String getIconFileName() {
+		return null;
+	}
+
+	public String getIconClassName() {
 		if (isIconDisplayed()) {
-			return "/images/24x24/setting.png";
+			return "icon-setting";
 		}
 		return null;
 	}

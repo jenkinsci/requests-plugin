@@ -126,9 +126,14 @@ public class RequestUnlockAction implements Action {
 		return null;
 	}
 
+	@Override
 	public String getIconFileName() {
+		return null;
+	}
+
+	public String getIconClassName() {
 		if (isIconDisplayed()) {
-			return "/images/24x24/lock.png";
+			return "icon-lock";
 		}
 		return null;
 	}
