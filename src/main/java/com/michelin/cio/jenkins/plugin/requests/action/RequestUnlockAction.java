@@ -23,33 +23,28 @@
  */
 package com.michelin.cio.jenkins.plugin.requests.action;
 
-import hudson.Functions;
-import hudson.model.Action;
-import hudson.model.Run;
-import io.jenkins.cli.shaded.org.apache.commons.lang.SerializationUtils;
-import jenkins.model.Jenkins;
-
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.mail.MessagingException;
 import javax.servlet.ServletException;
+
 import org.kohsuke.stapler.HttpRedirect;
 import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
-import org.kohsuke.stapler.interceptor.RequirePOST;
 import org.kohsuke.stapler.verb.POST;
 
 import com.michelin.cio.jenkins.plugin.requests.RequestsPlugin;
-import com.michelin.cio.jenkins.plugin.requests.model.RequestsUtility;
 import com.michelin.cio.jenkins.plugin.requests.model.UnlockRequest;
 
-import static java.util.logging.Level.FINE;
+import hudson.Functions;
+import hudson.model.Action;
+import hudson.model.Run;
+import jenkins.model.Jenkins;
 
+//Represents the "Request for build unlock" action appearing on a given build's page.
 // @author John Flynn <john.trixmot.flynn@gmail.com>
 
 public class RequestUnlockAction implements Action {
@@ -73,13 +68,16 @@ public class RequestUnlockAction implements Action {
 		if (isIconDisplayed()) {
 			final String username = request.getParameter("username");
 			RequestsPlugin plugin = Jenkins.get().getPlugin(RequestsPlugin.class);
-			String projectFullName = null;
-			String projectName = null;
-			StringBuffer stringBuffer = new StringBuffer();
-			
+
 			if (plugin == null) {
 				return null;
 			}
+
+			String projectFullName = null;
+			String projectName = null;
+			StringBuffer stringBuffer = new StringBuffer();
+
+			LOGGER.info("Unlock Build Action: fullDisplayName " + fullDisplayName);
 
 			// Need to extract the folder name(s) and the job name:
 			if (fullDisplayName.contains(" » ")) {
@@ -91,6 +89,7 @@ public class RequestUnlockAction implements Action {
 				for (int i = 0; i < folderCount - 1; i++) {
 					stringBuffer.append(Folder_project_BuildList[i] + "/job/");
 				}
+
 				projectName = Folder_project_BuildList[folderCount - 1].split(" #")[0];
 				// Cat in the job name:
 				stringBuffer.append(projectName);
@@ -112,8 +111,8 @@ public class RequestUnlockAction implements Action {
 			String jenkinsUrl = Jenkins.get().getRootUrl();
 			String buildUrl = jenkinsUrl + build_Url;
 			String[] emailData = { buildName, username, "An Unlock Build", buildUrl };
-
-			plugin.addRequestPlusEmail(new UnlockRequest("unlockBuild", username, projectName, projectFullName, Integer.toString(buildNumber)), emailData);
+			plugin.addRequestPlusEmail(new UnlockRequest("unlockBuild", username, projectName, projectFullName,
+					Integer.toString(buildNumber)), emailData);
 		}
 
 		return new HttpRedirect(request.getContextPath() + '/' + build_Url);
@@ -126,26 +125,20 @@ public class RequestUnlockAction implements Action {
 		return null;
 	}
 
-	@Override
 	public String getIconFileName() {
-		return null;
-	}
-
-	public String getIconClassName() {
 		if (isIconDisplayed()) {
-			return "icon-lock";
+			return "/images/24x24/lock.png";
 		}
 		return null;
 	}
-
-	// public Run<?, ?> getBuild() {
-	// return build;
-	// }
 
 	public String getUrlName() {
 		return "request-unlock";
 	}
 
+	/**
+	 * Displays the icon when the user can not Delete a build.
+	 */
 	private boolean isIconDisplayed() {
 		boolean isDisplayed = false;
 		try {

@@ -24,20 +24,15 @@
  */
 package com.michelin.cio.jenkins.plugin.requests;
 
-import com.michelin.cio.jenkins.plugin.requests.action.RequestMailSender;
-import com.michelin.cio.jenkins.plugin.requests.model.DeleteBuildRequest;
-import com.michelin.cio.jenkins.plugin.requests.model.DeleteJobRequest;
-import com.michelin.cio.jenkins.plugin.requests.model.RenameJobRequest;
-import com.michelin.cio.jenkins.plugin.requests.model.RenameFolderRequest;
-import com.michelin.cio.jenkins.plugin.requests.model.Request;
-import com.michelin.cio.jenkins.plugin.requests.model.UnlockRequest;
-import com.michelin.cio.jenkins.plugin.requests.model.DeleteFolderRequest;
+import java.io.IOException;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.logging.Logger;
 
-import hudson.Extension;
-import hudson.Plugin;
-import hudson.model.Hudson;
-import hudson.model.ManagementLink;
-import jenkins.model.Jenkins;
+import javax.mail.MessagingException;
+import javax.servlet.ServletException;
 
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.HttpRedirect;
@@ -45,28 +40,32 @@ import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.interceptor.RequirePOST;
-import org.kohsuke.stapler.verb.POST;
 
-import javax.mail.MessagingException;
-import javax.servlet.ServletException;
-import java.io.IOException;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.michelin.cio.jenkins.plugin.requests.action.RequestMailSender;
+import com.michelin.cio.jenkins.plugin.requests.model.DeleteBuildRequest;
+import com.michelin.cio.jenkins.plugin.requests.model.DeleteFolderRequest;
+import com.michelin.cio.jenkins.plugin.requests.model.DeleteJobRequest;
+import com.michelin.cio.jenkins.plugin.requests.model.RenameFolderRequest;
+import com.michelin.cio.jenkins.plugin.requests.model.RenameJobRequest;
+import com.michelin.cio.jenkins.plugin.requests.model.Request;
+import com.michelin.cio.jenkins.plugin.requests.model.UnlockRequest;
+
+import hudson.Extension;
+import hudson.Plugin;
+import hudson.model.Hudson;
+import hudson.model.ManagementLink;
+import jenkins.model.Jenkins;
 
 //Manages pending requests.
 // @author Daniel Petisme <daniel.petisme@gmail.com> <http://danielpetisme.blogspot.com/>, John Flynn <john.trixmot.flynn1@gmail.com>
 
 public class RequestsPlugin extends Plugin {
 
-	// The requests are unique (to avoid duplication problems like delete a job already deleted)
+	// The requests are unique (to avoid duplication problems like delete a job
+	// already deleted)
 	private List<Request> requests = new ArrayList<Request>();
 	private static final Logger LOGGER = Logger.getLogger(RequestsPlugin.class.getName());
 	private transient List<String> errors = new ArrayList<String>();
-	
 
 	public void addRequest(final Request request) {
 		boolean alreadyRequested = false;
@@ -91,7 +90,8 @@ public class RequestsPlugin extends Plugin {
 		}
 	}
 
-	public void addRequestPlusEmail(final Request request, final String[] emailData) throws UnknownHostException, MessagingException {
+	public void addRequestPlusEmail(final Request request, final String[] emailData)
+			throws UnknownHostException, MessagingException {
 		boolean alreadyRequested = false;
 
 		for (int i = 0; i < requests.size(); i++) {
@@ -111,9 +111,11 @@ public class RequestsPlugin extends Plugin {
 		if (!alreadyRequested) {
 			requests.add(request);
 
-			RequestMailSender mailSender = new RequestMailSender(emailData[0], emailData[1], emailData[2], emailData[3]);
+			RequestMailSender mailSender = new RequestMailSender(emailData[0], emailData[1], emailData[2],
+					emailData[3]);
+			LOGGER.info("[INFO] mailSender 1:");
 			mailSender.executeEmail();
-			// LOGGER.info("[INFO] Send Email:");
+			LOGGER.info("[INFO] mailSender 2:");
 			persistPendingRequests();
 		} else {
 			// LOGGER.info("[INFO] Don't Send Email:");
@@ -121,7 +123,8 @@ public class RequestsPlugin extends Plugin {
 	}
 
 	@RequirePOST
-	public HttpResponse doManageRequests(StaplerRequest request, StaplerResponse response) throws IOException, ServletException {
+	public HttpResponse doManageRequests(StaplerRequest request, StaplerResponse response)
+			throws IOException, ServletException {
 		Jenkins.get().checkPermission(Jenkins.ADMINISTER);
 		errors.clear();
 		String[] selectedRequests = request.getParameterValues("selected");
@@ -146,7 +149,8 @@ public class RequestsPlugin extends Plugin {
 						} else {
 							// Failed, show error message:
 							errors.add(currentRequest.getErrorMessage().toString());
-							LOGGER.info("[WARNING] The request can not be processed: " + currentRequest.getMessage().toString());
+							LOGGER.info("[WARNING] The request can not be processed: "
+									+ currentRequest.getMessage().toString());
 						}
 					} else {
 						requestsToRemove.add(currentRequest);
@@ -233,12 +237,12 @@ public class RequestsPlugin extends Plugin {
 
 		@Override
 		public String getIconFileName() {
-			return null;
+			return "/images/48x48/clipboard.png";
 		}
 
-		public String getIconClassName() {
-			return "icon-clipboard";
-		}
+		// public String getIconClassName() {
+		// return "icon-clipboard";
+		// }
 
 		public String getDisplayName() {
 			return Messages.RequestManagementLink_DisplayName();

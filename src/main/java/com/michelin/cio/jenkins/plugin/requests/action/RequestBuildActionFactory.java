@@ -24,39 +24,43 @@
 
 package com.michelin.cio.jenkins.plugin.requests.action;
 
-import hudson.Extension;
-import hudson.model.AbstractBuild;
-import hudson.model.Action;
-import hudson.model.Run;
-import jenkins.model.TransientActionFactory;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.logging.Logger;
 
+import hudson.Extension;
+import hudson.model.Action;
+import hudson.model.Run;
+import jenkins.model.TransientActionFactory;
 
 // @author John Flynn <john.trixmot.flynn@gmail.com>
 
 @Extension
 public class RequestBuildActionFactory extends TransientActionFactory<Run> {
 
-    @Override public Class<Run> type() {
-        return Run.class;
-    }
+	public static final Logger LOGGER = Logger.getLogger(RequestBuildActionFactory.class.getName());
 
-    public Collection<? extends Action> createFor(Run target) {
-    	RequestMailSender.DescriptorEmailImpl descriptorEmailImpl = new RequestMailSender.DescriptorEmailImpl();
-        List<Action> adminActions = new ArrayList<Action>();
+	@Override
+	public Class<Run> type() {
+		return Run.class;
+	}
 
-        if (descriptorEmailImpl.isEnableDeleteBuild()) {
-        	adminActions.add(new RequestDeleteBuildAction(target));
-        }
+	public Collection<? extends Action> createFor(Run target) {
+		RequestMailSender.DescriptorEmailImpl descriptorEmailImpl = new RequestMailSender.DescriptorEmailImpl();
+		List<Action> adminActions = new ArrayList<Action>();
 
-        if (descriptorEmailImpl.isEnableUnlockBuild()) {
-        	adminActions.add(new RequestUnlockAction(target));
-        }
+		if (descriptorEmailImpl.isEnableDeleteBuild()) {
+			// LOGGER.info("ActionFactory Delete Build Request: ");
+			adminActions.add(new RequestDeleteBuildAction(target));
+		}
 
-        return adminActions;
-    }
+		if (descriptorEmailImpl.isEnableUnlockBuild()) {
+			// LOGGER.info("ActionFactory Unlock Build Request: ");
+			adminActions.add(new RequestUnlockAction(target));
+		}
+
+		return adminActions;
+	}
 
 }

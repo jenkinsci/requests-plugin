@@ -28,16 +28,20 @@ package com.michelin.cio.jenkins.plugin.requests.action;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.*;
-import javax.mail.*;
-
+import java.util.Date;
+import java.util.Locale;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
@@ -48,12 +52,11 @@ import org.kohsuke.stapler.verb.POST;
 import hudson.Extension;
 import hudson.model.AbstractProject;
 import hudson.tasks.BuildStepDescriptor;
-import net.sf.json.JSONObject;
-
 import hudson.tasks.Builder;
 import hudson.util.FormValidation;
 import hudson.util.Secret;
 import jenkins.model.Jenkins;
+import net.sf.json.JSONObject;
 
 // Option to email an admin user/group for delete request:
 // @author John Flynn <john.trixmot.flynn@gmail.com>
@@ -114,7 +117,8 @@ public class RequestMailSender extends Builder {
 		boolean failedStatus = false;
 
 		if (requestemailserver == null || requestemailserver.equals("")) {
-			LOGGER.log(Level.WARNING, "[ERROR] The Requests email server value is missing so no email will not be sent");
+			LOGGER.log(Level.WARNING,
+					"[ERROR] The Requests email server value is missing so no email will not be sent");
 			failedStatus = true;
 		}
 
@@ -137,105 +141,70 @@ public class RequestMailSender extends Builder {
 			return;
 		}
 
-		//MimeMessage mail = createMail(itemName, userName, requestType);
-		String jenkinsURL = getProjectURL();
-		MimeMessage mail = createEmptyMail();
-		StringBuffer buf = new StringBuffer();
-		String[] jenkinsURLArray = null;
-		
+		MimeMessage mail = createMail(itemName, userName, requestType);
+
 		if (mail != null) {
-			String jenkinsHostName = InetAddress.getLocalHost().getHostName();
-			if (jenkinsHostName == null) {
-				LOGGER.log(Level.WARNING, "[ERROR] Unable to get Jenkins Hostname.");
-				return;
-			}
-
-			// Check to see if the hostname is an ip address:
-			if (Character.isLetter(jenkinsHostName.charAt(0))) {
-				String[] nameArray = jenkinsHostName.split("\\.");
-				jenkinsHostName = nameArray[0];
-				jenkinsHostName = jenkinsHostName.toUpperCase(Locale.ENGLISH);
-			}
-
-			if (projectURL == null) {
-				LOGGER.log(Level.WARNING, "[ERROR] Unable to get projectURL.");
-				return;
-			}
-			// Get Jenkins URL from the projectURL:
-			if (projectURL.contains("/view/")) {
-				jenkinsURLArray = jenkinsURL.split("/view/");
-			} else if (jenkinsURL.contains("/job/")) {
-				jenkinsURLArray = jenkinsURL.split("/job/");
-			}
-
-			if (jenkinsURLArray == null) {
-				LOGGER.log(Level.WARNING, "[ERROR] Unable to get jenkinsURLArray.");
-				return;
-			}
-			String pendingRequestsLink = jenkinsURLArray[0] + "/plugin/requests/";
-			
-
-			// Email Subject line:
-			mail.setSubject(String.format(jenkinsHostName + ": " + requestType + " Request has been submitted"));
-
-			// Email page content:
-			buf.append(".......................................................................................................................\n\n");
-			buf.append(requestType + " request has been submitted for '" + itemName + "'.\n\n");
-			buf.append("Pending Request Page:\n");
-			buf.append(pendingRequestsLink + "\n\n\n");
-			buf.append("Project Page:\n");
-			buf.append(getProjectURL() + "\n");
-			buf.append(".......................................................................................................................\n");
-			mail.setText(buf.toString());
+			Transport.send(mail);
+			LOGGER.log(Level.INFO,
+					"[INFO] A Request email has been sent to " + requestadminemail + " from " + userName);
 		}
 
 		return;
 	}
 
-	/*
-	 * private MimeMessage createMail(String itemName, String userName, String
-	 * requestType) throws MessagingException, UnknownHostException { String
-	 * jenkinsURL = getProjectURL(); MimeMessage msg = createEmptyMail();
-	 * StringBuffer buf = new StringBuffer(); String[] jenkinsURLArray = null;
-	 * 
-	 * try {
-	 * 
-	 * if (msg != null) { String jenkinsHostName =
-	 * InetAddress.getLocalHost().getHostName(); if (jenkinsHostName == null) {
-	 * 
-	 * }
-	 * 
-	 * // Check to see if the hostname is an ip address: if
-	 * (Character.isLetter(jenkinsHostName.charAt(0))) { String[] nameArray =
-	 * jenkinsHostName.split("\\."); jenkinsHostName = nameArray[0]; jenkinsHostName
-	 * = jenkinsHostName.toUpperCase(Locale.ENGLISH); }
-	 * 
-	 * // Get Jenkins URL from the projectURL: if (projectURL.contains("/view/")) {
-	 * jenkinsURLArray = jenkinsURL.split("/view/"); } else if
-	 * (jenkinsURL.contains("/job/")) { jenkinsURLArray = jenkinsURL.split("/job/");
-	 * }
-	 * 
-	 * String pendingRequestsLink = jenkinsURLArray[0] + "/plugin/requests/";
-	 * 
-	 * // Email Subject line: msg.setSubject(String.format(jenkinsHostName + ": " +
-	 * requestType + " Request has been submitted"));
-	 * 
-	 * // Email page content: buf.append(
-	 * ".......................................................................................................................\n\n"
-	 * ); buf.append(requestType + " request has been submitted for '" + itemName +
-	 * "'.\n\n"); buf.append("Pending Request Page:\n");
-	 * buf.append(pendingRequestsLink + "\n\n\n"); buf.append("Project Page:\n");
-	 * buf.append(getProjectURL() + "\n"); buf.append(
-	 * ".......................................................................................................................\n"
-	 * ); msg.setText(buf.toString()); }
-	 * 
-	 * } catch (Exception e) { LOGGER.log(Level.SEVERE, "[ERROR] Exception: " +
-	 * e.getMessage());
-	 * 
-	 * return null; }
-	 * 
-	 * return msg; }
-	 */
+	private MimeMessage createMail(String itemName, String userName, String requestType)
+			throws MessagingException, UnknownHostException {
+		String jenkinsURL = getProjectURL();
+		MimeMessage msg = createEmptyMail();
+		StringBuffer buf = new StringBuffer();
+		String[] jenkinsURLArray;
+
+		try {
+
+			if (msg != null) {
+				String jenkinsHostName = InetAddress.getLocalHost().getHostName();
+
+				// Check to see if the hostname is an ip address:
+				if (Character.isLetter(jenkinsHostName.charAt(0))) {
+					String[] nameArray = jenkinsHostName.split("\\.");
+					jenkinsHostName = nameArray[0];
+					jenkinsHostName = jenkinsHostName.toUpperCase(Locale.ENGLISH);
+				}
+
+				// Get Jenkins URL from the projectURL:
+				if (projectURL.contains("/view/")) {
+					jenkinsURLArray = jenkinsURL.split("/view/");
+					// } else if (jenkinsURL.contains("/job/")) {
+				} else {
+					jenkinsURLArray = jenkinsURL.split("/job/");
+				}
+
+				String pendingRequestsLink = jenkinsURLArray[0] + "/plugin/requests/";
+
+				// Email Subject line:
+				msg.setSubject(String.format(jenkinsHostName + ": " + requestType + " Request has been submitted"));
+
+				// Email page content:
+				buf.append(
+						".......................................................................................................................\n\n");
+				buf.append(requestType + " request has been submitted for '" + itemName + "'.\n\n");
+				buf.append("Pending Request Page:\n");
+				buf.append(pendingRequestsLink + "\n\n\n");
+				buf.append("Project Page:\n");
+				buf.append(getProjectURL() + "\n");
+				buf.append(
+						".......................................................................................................................\n");
+				msg.setText(buf.toString());
+			}
+
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "[ERROR] Exception: " + e.getMessage());
+
+			return null;
+		}
+
+		return msg;
+	}
 
 	private MimeMessage createEmptyMail() throws MessagingException {
 		String emailHost = getDescriptor().getRequestemailhost();
@@ -436,7 +405,8 @@ public class RequestMailSender extends Builder {
 		}
 
 		@POST
-		public FormValidation doTestEmail(@QueryParameter("testEmailAddress") final String testEmailAddress) throws MessagingException, UnknownHostException {
+		public FormValidation doTestEmail(@QueryParameter("testEmailAddress") final String testEmailAddress)
+				throws MessagingException, UnknownHostException {
 			Jenkins.get().checkPermission(Jenkins.ADMINISTER);
 			String emailHost = getRequestemailhost();
 			String returnMessage = "Unable to create email message";
@@ -480,9 +450,11 @@ public class RequestMailSender extends Builder {
 			msg.setSubject(String.format("Test Email - Jenkins Request Plugin"));
 
 			// Email page content:
-			buf.append(".......................................................................................................................\n");
+			buf.append(
+					".......................................................................................................................\n");
 			buf.append("This is a test email from the Jenkins Requests Plugin\n");
-			buf.append(".......................................................................................................................\n");
+			buf.append(
+					".......................................................................................................................\n");
 			msg.setText(buf.toString());
 
 			Transport.send(msg);

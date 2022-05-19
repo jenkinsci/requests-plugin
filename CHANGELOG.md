@@ -1,6 +1,12 @@
 
 ## Version History
 
+Version 2.2.18 (May 19, 2022)
+
+-		Fix issue with emails not sending
+-		Partial changes to adapt icon path removal from core       
+
+
 Version 2.2.17 (March 16, 2022)
 
 -       Fix for SECURITY-2650

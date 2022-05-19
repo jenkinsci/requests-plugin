@@ -24,37 +24,32 @@
  */
 package com.michelin.cio.jenkins.plugin.requests.action;
 
-import hudson.Functions;
-
-import java.util.ArrayList;
-import java.util.List;
+import java.io.IOException;
 import java.util.logging.Level;
-import hudson.model.Run;
-import jenkins.model.Jenkins;
-import hudson.model.Action;
+import java.util.logging.Logger;
+
+import javax.mail.MessagingException;
+import javax.servlet.ServletException;
+
 import org.kohsuke.stapler.HttpRedirect;
 import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
-import org.kohsuke.stapler.interceptor.RequirePOST;
 import org.kohsuke.stapler.verb.POST;
 
 import com.michelin.cio.jenkins.plugin.requests.RequestsPlugin;
 import com.michelin.cio.jenkins.plugin.requests.model.DeleteBuildRequest;
-import com.michelin.cio.jenkins.plugin.requests.model.RequestsUtility;
 
-import javax.mail.MessagingException;
-import javax.servlet.ServletException;
-import java.io.IOException;
-import java.util.logging.Logger;
-
-import static java.util.logging.Level.FINE;
+import hudson.Functions;
+import hudson.model.Action;
+import hudson.model.Run;
+import jenkins.model.Jenkins;
 
 // Represents the "Request for build deletion" action appearing on a given build's page.
 // @author John Flynn <john.trixmot.flynn1@gmail.com>
 
 public class RequestDeleteBuildAction implements Action {
-	private static final Logger LOGGER = Logger.getLogger(RequestDeleteBuildAction.class.getName());
+	public static final Logger LOGGER = Logger.getLogger(RequestDeleteBuildAction.class.getName());
 	private String buildName;
 	private int buildNumber;
 	private String fullDisplayName;
@@ -65,14 +60,16 @@ public class RequestDeleteBuildAction implements Action {
 		buildNumber = target.getNumber();
 		fullDisplayName = target.getFullDisplayName();
 		build_Url = target.getUrl();
-	} 
+	}
 
 	@POST
-	public HttpResponse doCreateDeleteBuildRequest(StaplerRequest request, StaplerResponse response) throws IOException, ServletException, MessagingException {
+	public HttpResponse doCreateDeleteBuildRequest(StaplerRequest request, StaplerResponse response)
+			throws IOException, ServletException, MessagingException {
 
 		if (isIconDisplayed()) {
 			final String username = request.getParameter("username");
 			RequestsPlugin plugin = Jenkins.get().getPlugin(RequestsPlugin.class);
+
 			if (plugin == null) {
 				return null;
 			}
@@ -81,9 +78,9 @@ public class RequestDeleteBuildAction implements Action {
 			String projectName = "";
 			StringBuffer stringBuffer = new StringBuffer();
 
-			LOGGER.info("Delete Build Action: fullDisplayName " + fullDisplayName);
+			// LOGGER.info("Delete Build Action: fullDisplayName " + fullDisplayName);
 
-			// Need to extract the folder name(s) and job name:
+			// Need to extract the folder name(s) and the job name:
 			if (fullDisplayName.contains(" » ")) {
 				String[] Folder_project_BuildList = null;
 				Folder_project_BuildList = fullDisplayName.split(" » ");
@@ -110,11 +107,14 @@ public class RequestDeleteBuildAction implements Action {
 				projectName = projectFullName;
 			}
 
+			LOGGER.info("[DEBUG] Delete Build Action: " + projectName + " : " + projectFullName);
+
 			String jenkinsUrl = Jenkins.get().getRootUrl();
 			String buildUrl = jenkinsUrl + build_Url;
 			String[] emailData = { buildName, username, "A Delete Build", buildUrl };
-			LOGGER.info("[DEBUG] Delete Build Action: " + projectName + " : " + projectFullName);
-			plugin.addRequestPlusEmail(new DeleteBuildRequest("deleteBuild", username, projectName, projectFullName, Integer.toString(buildNumber)), emailData);
+			// LOGGER.info("[INFO] doCreateDeleteBuildRequest:");
+			plugin.addRequestPlusEmail(new DeleteBuildRequest("deleteBuild", username, projectName, projectFullName,
+					Integer.toString(buildNumber)), emailData);
 		}
 
 		return new HttpRedirect(request.getContextPath() + '/' + build_Url);
@@ -129,12 +129,16 @@ public class RequestDeleteBuildAction implements Action {
 
 	@Override
 	public String getIconFileName() {
-		return null;
-	}
+		// if (isIconDisplayed()) {
+		// return "/images/24x24/edit-delete.png";
+		// }
+		// return null;
+		// }
 
-	public String getIconClassname() {
+		// public String getIconClassname() {
 		if (isIconDisplayed()) {
-			return "icon-edit-delete";
+			// return "icon-setting";
+			return "/images/24x24/edit-delete.png";
 		}
 		return null;
 	}
@@ -148,7 +152,7 @@ public class RequestDeleteBuildAction implements Action {
 	}
 
 	/**
-	 * Displays the icon when the user can configure and !delete.
+	 * Displays the icon when the user can not Delete a build.
 	 */
 	private boolean isIconDisplayed() {
 		boolean isDisplayed = false;
