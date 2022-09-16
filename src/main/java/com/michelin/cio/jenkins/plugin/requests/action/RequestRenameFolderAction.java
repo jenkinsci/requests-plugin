@@ -24,18 +24,16 @@
 
 package com.michelin.cio.jenkins.plugin.requests.action;
 
-import hudson.Extension;
-import hudson.Functions;
-
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
-import hudson.model.Item;
-import hudson.model.Job;
-import jenkins.model.Jenkins;
-import jenkins.model.TransientActionFactory;
-import hudson.model.Action;
+import java.util.logging.Logger;
+
+import javax.mail.MessagingException;
+import javax.servlet.ServletException;
+
 import org.kohsuke.stapler.HttpRedirect;
 import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.StaplerRequest;
@@ -44,15 +42,16 @@ import org.kohsuke.stapler.verb.POST;
 
 import com.cloudbees.hudson.plugins.folder.Folder;
 import com.michelin.cio.jenkins.plugin.requests.RequestsPlugin;
+import com.michelin.cio.jenkins.plugin.requests.action.RequestMailSender.DescriptorEmailImpl;
 import com.michelin.cio.jenkins.plugin.requests.model.RenameFolderRequest;
 import com.michelin.cio.jenkins.plugin.requests.model.RequestsUtility;
 
-import javax.mail.MessagingException;
-import javax.servlet.ServletException;
-import java.io.IOException;
-import java.util.logging.Logger;
-
-import static java.util.logging.Level.FINE;
+import hudson.Extension;
+import hudson.Functions;
+import hudson.model.Action;
+import hudson.model.Item;
+import jenkins.model.Jenkins;
+import jenkins.model.TransientActionFactory;
 
 // Represents the "Ask for renaming" action appearing on a given project's page.
 
@@ -67,13 +66,17 @@ public class RequestRenameFolderAction implements Action {
 	}
 
 	@POST
-	public HttpResponse doCreateRenameFolderRequest(StaplerRequest request,
-			StaplerResponse response) throws IOException, ServletException, MessagingException {
+	public HttpResponse doCreateRenameFolderRequest(StaplerRequest request, StaplerResponse response)
+			throws IOException, ServletException, MessagingException {
 
 		try {
 			if (isIconDisplayed()) {
 				final String newName = request.getParameter("new-name");
-				final String username = request.getParameter("username");
+				// Use the Admin user that was set in the global jenkins settings for this
+				// plugin:
+				DescriptorEmailImpl descriptorEmailImpl = new DescriptorEmailImpl();
+				final String username = descriptorEmailImpl.getUnlockuser();
+				// final String username = request.getParameter("username");
 
 				RequestsPlugin plugin = Jenkins.get().getPlugin(RequestsPlugin.class);
 				if (plugin == null) {
@@ -87,19 +90,18 @@ public class RequestRenameFolderAction implements Action {
 					RequestsUtility requestsUtility = new RequestsUtility();
 					projectFullName = requestsUtility.constructFolderJobName(projectFullName);
 				}
-				
+
 				if (projectName.contains("/")) {
-					String [] projectnameList = projectName.split("/");
+					String[] projectnameList = projectName.split("/");
 					int nameCount = projectnameList.length;
-					projectName = projectnameList[nameCount-1];
+					projectName = projectnameList[nameCount - 1];
 				}
-				
+
 				LOGGER.info("Rename Folder Request: " + projectName + " - " + projectFullName);
-				String[] emailData = {projectName + " -> " + newName, username, "A Rename Folder", project.getAbsoluteUrl()};
+				String[] emailData = { projectName + " -> " + newName, username, "A Rename Folder", project.getAbsoluteUrl() };
 
 				plugin.addRequestPlusEmail(new RenameFolderRequest("renameFolder", username, projectName, projectFullName, newName), emailData);
-				LOGGER.log(Level.INFO,
-						"The request to rename the folder {0} to {1} has been sent to the administrator",
+				LOGGER.log(Level.INFO, "The request to rename the folder {0} to {1} has been sent to the administrator",
 						new Object[] { project.getName(), newName });
 			}
 		} catch (Exception e) {
@@ -108,8 +110,7 @@ public class RequestRenameFolderAction implements Action {
 			return null;
 		}
 
-		return new HttpRedirect(
-				request.getContextPath() + '/' + project.getUrl());
+		return new HttpRedirect(request.getContextPath() + '/' + project.getUrl());
 	}
 
 	public String getDisplayName() {
@@ -141,34 +142,33 @@ public class RequestRenameFolderAction implements Action {
 	}
 
 	/*
-	 * Permission computing 1: The user has the permission 0: The user has not
-	 * the permission
+	 * Permission computing 1: The user has the permission 0: The user has not the
+	 * permission
 	 *
 	 * Create | 1 | 0 | Delete | 0 | 1 | Configure | 0 | 0 |
 	 *
-	 * So, the action has to be enabled when: Create AND !Delete AND !Configure
-	 * OR Delete AND !Create AND !Configure
+	 * So, the action has to be enabled when: Create AND !Delete AND !Configure OR
+	 * Delete AND !Create AND !Configure
 	 */
-	
-	// If a Folder is created (Create access) by a user but does not have Configure or Delete, the custom sidebar link will not appear.
+
+	// If a Folder is created (Create access) by a user but does not have Configure
+	// or Delete, the custom sidebar link will not appear.
 	// The user will be able to use the standard Jenkins rename sidebar link:
 	private boolean isIconDisplayed() {
 		boolean isDisplayed = false;
 		try {
 			isDisplayed = (!hasDeletePermission() && !hasConfigurePermission() && hasCreatePermission())
-					   || (!hasCreatePermission() && !hasConfigurePermission() && hasDeletePermission())
-					   || (!hasDeletePermission() && !hasCreatePermission() && !hasConfigurePermission());
+					|| (!hasCreatePermission() && !hasConfigurePermission() && hasDeletePermission())
+					|| (!hasDeletePermission() && !hasCreatePermission() && !hasConfigurePermission());
 
 		} catch (IOException | ServletException e) {
-			LOGGER.log(Level.WARNING,
-					"Impossible to know if the icon has to be displayed", e);
+			LOGGER.log(Level.WARNING, "Impossible to know if the icon has to be displayed", e);
 		}
 
 		return isDisplayed;
 	}
 
-	private boolean hasConfigurePermission()
-			throws IOException, ServletException {
+	private boolean hasConfigurePermission() throws IOException, ServletException {
 		return Functions.hasPermission(project, Item.CONFIGURE);
 	}
 
@@ -181,9 +181,9 @@ public class RequestRenameFolderAction implements Action {
 	}
 
 	private static final Logger LOGGER = Logger.getLogger(RequestRenameFolderAction.class.getName());
-	
+
 	@Extension
-    public static class TransientFolderActionFactoryImpl extends TransientActionFactory<Folder> {
+	public static class TransientFolderActionFactoryImpl extends TransientActionFactory<Folder> {
 
 		@Override
 		public Collection<? extends Action> createFor(Folder target) {
@@ -203,6 +203,6 @@ public class RequestRenameFolderAction implements Action {
 		public Class<Folder> type() {
 			return Folder.class;
 		}
-    }
+	}
 
 }

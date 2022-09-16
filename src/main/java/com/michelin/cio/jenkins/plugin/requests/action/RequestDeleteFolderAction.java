@@ -24,37 +24,35 @@
 
 package com.michelin.cio.jenkins.plugin.requests.action;
 
-import hudson.Extension;
-import hudson.Functions;
-
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
-import hudson.model.Item;
-import jenkins.model.Jenkins;
-import jenkins.model.TransientActionFactory;
-import hudson.model.Action;
+import java.util.logging.Logger;
+
+import javax.mail.MessagingException;
+import javax.servlet.ServletException;
+
 import org.kohsuke.stapler.HttpRedirect;
 import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.verb.POST;
 
+import com.cloudbees.hudson.plugins.folder.Folder;
+import com.cloudbees.hudson.plugins.folder.FolderProperty;
 import com.michelin.cio.jenkins.plugin.requests.RequestsPlugin;
+import com.michelin.cio.jenkins.plugin.requests.action.RequestMailSender.DescriptorEmailImpl;
 import com.michelin.cio.jenkins.plugin.requests.model.DeleteFolderRequest;
 import com.michelin.cio.jenkins.plugin.requests.model.RequestsUtility;
 
-import javax.mail.MessagingException;
-import javax.servlet.ServletException;
-import java.io.IOException;
-import java.util.logging.Logger;
-
-import com.cloudbees.hudson.plugins.folder.Folder;
-import com.cloudbees.hudson.plugins.folder.FolderProperty;
-
-
-import static java.util.logging.Level.FINE;
+import hudson.Extension;
+import hudson.Functions;
+import hudson.model.Action;
+import hudson.model.Item;
+import jenkins.model.Jenkins;
+import jenkins.model.TransientActionFactory;
 
 // Represents the "Ask for deletion" action appearing on a given folder view page.
 
@@ -63,21 +61,22 @@ public class RequestDeleteFolderAction extends FolderProperty<Folder> implements
 	private Folder project;
 	private Folder project2;
 
-
 	public RequestDeleteFolderAction(Folder target) {
 		project2 = (Folder) target.getTarget();
 		this.project = project2;
 	}
-	
 
 	@POST
-	public HttpResponse doCreateDeleteFolderRequest(StaplerRequest request,
-			StaplerResponse response)
+	public HttpResponse doCreateDeleteFolderRequest(StaplerRequest request, StaplerResponse response)
 			throws IOException, ServletException, MessagingException {
 
 		try {
 			if (isIconDisplayed()) {
-				final String username = request.getParameter("username");
+				// Use the Admin user that was set in the global jenkins settings for this
+				// plugin:
+				DescriptorEmailImpl descriptorEmailImpl = new DescriptorEmailImpl();
+				final String username = descriptorEmailImpl.getUnlockuser();
+				// final String username = request.getParameter("username");
 				RequestsPlugin plugin = Jenkins.get().getPlugin(RequestsPlugin.class);
 				if (plugin == null) {
 					return null;
@@ -90,15 +89,15 @@ public class RequestDeleteFolderAction extends FolderProperty<Folder> implements
 					RequestsUtility requestsUtility = new RequestsUtility();
 					projectFullName = requestsUtility.constructFolderJobName(projectFullName);
 				}
-				
-				String[] emailData = {project.getName(), username, "A Delete Folder", project.getAbsoluteUrl()};
+
+				String[] emailData = { project.getName(), username, "A Delete Folder", project.getAbsoluteUrl() };
 
 				if (projectName.contains("/")) {
-					String [] projectnameList = projectName.split("/");
+					String[] projectnameList = projectName.split("/");
 					int nameCount = projectnameList.length;
-					projectName = projectnameList[nameCount-1];
+					projectName = projectnameList[nameCount - 1];
 				}
-				
+
 				LOGGER.info("Delete Folder Request: " + projectName + " - " + projectFullName);
 				plugin.addRequestPlusEmail(new DeleteFolderRequest("deleteFolder", username, projectName, projectFullName, ""), emailData);
 			}
@@ -109,8 +108,7 @@ public class RequestDeleteFolderAction extends FolderProperty<Folder> implements
 			return null;
 		}
 
-		return new HttpRedirect(
-				request.getContextPath() + '/' + project.getUrl());
+		return new HttpRedirect(request.getContextPath() + '/' + project.getUrl());
 	}
 
 	public String getDisplayName() {
@@ -142,40 +140,39 @@ public class RequestDeleteFolderAction extends FolderProperty<Folder> implements
 	}
 
 	/*
-	 * Permission computing 1: The user has the permission 0: The user has not
-	 * the permission
+	 * Permission computing 1: The user has the permission 0: The user has not the
+	 * permission
 	 *
 	 * Create | 1 | 0 | Delete | 0 | 1 | Configure | 0 | 0 |
 	 *
-	 * So, the action has to be enabled when: Create AND !Delete AND !Configure
-	 * OR Delete AND !Create AND !Configure
+	 * So, the action has to be enabled when: Create AND !Delete AND !Configure OR
+	 * Delete AND !Create AND !Configure
 	 */
 	private boolean isIconDisplayed() {
 		boolean isDisplayed = false;
 		try {
 			isDisplayed = !hasDeletePermission();
 		} catch (Exception e) {
-			LOGGER.log(Level.WARNING,
-					"Impossible to know if the icon has to be displayed", e);
+			LOGGER.log(Level.WARNING, "Impossible to know if the icon has to be displayed", e);
 		}
 
 		return isDisplayed;
 	}
 
-	//private boolean hasConfigurePermission()
-	//		throws IOException, ServletException {
-	//	return Functions.hasPermission(project, Item.CONFIGURE);
-	//}
+	// private boolean hasConfigurePermission()
+	// throws IOException, ServletException {
+	// return Functions.hasPermission(project, Item.CONFIGURE);
+	// }
 
 	private boolean hasDeletePermission() throws IOException, ServletException {
 		return Functions.hasPermission(project, Item.DELETE);
 	}
 
 	private static final Logger LOGGER = Logger.getLogger(RequestDeleteFolderAction.class.getName());
-	
-	//@Extension(optional = true)
+
+	// @Extension(optional = true)
 	@Extension
-    public static class TransientFolderActionFactoryImpl extends TransientActionFactory<Folder> {
+	public static class TransientFolderActionFactoryImpl extends TransientActionFactory<Folder> {
 
 		@Override
 		public Collection<? extends Action> createFor(Folder target) {
@@ -195,6 +192,6 @@ public class RequestDeleteFolderAction extends FolderProperty<Folder> implements
 		public Class<Folder> type() {
 			return Folder.class;
 		}
-    }
+	}
 
 }

@@ -25,30 +25,29 @@
 
 package com.michelin.cio.jenkins.plugin.requests.action;
 
-import hudson.Functions;
+import java.io.IOException;
 import java.util.logging.Level;
-import hudson.model.Item;
-import hudson.model.Job;
-import hudson.model.Run;
-import jenkins.model.Jenkins;
-import hudson.model.Action;
+import java.util.logging.Logger;
+
+import javax.mail.MessagingException;
+import javax.servlet.ServletException;
+
 import org.kohsuke.stapler.HttpRedirect;
 import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
-import org.kohsuke.stapler.interceptor.RequirePOST;
 import org.kohsuke.stapler.verb.POST;
 
 import com.michelin.cio.jenkins.plugin.requests.RequestsPlugin;
+import com.michelin.cio.jenkins.plugin.requests.action.RequestMailSender.DescriptorEmailImpl;
 import com.michelin.cio.jenkins.plugin.requests.model.RenameJobRequest;
 import com.michelin.cio.jenkins.plugin.requests.model.RequestsUtility;
 
-import javax.mail.MessagingException;
-import javax.servlet.ServletException;
-import java.io.IOException;
-import java.util.logging.Logger;
-
-import static java.util.logging.Level.FINE;
+import hudson.Functions;
+import hudson.model.Action;
+import hudson.model.Item;
+import hudson.model.Job;
+import jenkins.model.Jenkins;
 
 // Represents the "Ask for renaming" action appearing on a given project's page.
 //
@@ -65,13 +64,17 @@ public class RequestRenameJobAction implements Action {
 	}
 
 	@POST
-	public HttpResponse doCreateRenameJobRequest(StaplerRequest request,
-			StaplerResponse response) throws IOException, ServletException, MessagingException {
+	public HttpResponse doCreateRenameJobRequest(StaplerRequest request, StaplerResponse response)
+			throws IOException, ServletException, MessagingException {
 
 		try {
 			if (isIconDisplayed()) {
 				final String newName = request.getParameter("new-name");
-				final String username = request.getParameter("username");
+				// Use the Admin user that was set in the global jenkins settings for this
+				// plugin:
+				DescriptorEmailImpl descriptorEmailImpl = new DescriptorEmailImpl();
+				final String username = descriptorEmailImpl.getUnlockuser();
+				// final String username = request.getParameter("username");
 
 				RequestsPlugin plugin = Jenkins.get().getPlugin(RequestsPlugin.class);
 				if (plugin == null) {
@@ -85,19 +88,18 @@ public class RequestRenameJobAction implements Action {
 					RequestsUtility requestsUtility = new RequestsUtility();
 					projectFullName = requestsUtility.constructFolderJobName(projectFullName);
 				}
-				
+
 				if (projectName.contains("/")) {
-					String [] projectnameList = projectName.split("/");
+					String[] projectnameList = projectName.split("/");
 					int nameCount = projectnameList.length;
-					projectName = projectnameList[nameCount-1];
+					projectName = projectnameList[nameCount - 1];
 				}
-				
+
 				LOGGER.info("Rename Job Request After: " + projectName + " - " + projectFullName);
-				String[] emailData = {projectName + " -> " + newName, username, "A Rename Job", project.getAbsoluteUrl()};
+				String[] emailData = { projectName + " -> " + newName, username, "A Rename Job", project.getAbsoluteUrl() };
 
 				plugin.addRequestPlusEmail(new RenameJobRequest("renameJob", username, projectName, projectFullName, newName), emailData);
-				LOGGER.log(Level.INFO,
-						"The request to rename the job {0} to {1} has been sent to the administrator",
+				LOGGER.log(Level.INFO, "The request to rename the job {0} to {1} has been sent to the administrator",
 						new Object[] { project.getName(), newName });
 			}
 		} catch (Exception e) {
@@ -106,8 +108,7 @@ public class RequestRenameJobAction implements Action {
 			return null;
 		}
 
-		return new HttpRedirect(
-				request.getContextPath() + '/' + project.getUrl());
+		return new HttpRedirect(request.getContextPath() + '/' + project.getUrl());
 	}
 
 	public String getDisplayName() {
@@ -140,31 +141,29 @@ public class RequestRenameJobAction implements Action {
 	}
 
 	/*
-	 * Permission computing 1: The user has the permission 0: The user has not
-	 * the permission
+	 * Permission computing 1: The user has the permission 0: The user has not the
+	 * permission
 	 *
 	 * Create | 1 | 0 | Delete | 0 | 1 | Configure | 0 | 0 |
 	 *
-	 * So, the action has to be enabled when: Create AND !Delete AND !Configure
-	 * OR Delete AND !Create AND !Configure
+	 * So, the action has to be enabled when: Create AND !Delete AND !Configure OR
+	 * Delete AND !Create AND !Configure
 	 */
 	private boolean isIconDisplayed() {
 		boolean isDisplayed = false;
 		try {
 			isDisplayed = (!hasDeletePermission() && !hasConfigurePermission() && hasCreatePermission())
-					   || (!hasCreatePermission() && !hasConfigurePermission() && hasDeletePermission())
-					   || (!hasDeletePermission() && !hasCreatePermission() && !hasConfigurePermission());
+					|| (!hasCreatePermission() && !hasConfigurePermission() && hasDeletePermission())
+					|| (!hasDeletePermission() && !hasCreatePermission() && !hasConfigurePermission());
 
 		} catch (IOException | ServletException e) {
-			LOGGER.log(Level.WARNING,
-					"Impossible to know if the icon has to be displayed", e);
+			LOGGER.log(Level.WARNING, "Impossible to know if the icon has to be displayed", e);
 		}
 
 		return isDisplayed;
 	}
 
-	private boolean hasConfigurePermission()
-			throws IOException, ServletException {
+	private boolean hasConfigurePermission() throws IOException, ServletException {
 		return Functions.hasPermission(project, Item.CONFIGURE);
 	}
 
@@ -176,7 +175,6 @@ public class RequestRenameJobAction implements Action {
 		return Functions.hasPermission(project, Item.DELETE);
 	}
 
-	private static final Logger LOGGER = Logger
-			.getLogger(RequestRenameJobAction.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(RequestRenameJobAction.class.getName());
 
 }

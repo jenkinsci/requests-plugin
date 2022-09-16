@@ -37,6 +37,7 @@ import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.verb.POST;
 
 import com.michelin.cio.jenkins.plugin.requests.RequestsPlugin;
+import com.michelin.cio.jenkins.plugin.requests.action.RequestMailSender.DescriptorEmailImpl;
 import com.michelin.cio.jenkins.plugin.requests.model.UnlockRequest;
 
 import hudson.Functions;
@@ -66,7 +67,11 @@ public class RequestUnlockAction implements Action {
 			throws IOException, ServletException, MessagingException {
 
 		if (isIconDisplayed()) {
-			final String username = request.getParameter("username");
+			// Use the Admin user that was set in the global jenkins settings for this
+			// plugin:
+			DescriptorEmailImpl descriptorEmailImpl = new DescriptorEmailImpl();
+			final String username = descriptorEmailImpl.getUnlockuser();
+			// final String username = request.getParameter("username");
 			RequestsPlugin plugin = Jenkins.get().getPlugin(RequestsPlugin.class);
 
 			if (plugin == null) {
@@ -111,8 +116,8 @@ public class RequestUnlockAction implements Action {
 			String jenkinsUrl = Jenkins.get().getRootUrl();
 			String buildUrl = jenkinsUrl + build_Url;
 			String[] emailData = { buildName, username, "An Unlock Build", buildUrl };
-			plugin.addRequestPlusEmail(new UnlockRequest("unlockBuild", username, projectName, projectFullName,
-					Integer.toString(buildNumber)), emailData);
+			plugin.addRequestPlusEmail(new UnlockRequest("unlockBuild", username, projectName, projectFullName, Integer.toString(buildNumber)),
+					emailData);
 		}
 
 		return new HttpRedirect(request.getContextPath() + '/' + build_Url);
