@@ -67,9 +67,15 @@ Jenkins** \> **Configure System**):
 
  ![](docs/images/Configure_system1.png)
 
+
+
  ![](docs/images/configure_system2.png)
 
+
+
  ![](docs/images/configure_system3.png)
+
+
   
 Administrators get a new **Pending  Requests** entry in Jenkins' main
 configuration screen (**Manage Jenkins**):  
