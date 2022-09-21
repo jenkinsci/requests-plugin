@@ -65,35 +65,37 @@ Jenkins** \> **Configure System**):
 
   
 
- ![](docs/images/new_global.png)
+ ![](docs/images/Configure_system1.png)
 
+ ![](docs/images/configure_system2.png)
 
+ ![](docs/images/configure_system3.png)
   
 Administrators get a new **Pending  Requests** entry in Jenkins' main
 configuration screen (**Manage Jenkins**):  
 
  ![](docs/images/pendingRequets.png)
 
-------------------------------------------------------------------------
 
  ![](docs/images/pendingRequestPage.png)
 
-------------------------------------------------------------------------
 
 
-### In order to see Action					Not Authorized
+Lack of Permissions in order to see the links if enabled
+---
+### Delete Job/Folder/Multibranch Pipeline Request       
+- !Job.Delete
 
-Delete Job Request							!Job.Delete
-Delete Folder Request						!Job.Delete
-Delete MBP Request							!Job.Delete
-Delete Build Request						!Run.Delete
-Unlock Build Request						!Run.Delete
-Rename Job Request							(!Job.Delete and !Job.Configure and Job.Create) 
-												OR	(!Job.Create and !Job.Configure and Job.Delete)
-												OR	(!Job.Delete and !Job.Create and !Job.Configure)
-Rename Folder Request						(!Job.Delete and !Job.Configure and Job.Create) 
-												OR	(!Job.Create and !Job.Configure and Job.Delete)
-												OR    (!Job.Delete and !Job.Create and !Job.Configure)
+
+### Delete/Unlock Build Request
+
+- !Run.Delete
+
+
+### Rename Job/Folder Request       
+- (!Job.Delete and !Job.Configure and Job.Create) OR
+- (!Job.Create and !Job.Configure and Job.Delete) OR
+- (!Job.Delete and !Job.Create and !Job.Configure)
 
 If permissions are set within a job, it will affect the above permission patterns.
 
