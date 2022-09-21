@@ -23,15 +23,12 @@
  */
 package com.michelin.cio.jenkins.plugin.requests.model;
 
-import hudson.model.AbstractItem;
-import hudson.model.Hudson;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import hudson.model.Item;
 import hudson.model.Job;
 import jenkins.model.Jenkins;
-
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 // Represents a renaming request sent by a user to the administrator.
 //
@@ -60,16 +57,18 @@ public class RenameJobRequest extends Request {
 		boolean success = false;
 
 		try {
-			if ((Jenkins.get().hasPermission(Item.DELETE) && !Jenkins.get().hasPermission(Item.CREATE) && Jenkins.get().hasPermission(Item.CONFIGURE)) || 
-				(!Jenkins.get().hasPermission(Item.DELETE) && Jenkins.get().hasPermission(Item.CREATE) && Jenkins.get().hasPermission(Item.CONFIGURE)) ||
-				(Jenkins.get().hasPermission(Item.DELETE) && Jenkins.get().hasPermission(Item.CREATE) && Jenkins.get().hasPermission(Item.CONFIGURE))) {
+			if ((Jenkins.get().hasPermission(Item.DELETE) && !Jenkins.get().hasPermission(Item.CREATE) && Jenkins.get().hasPermission(Item.CONFIGURE))
+					|| (!Jenkins.get().hasPermission(Item.DELETE) && Jenkins.get().hasPermission(Item.CREATE)
+							&& Jenkins.get().hasPermission(Item.CONFIGURE))
+					|| (Jenkins.get().hasPermission(Item.DELETE) && Jenkins.get().hasPermission(Item.CREATE)
+							&& Jenkins.get().hasPermission(Item.CONFIGURE))) {
 				((Job) item).renameTo(newName);
 				success = true;
 				LOGGER.log(Level.INFO, "The Job {0} has been properly renamed in {1}", new Object[] { item.getName(), newName });
 
 			} else {
-				errorMessage = "The current user " + username + " has no permission to RENAME the Job";
-				LOGGER.log(Level.FINE, "The current user {0} has no permission to RENAME the Job", new Object[] { username });
+				errorMessage = "The current user does not have permission to RENAME the Job";
+				LOGGER.log(Level.FINE, "The current user does not have permission to RENAME the Job");
 			}
 		} catch (Exception e) {
 			errorMessage = "Unable to RENAME the Job " + e.getMessage().toString();

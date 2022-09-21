@@ -23,17 +23,13 @@
  */
 package com.michelin.cio.jenkins.plugin.requests.model;
 
-import hudson.model.AbstractItem;
-import hudson.model.Hudson;
-import hudson.model.Item;
-import hudson.model.Job;
-import jenkins.model.Jenkins;
-
-import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.cloudbees.hudson.plugins.folder.Folder;
+
+import hudson.model.Item;
+import jenkins.model.Jenkins;
 
 // Represents a renaming request sent by a user to the administrator.
 
@@ -60,16 +56,18 @@ public class RenameFolderRequest extends Request {
 		boolean success = false;
 
 		try {
-			if ((Jenkins.get().hasPermission(Item.DELETE) && !Jenkins.get().hasPermission(Item.CREATE) && Jenkins.get().hasPermission(Item.CONFIGURE)) || 
-			   (!Jenkins.get().hasPermission(Item.DELETE) && Jenkins.get().hasPermission(Item.CREATE) && Jenkins.get().hasPermission(Item.CONFIGURE)) ||
-				(Jenkins.get().hasPermission(Item.DELETE) && Jenkins.get().hasPermission(Item.CREATE) && Jenkins.get().hasPermission(Item.CONFIGURE))) {
+			if ((Jenkins.get().hasPermission(Item.DELETE) && !Jenkins.get().hasPermission(Item.CREATE) && Jenkins.get().hasPermission(Item.CONFIGURE))
+					|| (!Jenkins.get().hasPermission(Item.DELETE) && Jenkins.get().hasPermission(Item.CREATE)
+							&& Jenkins.get().hasPermission(Item.CONFIGURE))
+					|| (Jenkins.get().hasPermission(Item.DELETE) && Jenkins.get().hasPermission(Item.CREATE)
+							&& Jenkins.get().hasPermission(Item.CONFIGURE))) {
 				((Folder) item).renameTo(newName);
 				success = true;
 				LOGGER.log(Level.INFO, "The Folder {0} has been properly renamed in {1}", new Object[] { item.getName(), newName });
-			
+
 			} else {
-				errorMessage = "The current user " + username + " has no permission to RENAME the Folder";
-				LOGGER.log(Level.FINE, "The current user {0} has no permission to RENAME the Folder", new Object[] { username });
+				errorMessage = "The current user does not have permission to RENAME the Folder";
+				LOGGER.log(Level.FINE, "The current user does not have permission to RENAME the Folder");
 			}
 		} catch (Exception e) {
 			errorMessage = "Unable to RENAME the Folder: " + e.getMessage().toString();

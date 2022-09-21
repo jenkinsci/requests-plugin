@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2020 Lexmark
+ * Copyright 2022 Lexmark
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -122,7 +122,7 @@ public class RequestDeleteMultiBranchAction implements Action {
 
 	public String getIconClassName() {
 		if (isIconDisplayed()) {
-			return "icon-setting";
+			return "icon-edit-delete";
 		}
 		return null;
 	}

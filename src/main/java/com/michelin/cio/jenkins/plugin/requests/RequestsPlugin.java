@@ -45,6 +45,7 @@ import com.michelin.cio.jenkins.plugin.requests.action.RequestMailSender;
 import com.michelin.cio.jenkins.plugin.requests.model.DeleteBuildRequest;
 import com.michelin.cio.jenkins.plugin.requests.model.DeleteFolderRequest;
 import com.michelin.cio.jenkins.plugin.requests.model.DeleteJobRequest;
+import com.michelin.cio.jenkins.plugin.requests.model.DeleteMultiBranchRequest;
 import com.michelin.cio.jenkins.plugin.requests.model.RenameFolderRequest;
 import com.michelin.cio.jenkins.plugin.requests.model.RenameJobRequest;
 import com.michelin.cio.jenkins.plugin.requests.model.Request;
@@ -90,8 +91,7 @@ public class RequestsPlugin extends Plugin {
 		}
 	}
 
-	public void addRequestPlusEmail(final Request request, final String[] emailData)
-			throws UnknownHostException, MessagingException {
+	public void addRequestPlusEmail(final Request request, final String[] emailData) throws UnknownHostException, MessagingException {
 		boolean alreadyRequested = false;
 
 		for (int i = 0; i < requests.size(); i++) {
@@ -111,11 +111,10 @@ public class RequestsPlugin extends Plugin {
 		if (!alreadyRequested) {
 			requests.add(request);
 
-			RequestMailSender mailSender = new RequestMailSender(emailData[0], emailData[1], emailData[2],
-					emailData[3]);
-			LOGGER.info("[INFO] mailSender 1:");
+			RequestMailSender mailSender = new RequestMailSender(emailData[0], emailData[1], emailData[2], emailData[3]);
+			// LOGGER.info("[INFO] mailSender 1:");
 			mailSender.executeEmail();
-			LOGGER.info("[INFO] mailSender 2:");
+			// LOGGER.info("[INFO] mailSender 2:");
 			persistPendingRequests();
 		} else {
 			// LOGGER.info("[INFO] Don't Send Email:");
@@ -123,8 +122,7 @@ public class RequestsPlugin extends Plugin {
 	}
 
 	@RequirePOST
-	public HttpResponse doManageRequests(StaplerRequest request, StaplerResponse response)
-			throws IOException, ServletException {
+	public HttpResponse doManageRequests(StaplerRequest request, StaplerResponse response) throws IOException, ServletException {
 		Jenkins.get().checkPermission(Jenkins.ADMINISTER);
 		errors.clear();
 		String[] selectedRequests = request.getParameterValues("selected");
@@ -149,8 +147,7 @@ public class RequestsPlugin extends Plugin {
 						} else {
 							// Failed, show error message:
 							errors.add(currentRequest.getErrorMessage().toString());
-							LOGGER.info("[WARNING] The request can not be processed: "
-									+ currentRequest.getMessage().toString());
+							LOGGER.info("[WARNING] The request can not be processed: " + currentRequest.getMessage().toString());
 						}
 					} else {
 						requestsToRemove.add(currentRequest);
@@ -222,6 +219,7 @@ public class RequestsPlugin extends Plugin {
 		Hudson.XSTREAM.alias("RenameJobRequest", RenameJobRequest.class);
 		Hudson.XSTREAM.alias("RenameFolderRequest", RenameFolderRequest.class);
 		Hudson.XSTREAM.alias("DeleteFolderRequest", DeleteFolderRequest.class);
+		Hudson.XSTREAM.alias("DeleteMultiBranchRequest", DeleteMultiBranchRequest.class);
 		Hudson.XSTREAM.alias("RequestsPlugin", RequestsPlugin.class);
 
 		load();

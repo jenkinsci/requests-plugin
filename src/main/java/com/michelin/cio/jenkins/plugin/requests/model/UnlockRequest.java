@@ -23,13 +23,13 @@
  */
 package com.michelin.cio.jenkins.plugin.requests.model;
 
-import hudson.model.Item;
-import hudson.model.Run;
-import jenkins.model.Jenkins;
-
-import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import com.michelin.cio.jenkins.plugin.requests.action.RequestMailSender.DescriptorEmailImpl;
+
+import hudson.model.Item;
+import jenkins.model.Jenkins;
 
 // @author John Flynn <john.trixmot.flynn@gmail.com>
 
@@ -50,73 +50,58 @@ public class UnlockRequest extends Request {
 		Jenkins jenkins = null;
 		boolean success = false;
 		String returnStatus = null;
+		// Use the Admin user set in the global jenkins settings for the plugin:
+		DescriptorEmailImpl descriptorEmailImpl = new DescriptorEmailImpl();
+		final String adminUser = descriptorEmailImpl.getUnlockuser();
 
 		try {
 			jenkins = Jenkins.get();
 			if (jenkins == null)
-				throw new NullPointerException("Jenkins instance is null");
+				throw new NullPointerException("Jenkins get() is null");
 
-			if (Jenkins.get() != null && Jenkins.get().hasPermission(Run.DELETE)) {
-				try {
-					String jenkinsURL = null;
+			String jenkinsURL = null;
 
-					try {
-						jenkinsURL = Jenkins.get().getRootUrl();
-						if (jenkinsURL == null)
-							throw new NullPointerException("Jenkins instance is null");
-					} catch (Exception npe) {
-						LOGGER.log(Level.SEVERE, "[ERROR] Exception: " + npe.getMessage().toString());
-						return false;
-					}
+			jenkinsURL = Jenkins.get().getRootUrl();
+			if (jenkinsURL == null)
+				throw new NullPointerException("Jenkins getRootUrl() is null");
 
-					RequestsUtility requestsUtility = new RequestsUtility();
-					// projectFullName = requestsUtility.encodeValue(projectFullName);
-					projectFullName = projectFullName.replace(" ", "%20");
-					String urlString = jenkinsURL + "job/" + projectFullName + "/" + buildNumber + "/toggleLogKeep";
+			RequestsUtility requestsUtility = new RequestsUtility();
+			// projectFullName = requestsUtility.encodeValue(projectFullName);
+			projectFullName = projectFullName.replace(" ", "%20");
+			String urlString = jenkinsURL + "job/" + projectFullName + "/" + buildNumber + "/toggleLogKeep";
 
-					try {
-						returnStatus = requestsUtility.runPostMethod(jenkinsURL, urlString);
+			try {
+				returnStatus = requestsUtility.runPostMethod(jenkinsURL, urlString);
 
-					} catch (Exception e) {
-						errorMessage = "Unable to Unlock the build: " + e.getMessage();
-						LOGGER.log(Level.SEVERE, "Unable to Unlock the build " + projectFullName + ":" + buildNumber, e.getMessage().toString());
+			} catch (Exception e) {
+				errorMessage = "Unable to Unlock the build: " + e.getMessage();
+				LOGGER.log(Level.SEVERE, "Unable to Unlock the build " + projectFullName + ":" + buildNumber, e.getMessage().toString());
 
-						return false;
-					}
+				return false;
+			}
 
-					if (returnStatus.equals("success")) {
-						errorMessage = "Build number " + buildNumber + " has been properly Unlocked for " + projectFullName;
-						LOGGER.log(Level.INFO, "Build {0} has been properly Unlocked", projectFullName + ":" + buildNumber);
-						success = true;
+			if (returnStatus.equals("success")) {
+				errorMessage = "Build number " + buildNumber + " has been properly Unlocked for " + projectFullName;
+				LOGGER.log(Level.INFO, "Build {0} has been properly Unlocked", projectFullName + ":" + buildNumber);
+				success = true;
 
-					} else if (returnStatus.contains("Forbidden")) {
-						errorMessage = "The current user " + username + " does not have permission to Unlock the Build";
-						LOGGER.log(Level.SEVERE, "The current user {0} does not have permission to Unlock the Build", new Object[] { username });
-						success = false;
-						
-					} else {
-						errorMessage = "UNLOCK Build request has failed for " + projectFullName + ":" + buildNumber + " : " + returnStatus.toString();
-						LOGGER.log(Level.INFO, "UNLOCK Build call has failed: ", projectFullName + ":" + buildNumber + " : " + returnStatus.toString());
-
-						success = false;
-					}
-
-				} catch (Exception e) {
-					errorMessage = "Unable to UNLOCK the Build: " + e.getMessage();
-					LOGGER.log(Level.SEVERE, "Unable to UNLOCK the Build " + projectFullName + ":" + buildNumber, e.getMessage().toString());
-				}
+			} else if (returnStatus.contains("Forbidden")) {
+				errorMessage = "The Admin User " + username + " does not have permission to Unlock the Build";
+				LOGGER.log(Level.SEVERE, "The Admin User {0} does not have permission to Unlock the Build", new Object[] { adminUser });
+				success = false;
 
 			} else {
-				errorMessage = "The current user " + username + " does not have permission to UNLOCK the Build";
-				LOGGER.log(Level.FINE, "The current user {0} does not have permission to UNLOCK the Build", new Object[] { username });
+				errorMessage = "UNLOCK Build request has failed for " + projectFullName + ":" + buildNumber + " : " + returnStatus.toString();
+				LOGGER.log(Level.INFO, "UNLOCK Build call has failed: ", projectFullName + ":" + buildNumber + " : " + returnStatus.toString());
+
+				success = false;
 			}
 
 		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "[ERROR] Exception: " + e.getMessage().toString());
+			LOGGER.log(Level.SEVERE, "[ERROR] Exception executing Unlock Request: " + projectFullName + ":" + buildNumber, e.getMessage().toString());
 			return false;
 		}
 
 		return success;
 	}
-
 }

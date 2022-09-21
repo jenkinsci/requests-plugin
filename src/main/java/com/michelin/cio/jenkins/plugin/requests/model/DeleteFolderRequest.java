@@ -23,15 +23,11 @@
  */
 package com.michelin.cio.jenkins.plugin.requests.model;
 
-import hudson.model.AbstractItem;
-import hudson.model.Hudson;
-import hudson.model.Item;
-import hudson.model.Job;
-import jenkins.model.Jenkins;
-
-import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import hudson.model.Item;
+import jenkins.model.Jenkins;
 
 // Represents a folder deletion request sent by a user to the administrator.
 
@@ -59,16 +55,16 @@ public class DeleteFolderRequest extends Request {
 					success = true;
 					errorMessage = "The Folder " + item.getFullName() + " has been properly Deleted";
 					LOGGER.log(Level.INFO, "The Folder {0} has been properly deleted", item.getFullName());
-					
+
 				} catch (Exception e) {
 					errorMessage = e.getMessage().toString();
 					LOGGER.log(Level.SEVERE, "Unable to DELETE the Folder " + item.getFullName(), e);
 					success = false;
 				}
-				
+
 			} else {
-				errorMessage = "The current user " + username + " does not have permission to DELETE the Folder";
-				LOGGER.log(Level.FINE, "The current user {0} does not have permission to DELETE the Folder", new Object[] { username });
+				errorMessage = "The current user does not have permission to DELETE the Folder";
+				LOGGER.log(Level.FINE, "The current user does not have permission to DELETE the Folder");
 				success = false;
 			}
 

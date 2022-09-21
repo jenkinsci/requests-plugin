@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2020 Lexmark
+ * Copyright 2022 Lexmark
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -49,10 +49,6 @@ public class DeleteMultiBranchRequest extends Request {
 		boolean success = false;
 
 		try {
-			// The Admin user set in the global jenkins settings for the plugin:
-			// DescriptorEmailImpl descriptorEmailImpl = new DescriptorEmailImpl();
-			// final String adminUser = descriptorEmailImpl.getUnlockuser();
-
 			if (Jenkins.get().hasPermission(Item.DELETE)) {
 				try {
 					item.delete();

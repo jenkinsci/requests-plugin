@@ -24,14 +24,14 @@
  */
 package com.michelin.cio.jenkins.plugin.requests.model;
 
-import hudson.model.Item;
-//import hudson.model.Run;
-import hudson.model.Job;
-import jenkins.model.Jenkins;
-
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import com.michelin.cio.jenkins.plugin.requests.action.RequestMailSender.DescriptorEmailImpl;
+
+import hudson.model.Item;
+import jenkins.model.Jenkins;
 
 // Represents a deletion request sent by a user to Jenkins' administrator.
 // @author Daniel Petisme <daniel.petisme@gmail.com> <http://danielpetisme.blogspot.com/>
@@ -49,42 +49,39 @@ public class DeleteJobRequest extends Request {
 		return Messages.DeleteJobRequest_message(project);
 	}
 
-	public boolean execute_backup(Item item) {
-		boolean success = false;
-
-		try {
-			if (Jenkins.get().hasPermission(Item.DELETE)) {
-				try {
-					item.delete();
-					success = true;
-					errorMessage = "The Job " + item.getFullName() + " has been properly Deleted";
-					LOGGER.log(Level.INFO, "The job {0} has been properly deleted", item.getFullName());
-				} catch (Exception e) {
-					errorMessage = e.getMessage().toString();
-					LOGGER.log(Level.SEVERE, "Unable to delete the job " + item.getFullName(), e);
-				}
-			} else {
-				errorMessage = "The current user " + username + " does not have permission to delete the job";
-				LOGGER.log(Level.FINE, "The current user {0} does not have permission to DELETE the job", new Object[] { username });
-			}
-
-		} catch (Exception e) {
-			errorMessage = e.getMessage().toString();
-			LOGGER.log(Level.SEVERE, "Unable to Delete the job " + projectFullName + ":" + buildNumber, e.getMessage().toString());
-
-			return false;
-		}
-
-		return success;
-	}
+	/*
+	 * public boolean execute_backup(Item item) { boolean success = false;
+	 * 
+	 * try { if (Jenkins.get().hasPermission(Item.DELETE)) { try { item.delete();
+	 * success = true; errorMessage = "The Job " + item.getFullName() +
+	 * " has been properly Deleted"; LOGGER.log(Level.INFO,
+	 * "The job {0} has been properly deleted", item.getFullName()); } catch
+	 * (Exception e) { errorMessage = e.getMessage().toString();
+	 * LOGGER.log(Level.SEVERE, "Unable to delete the job " + item.getFullName(),
+	 * e); } } else { errorMessage = "The current user " + username +
+	 * " does not have permission to delete the job"; LOGGER.log(Level.FINE,
+	 * "The current user {0} does not have permission to DELETE the job", new
+	 * Object[] { username }); }
+	 * 
+	 * } catch (Exception e) { errorMessage = e.getMessage().toString();
+	 * LOGGER.log(Level.SEVERE, "Unable to Delete the job " + projectFullName + ":"
+	 * + buildNumber, e.getMessage().toString());
+	 * 
+	 * return false; }
+	 * 
+	 * return success; }
+	 */
 
 	public boolean execute(Item item) {
 		boolean success = false;
 		String returnStatus;
 		StringBuffer stringBuffer = new StringBuffer();
 		String[] projectList = null;
+		// The Admin user set in the global jenkins settings for the plugin:
+		DescriptorEmailImpl descriptorEmailImpl = new DescriptorEmailImpl();
+		final String adminUser = descriptorEmailImpl.getUnlockuser();
 
-		if (Jenkins.get().hasPermission(Job.DELETE)) {
+		try {
 			String jenkinsURL = Jenkins.get().getRootUrl();
 			if (jenkinsURL == null) {
 				LOGGER.log(Level.SEVERE, "Jenkins instance is null: ");
@@ -131,8 +128,8 @@ public class DeleteJobRequest extends Request {
 				success = true;
 
 			} else if (returnStatus.contains("Forbidden")) {
-				errorMessage = "The current user " + username + " does not have permission to DELETE the Job";
-				LOGGER.log(Level.SEVERE, "The current user {0} does not have permission to DELETE the Job", new Object[] { username });
+				errorMessage = "The Admin User " + adminUser + " does not have permission to DELETE the Job";
+				LOGGER.log(Level.SEVERE, "The Admin User {0} does not have permission to DELETE the Job", new Object[] { adminUser });
 				success = false;
 
 			} else {
@@ -141,9 +138,10 @@ public class DeleteJobRequest extends Request {
 				success = false;
 			}
 
-		} else {
-			errorMessage = "The current user " + username + " does not have permission to DELETE the Job";
-			LOGGER.log(Level.FINE, "The current user {0} does not have permission to DELETE the Job", new Object[] { username });
+		} catch (Exception e) {
+			errorMessage = e.getMessage().toString();
+			LOGGER.log(Level.SEVERE, "Jenkins.get Error: Unable to Delete the Job " + projectFullName + " : " + e.getMessage().toString());
+
 			success = false;
 		}
 

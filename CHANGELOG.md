@@ -1,10 +1,11 @@
 
 ## Version History
 
-Version 2.2.19 (September 16, 2022)
+Version 2.2.19 (September 21, 2022)
 
 -       Update POM dependencies
 -       Fix user name in Manage requests lack of permission error return messages
+-		Add new Request to Delete Multibranch Pipeline
 
 
 Version 2.2.18 (May 19, 2022)

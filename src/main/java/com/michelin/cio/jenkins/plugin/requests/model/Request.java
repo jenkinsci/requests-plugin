@@ -24,11 +24,12 @@
  */
 package com.michelin.cio.jenkins.plugin.requests.model;
 
+import java.util.Calendar;
+
+import org.apache.commons.lang.time.FastDateFormat;
+
 import hudson.model.Item;
 import jenkins.model.Jenkins;
-
-import java.util.Calendar;
-import org.apache.commons.lang.time.FastDateFormat;
 
 //import java.util.logging.Logger;
 
@@ -46,7 +47,8 @@ public abstract class Request {
 
 	private static String dateFormat = "yyyy-MM-dd HH:mm:ss";
 	private static final FastDateFormat yyyymmdd = FastDateFormat.getInstance(dateFormat);
-	//private static final Logger LOGGER = Logger.getLogger(RequestsUtility.class.getName());
+	// private static final Logger LOGGER =
+	// Logger.getLogger(RequestsUtility.class.getName());
 
 	public Request(String requestType, String username, String project, String projectFullName, String buildNumber) {
 		this.requestType = requestType;
@@ -70,7 +72,7 @@ public abstract class Request {
 		String[] projectList = null;
 		String projectFullNameWithoutJobSeparator;
 		StringBuffer stringBuffer = new StringBuffer();
-		
+
 		if (projectFullName.contains("/job/")) {
 			projectList = projectFullName.split("/job/");
 			int nameCount = projectList.length;
@@ -78,13 +80,13 @@ public abstract class Request {
 			for (int i = 1; i < nameCount; i++) {
 				stringBuffer.append("/" + projectList[i]);
 			}
-			
+
 			projectFullNameWithoutJobSeparator = stringBuffer.toString();
-			
+
 		} else {
 			projectFullNameWithoutJobSeparator = projectFullName;
 		}
-		
+
 		return projectFullNameWithoutJobSeparator;
 	}
 
@@ -127,6 +129,9 @@ public abstract class Request {
 			} else {
 				if (requestType.equals("deleteJob") || requestType.equals("renameJob")) {
 					errorMessage = "The job " + projectName + " doesn't exist";
+				}
+				if (requestType.equals("deleteMultiBranch")) {
+					errorMessage = "The MultiBranch Pipeline folder " + projectName + " doesn't exist";
 				}
 				if (requestType.equals("deleteFolder") || requestType.equals("renameFolder")) {
 					errorMessage = "The folder " + projectName + " doesn't exist";

@@ -23,9 +23,17 @@
  */
 package com.michelin.cio.jenkins.plugin.requests.model;
 
-import com.michelin.cio.jenkins.plugin.requests.action.RequestMailSender.DescriptorEmailImpl;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import hudson.util.Secret;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
@@ -41,13 +49,13 @@ import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
+
+import com.michelin.cio.jenkins.plugin.requests.action.RequestMailSender.DescriptorEmailImpl;
+
+import hudson.util.Secret;
 
 // @author John Flynn <john.trixmot.flynn@gmail.com>
 
@@ -124,6 +132,41 @@ public class RequestsUtility {
 		} catch (UnsupportedEncodingException ex) {
 			throw new RuntimeException(ex.getCause());
 		}
+	}
+
+	public boolean verifyJobType(String strJobName) {
+		// Used by *ActionFactory.java to verify that the job is a MultiBranch pipeline
+		// jobType:
+		if (strJobName != null) {
+			Document document = createDocumentFromXMLString(strJobName);
+			if (document != null) {
+				Node node = document.getDocumentElement();
+				String root = node.getNodeName();
+				String rootElementString = "org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject";
+
+				if (rootElementString.equalsIgnoreCase(root)) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	public Document createDocumentFromXMLString(String xmlString) {
+		Document document = null;
+		try {
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder builder = factory.newDocumentBuilder();
+			document = builder.parse(new InputSource(new StringReader(xmlString)));
+			document.getDocumentElement().normalize();
+
+		} catch (Exception e) {
+			LOGGER.warning("ERROR: CreateDocumentFromXMLString(): " + xmlString + " - Exception error: " + e.getMessage());
+			return null;
+		}
+
+		return document;
 	}
 
 }

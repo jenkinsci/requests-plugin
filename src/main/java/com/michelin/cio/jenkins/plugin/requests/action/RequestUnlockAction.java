@@ -37,7 +37,6 @@ import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.verb.POST;
 
 import com.michelin.cio.jenkins.plugin.requests.RequestsPlugin;
-import com.michelin.cio.jenkins.plugin.requests.action.RequestMailSender.DescriptorEmailImpl;
 import com.michelin.cio.jenkins.plugin.requests.model.UnlockRequest;
 
 import hudson.Functions;
@@ -67,11 +66,7 @@ public class RequestUnlockAction implements Action {
 			throws IOException, ServletException, MessagingException {
 
 		if (isIconDisplayed()) {
-			// Use the Admin user that was set in the global jenkins settings for this
-			// plugin:
-			DescriptorEmailImpl descriptorEmailImpl = new DescriptorEmailImpl();
-			final String username = descriptorEmailImpl.getUnlockuser();
-			// final String username = request.getParameter("username");
+			final String username = request.getParameter("username");
 			RequestsPlugin plugin = Jenkins.get().getPlugin(RequestsPlugin.class);
 
 			if (plugin == null) {
@@ -130,9 +125,14 @@ public class RequestUnlockAction implements Action {
 		return null;
 	}
 
+	@Override
 	public String getIconFileName() {
+		return null;
+	}
+
+	public String getIconClassName() {
 		if (isIconDisplayed()) {
-			return "/images/24x24/lock.png";
+			return "icon-setting";
 		}
 		return null;
 	}

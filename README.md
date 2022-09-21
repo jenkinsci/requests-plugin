@@ -24,26 +24,26 @@ button.
 
 ## For Users
 
-For users who don't have permissions to Delete a Job, Rename a Job,
-Delete a Build, or Unlock a Build, the following four actions are
+For users who don't have permissions to Delete/Rename a Job,
+Delete/Unlock a Build, Delete/Rename a Folder, or Delete a Multibranch Pipeline. The following actions are
 available if enabled.
 
 -   Request For Job Deletion
+- 	Request For Job Rename
 -   Request For Build Deletion
--   Request To Unlock Build
--   Request Job Rename
+-   Request For Build Unlock
+-   Request For Folder Deletion
+- 	Request For Folder Rename
+- 	Request For Multibranch Pipleline Deletion
 
   
 
-###                               Project page                                               Project page                                                                           Build page
-
-                       
-  ![](docs/images/jobAction.png){.confluence-embedded-image
-width="231"}       
- ![](docs/images/renameJob.png){.confluence-embedded-image
-width="210"}                                      
-  ![](docs/images/build-page.png){.confluence-embedded-image
-width="200"}                             
+### Project page
+ ![](docs/images/jobAction.png)
+### Project Page
+ ![](docs/images/renameJob.png)
+### Build Page
+ ![](docs/images/build-page.png)
 
   
 
@@ -51,7 +51,7 @@ width="200"}                             
 
 ## For Administrators
 
-The Global Settings allow the admin to enable/disable any of the 4
+The Global Settings allow the admin to enable/disable any of the available
 actions and to enable e-mail notifications (**Manage
 Jenkins** \> **Configure System**):
 
@@ -65,44 +65,37 @@ Jenkins** \> **Configure System**):
 
   
 
-                           
- ![](docs/images/new_global.png){.confluence-embedded-image
-width="1100"}
+ ![](docs/images/new_global.png)
 
-        
 
   
 Administrators get a new **Pending  Requests** entry in Jenkins' main
 configuration screen (**Manage Jenkins**):  
 
-                         
- ![](docs/images/pendingRequets.png){.confluence-embedded-image
-height="81"}
+ ![](docs/images/pendingRequets.png)
 
 ------------------------------------------------------------------------
 
-                           
-  ![](docs/images/pendingRequestPage.png){.confluence-embedded-image
-width="700"}
+ ![](docs/images/pendingRequestPage.png)
 
 ------------------------------------------------------------------------
 
-                        
 
-#### In order to see Action                      Not Authorized
+### In order to see Action					Not Authorized
 
-Delete Job Request                         !Job.Delete
+Delete Job Request							!Job.Delete
+Delete Folder Request						!Job.Delete
+Delete MBP Request							!Job.Delete
+Delete Build Request						!Run.Delete
+Unlock Build Request						!Run.Delete
+Rename Job Request							(!Job.Delete and !Job.Configure and Job.Create) 
+												OR	(!Job.Create and !Job.Configure and Job.Delete)
+												OR	(!Job.Delete and !Job.Create and !Job.Configure)
+Rename Folder Request						(!Job.Delete and !Job.Configure and Job.Create) 
+												OR	(!Job.Create and !Job.Configure and Job.Delete)
+												OR    (!Job.Delete and !Job.Create and !Job.Configure)
 
-Delete Build Request                       !Run.Delete
-
-Unlock Build Request                      !Run.Delete
-
-Rename Job Request                      (!Job.Delete and !Job.Configure and Job.Create) 
-                                  OR    (!Job.Create and !Job.Configure and Job.Delete)
-                                  OR    (!Job.Delete and !Job.Create and !Job.Configure)
-
-  
-
+If permissions are set within a job, it will affect the above permission patterns.
 
   
 

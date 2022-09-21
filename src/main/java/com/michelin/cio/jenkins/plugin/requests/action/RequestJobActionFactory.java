@@ -25,16 +25,14 @@
 
 package com.michelin.cio.jenkins.plugin.requests.action;
 
-import hudson.Extension;
-import hudson.model.AbstractProject;
-import hudson.model.Action;
-import hudson.model.Job;
-import hudson.model.TransientProjectActionFactory;
-import jenkins.model.TransientActionFactory;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import hudson.Extension;
+import hudson.model.Action;
+import hudson.model.Job;
+import jenkins.model.TransientActionFactory;
 
 //
 // Adds custom {@link Action}s to {@link AbstractProject}s through
@@ -50,6 +48,7 @@ public class RequestJobActionFactory extends TransientActionFactory<Job> {
 		RequestMailSender.DescriptorEmailImpl descriptorEmailImpl = new RequestMailSender.DescriptorEmailImpl();
 		List<Action> adminActions = new ArrayList<Action>();
 
+		// Check if option is enabled in Global settings of the plugin:
 		// Note: that a restart is required after making a change since this is
 		// loaded at start up time:
 		if (descriptorEmailImpl.getEnableDeleteJob()) {

@@ -117,8 +117,7 @@ public class RequestMailSender extends Builder {
 		boolean failedStatus = false;
 
 		if (requestemailserver == null || requestemailserver.equals("")) {
-			LOGGER.log(Level.WARNING,
-					"[ERROR] The Requests email server value is missing so no email will not be sent");
+			LOGGER.log(Level.WARNING, "[ERROR] The Requests email server value is missing so no email will not be sent");
 			failedStatus = true;
 		}
 
@@ -145,15 +144,13 @@ public class RequestMailSender extends Builder {
 
 		if (mail != null) {
 			Transport.send(mail);
-			LOGGER.log(Level.INFO,
-					"[INFO] A Request email has been sent to " + requestadminemail + " from " + userName);
+			LOGGER.log(Level.INFO, "[INFO] A Request email has been sent to " + requestadminemail + " from " + userName);
 		}
 
 		return;
 	}
 
-	private MimeMessage createMail(String itemName, String userName, String requestType)
-			throws MessagingException, UnknownHostException {
+	private MimeMessage createMail(String itemName, String userName, String requestType) throws MessagingException, UnknownHostException {
 		String jenkinsURL = getProjectURL();
 		MimeMessage msg = createEmptyMail();
 		StringBuffer buf = new StringBuffer();
@@ -269,6 +266,7 @@ public class RequestMailSender extends Builder {
 		private boolean enableRenameJob;
 		private boolean enableRenameFolder;
 		private boolean enableDeleteFolder;
+		private boolean enableDeleteMultiBranch;
 		private boolean enableEmails;
 
 		@DataBoundConstructor
@@ -362,6 +360,10 @@ public class RequestMailSender extends Builder {
 			return enableDeleteFolder;
 		}
 
+		public boolean isEnableDeleteMultiBranch() {
+			return enableDeleteMultiBranch;
+		}
+
 		@DataBoundSetter
 		public void setEnableDeleteJob(boolean enableDeleteJob) {
 			this.enableDeleteJob = enableDeleteJob;
@@ -388,6 +390,11 @@ public class RequestMailSender extends Builder {
 		@DataBoundSetter
 		public void setEnableDeleteFolder(boolean enableDeleteFolder) {
 			this.enableDeleteFolder = enableDeleteFolder;
+		}
+
+		@DataBoundSetter
+		public void setEnableDeleteMultiBranch(boolean enableDeleteMultiBranch) {
+			this.enableDeleteMultiBranch = enableDeleteMultiBranch;
 		}
 
 		public void setEnableEmails(boolean enableEmails) {
@@ -450,11 +457,9 @@ public class RequestMailSender extends Builder {
 			msg.setSubject(String.format("Test Email - Jenkins Request Plugin"));
 
 			// Email page content:
-			buf.append(
-					".......................................................................................................................\n");
+			buf.append(".......................................................................................................................\n");
 			buf.append("This is a test email from the Jenkins Requests Plugin\n");
-			buf.append(
-					".......................................................................................................................\n");
+			buf.append(".......................................................................................................................\n");
 			msg.setText(buf.toString());
 
 			Transport.send(msg);

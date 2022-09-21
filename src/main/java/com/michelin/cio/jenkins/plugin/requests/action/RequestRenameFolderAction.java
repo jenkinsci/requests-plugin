@@ -42,7 +42,6 @@ import org.kohsuke.stapler.verb.POST;
 
 import com.cloudbees.hudson.plugins.folder.Folder;
 import com.michelin.cio.jenkins.plugin.requests.RequestsPlugin;
-import com.michelin.cio.jenkins.plugin.requests.action.RequestMailSender.DescriptorEmailImpl;
 import com.michelin.cio.jenkins.plugin.requests.model.RenameFolderRequest;
 import com.michelin.cio.jenkins.plugin.requests.model.RequestsUtility;
 
@@ -72,11 +71,7 @@ public class RequestRenameFolderAction implements Action {
 		try {
 			if (isIconDisplayed()) {
 				final String newName = request.getParameter("new-name");
-				// Use the Admin user that was set in the global jenkins settings for this
-				// plugin:
-				DescriptorEmailImpl descriptorEmailImpl = new DescriptorEmailImpl();
-				final String username = descriptorEmailImpl.getUnlockuser();
-				// final String username = request.getParameter("username");
+				final String username = request.getParameter("username");
 
 				RequestsPlugin plugin = Jenkins.get().getPlugin(RequestsPlugin.class);
 				if (plugin == null) {

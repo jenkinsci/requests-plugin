@@ -43,7 +43,6 @@ import org.kohsuke.stapler.verb.POST;
 import com.cloudbees.hudson.plugins.folder.Folder;
 import com.cloudbees.hudson.plugins.folder.FolderProperty;
 import com.michelin.cio.jenkins.plugin.requests.RequestsPlugin;
-import com.michelin.cio.jenkins.plugin.requests.action.RequestMailSender.DescriptorEmailImpl;
 import com.michelin.cio.jenkins.plugin.requests.model.DeleteFolderRequest;
 import com.michelin.cio.jenkins.plugin.requests.model.RequestsUtility;
 
@@ -72,11 +71,7 @@ public class RequestDeleteFolderAction extends FolderProperty<Folder> implements
 
 		try {
 			if (isIconDisplayed()) {
-				// Use the Admin user that was set in the global jenkins settings for this
-				// plugin:
-				DescriptorEmailImpl descriptorEmailImpl = new DescriptorEmailImpl();
-				final String username = descriptorEmailImpl.getUnlockuser();
-				// final String username = request.getParameter("username");
+				final String username = request.getParameter("username");
 				RequestsPlugin plugin = Jenkins.get().getPlugin(RequestsPlugin.class);
 				if (plugin == null) {
 					return null;
@@ -179,6 +174,7 @@ public class RequestDeleteFolderAction extends FolderProperty<Folder> implements
 			RequestMailSender.DescriptorEmailImpl descriptorEmailImpl = new RequestMailSender.DescriptorEmailImpl();
 			List<Action> adminActions = new ArrayList<Action>();
 
+			// Check if option is enabled in Global settings of the plugin:
 			// Note: that a restart is required after making a change since this is
 			// loaded at start up time:
 			if (descriptorEmailImpl.isEnableDeleteFolder()) {

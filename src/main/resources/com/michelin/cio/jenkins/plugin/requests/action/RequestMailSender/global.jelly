@@ -45,10 +45,13 @@
 		<f:entry title="${%EnableRenameFolder}" field="enableRenameFolder" description="${%RenameFolderOption}">
   			<f:checkbox/>
 		</f:entry>
-		<f:entry title="${%User ID}" field="unlockuser" description="${%UserID}">
+		<f:entry title="${%EnableDeleteMultiBranch}" field="enableDeleteMultiBranch" description="${%DeleteMultiBranchOption}">
+  			<f:checkbox/>
+		</f:entry>
+		<f:entry title="${%Admin User ID}" field="unlockuser" description="${%UserID}">
             <f:textbox />
         </f:entry>
-        <f:entry title="${%User Token}" description="${%Token}">
+        <f:entry title="${%Admin API Token}" description="${%Token}">
             <f:password field="unlockpassword" />
         </f:entry>
         
