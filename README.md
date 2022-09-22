@@ -38,14 +38,14 @@ available if enabled.
 
   
 
-### Project page
- ![](docs/images/jobAction.png)
-### Project Page
- ![](docs/images/renameJob.png)
-### Build Page
- ![](docs/images/build-page.png)
-
-  
+### Job Requests
+ ![](docs/images/job_requests.png)
+### Multibranch Pipeline Requests
+ ![](docs/images/mbp_requests.png)
+### Build Requests
+ ![](docs/images/build_requests.png)
+### Folder Requests
+ ![](docs/images/folder_requests.png)
 
 ------------------------------------------------------------------------
 
@@ -77,10 +77,8 @@ Jenkins** \> **Configure System**):
 Administrators get a new **Pending  Requests** entry in Jenkins' main
 configuration screen (**Manage Jenkins - Tools and Actions**):  
 
- ![](docs/images/pendingRequets.png)
 
-
- ![](docs/images/pendingRequestPage.png)
+ ![](docs/images/pending_requests.png)
 
 
 

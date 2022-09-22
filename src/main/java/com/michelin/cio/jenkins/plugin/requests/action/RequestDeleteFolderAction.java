@@ -120,7 +120,7 @@ public class RequestDeleteFolderAction extends FolderProperty<Folder> implements
 
 	public String getIconClassName() {
 		if (isIconDisplayed()) {
-			return "icon-setting";
+			return "icon-edit-delete";
 		}
 		return null;
 	}
