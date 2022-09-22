@@ -75,7 +75,7 @@ Jenkins** \> **Configure System**):
 
   
 Administrators get a new **Pending  Requests** entry in Jenkins' main
-configuration screen (**Manage Jenkins**):  
+configuration screen (**Manage Jenkins - Tools and Actions**):  
 
  ![](docs/images/pendingRequets.png)
 

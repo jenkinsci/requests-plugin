@@ -233,6 +233,10 @@ public class RequestsPlugin extends Plugin {
 			return Messages.RequestManagementLink_Description();
 		}
 
+		public String getCategoryName() {
+			return "TOOLS";
+		}
+
 		@Override
 		public String getIconFileName() {
 			return "/images/48x48/clipboard.png";

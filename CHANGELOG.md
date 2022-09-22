@@ -1,11 +1,12 @@
 
 ## Version History
 
-Version 2.2.19 (September 21, 2022)
+Version 2.2.19 (September 22, 2022)
 
 -       Update POM dependencies
--       Fix user name in Manage requests lack of permission error return messages
+-       Fix wrong user name in permission error messages
 -		Add new Request to Delete Multibranch Pipeline
+-		Moved Pending Requests - Manage Jenkins link from Uncategorized to Tools and Actions
 
 
 Version 2.2.18 (May 19, 2022)

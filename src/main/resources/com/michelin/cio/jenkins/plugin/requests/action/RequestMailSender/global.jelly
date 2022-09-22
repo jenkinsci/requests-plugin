@@ -48,29 +48,29 @@
 		<f:entry title="${%EnableDeleteMultiBranch}" field="enableDeleteMultiBranch" >
   			<f:checkbox/>
 		</f:entry>
-		<f:entry title="${%Admin User ID}" field="unlockuser" description="${%UserID}">
+		<f:entry title="${%Admin User ID}" field="unlockuser" help="/plugin/requests/help-adminUserID.html">
             <f:textbox />
         </f:entry>
-        <f:entry title="${%Admin API Token}" description="${%Token}">
+        <f:entry title="${%Admin API Token}" help="/plugin/requests/help-adminAPIToken.html">
             <f:password field="unlockpassword" />
         </f:entry>
         
-		<f:entry title="${%EnableEmails}" field="enableEmails" description="${%EmailOption}">
+		<f:entry title="${%EnableEmails}" field="enableEmails" help="/plugin/requests/help-enableEmails.html">
   		<f:checkbox/>
 		</f:entry>
-        <f:entry title="${%Mail Server}" field="requestemailserver" description="${%MailServer}">
+        <f:entry title="${%Mail Server}" field="requestemailserver" help="/plugin/requests/help-emailServer.html">
             <f:textbox />
         </f:entry>
-		<f:entry title="${%Email Domain}" field="requestmaildomain" description="${%EmailDomain}">
+		<f:entry title="${%Email Domain}" field="requestmaildomain" help="/plugin/requests/help-emailDomain.html">
 			<f:textbox />
 		</f:entry>
-       <f:entry title="${%Admin Email Address}" field="requestadminemail" description="${%AdminEmail}">
+       <f:entry title="${%Admin Email Address}" field="requestadminemail" help="/plugin/requests/help-adminEmailAddress.html">
 			<f:textbox />
 		</f:entry>
-		<f:entry title="${%Email Host}" field="requestemailhost" description="${%EmailHost}">
+		<f:entry title="${%Email Host}" field="requestemailhost" help="/plugin/requests/help-emailHost.html">
 			<f:textbox default="localhost" />
 		</f:entry>
-			<f:entry title="Test email configuration: Enter full email address" >
+			<f:entry title="Test email" help="/plugin/requests/help-testEmail.html" >
 				<f:textbox name="testEmailAddress" field="testEmailAddress" />
 				<f:validateButton title="${%Send Test Email}" progress="${%Sending...}" method="testEmail" with="testEmailAddress" />
 			</f:entry>
