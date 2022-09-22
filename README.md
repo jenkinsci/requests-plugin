@@ -65,15 +65,12 @@ Jenkins** \> **Configure System**):
 
   
 
- ![](docs/images/Configure_system1.png)
+ ![](docs/images/configure1.png)
 
 
 
- ![](docs/images/configure_system2.png)
+ ![](docs/images/configure2.png)
 
-
-
- ![](docs/images/configure_system3.png)
 
 
   

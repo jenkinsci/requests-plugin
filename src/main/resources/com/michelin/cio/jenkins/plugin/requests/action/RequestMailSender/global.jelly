@@ -27,25 +27,25 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
          xmlns:t="/lib/hudson" xmlns:f="/lib/form">
 	<f:section title="${%GlobalSectionTitle}" name="globalRequests">
-		<f:entry title="${%EnableDeleteJob}" field="enableDeleteJob" default="true" description="${%DeleteJobOption}">
+		<f:entry title="${%EnableDeleteJob}" field="enableDeleteJob" default="true" >
   			<f:checkbox />
 		</f:entry>
-		<f:entry title="${%EnableDeleteBuild}" field="enableDeleteBuild" description="${%DeleteBuildOption}">
+		<f:entry title="${%EnableDeleteBuild}" field="enableDeleteBuild" >
   			<f:checkbox/>
 		</f:entry>
-		<f:entry title="${%EnableDeleteFolder}" field="enableDeleteFolder" description="${%DeleteFolderOption}">
+		<f:entry title="${%EnableDeleteFolder}" field="enableDeleteFolder" >
   			<f:checkbox/>
 		</f:entry>
-		<f:entry title="${%EnableUnlockBuild}" field="enableUnlockBuild" description="${%UnlockBuildOption}">
+		<f:entry title="${%EnableUnlockBuild}" field="enableUnlockBuild" >
   			<f:checkbox/>
 		</f:entry>
-		<f:entry title="${%EnableRenameJob}" field="enableRenameJob" description="${%RenameJobOption}">
+		<f:entry title="${%EnableRenameJob}" field="enableRenameJob" >
   			<f:checkbox/>
 		</f:entry>
-		<f:entry title="${%EnableRenameFolder}" field="enableRenameFolder" description="${%RenameFolderOption}">
+		<f:entry title="${%EnableRenameFolder}" field="enableRenameFolder" >
   			<f:checkbox/>
 		</f:entry>
-		<f:entry title="${%EnableDeleteMultiBranch}" field="enableDeleteMultiBranch" description="${%DeleteMultiBranchOption}">
+		<f:entry title="${%EnableDeleteMultiBranch}" field="enableDeleteMultiBranch" >
   			<f:checkbox/>
 		</f:entry>
 		<f:entry title="${%Admin User ID}" field="unlockuser" description="${%UserID}">
