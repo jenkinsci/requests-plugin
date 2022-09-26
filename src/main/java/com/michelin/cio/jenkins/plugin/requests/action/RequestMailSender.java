@@ -127,12 +127,12 @@ public class RequestMailSender extends Builder {
 		}
 
 		if (requestadminemail == null || requestadminemail.equals("")) {
-			LOGGER.log(Level.WARNING, "[ERROR] The Requests email address is missing so no email will not be sent");
+			LOGGER.log(Level.WARNING, "[ERROR] The Requests Admin email address is missing so no email will not be sent");
 			failedStatus = true;
 		}
 
 		if (!checkAddress()) {
-			LOGGER.log(Level.WARNING, "[ERROR] The Requests email address is invalid so no email will not be sent");
+			LOGGER.log(Level.WARNING, "[ERROR] The Requests Admin email address is invalid so no email will not be sent");
 			failedStatus = true;
 		}
 
@@ -466,6 +466,94 @@ public class RequestMailSender extends Builder {
 			returnMessage = "Email sent successfully";
 
 			return FormValidation.ok(returnMessage);
+		}
+
+		@POST
+		public FormValidation doTestEmailTEST(@QueryParameter("testEmailAddress") final String testEmailAddress)
+				throws MessagingException, UnknownHostException {
+			MimeMessage msg = createEmptyMailTEST(testEmailAddress);
+			StringBuffer buf = new StringBuffer();
+
+			try {
+
+				if (msg != null) {
+					String jenkinsHostName = InetAddress.getLocalHost().getHostName();
+
+					// Check to see if the hostname is an ip address:
+					if (Character.isLetter(jenkinsHostName.charAt(0))) {
+						String[] nameArray = jenkinsHostName.split("\\.");
+						jenkinsHostName = nameArray[0];
+						jenkinsHostName = jenkinsHostName.toUpperCase(Locale.ENGLISH);
+					}
+
+					// Email Subject line:
+					msg.setSubject(String.format(jenkinsHostName + ": Test Email - Jenkins Request Plugin"));
+
+					// Email page content:
+					buf.append(
+							".......................................................................................................................\n\n");
+					buf.append("This is a test email from the Jenkins Requests Plugin\n");
+					buf.append(
+							".......................................................................................................................\n");
+					msg.setText(buf.toString());
+				}
+
+			} catch (Exception e) {
+				LOGGER.log(Level.SEVERE, "[ERROR] Exception: " + e.getMessage());
+
+				return null;
+			}
+
+			try {
+				Transport.send(msg);
+				String returnMessage = "Email sent successfully";
+				return FormValidation.ok(returnMessage);
+
+			} catch (MessagingException me) {
+				LOGGER.log(Level.WARNING, "Unable to create email message! ", me.getMessage());
+				String returnMessage = "Email sent successfully";
+				return FormValidation.error(returnMessage);
+			}
+		}
+
+		private MimeMessage createEmptyMailTEST(String testEmailAddress) throws MessagingException {
+			String emailHost = getRequestemailhost();
+			if (emailHost == null || requestemailserver.equals("")) {
+				emailHost = "localhost";
+			}
+			Properties properties = System.getProperties();
+			properties.setProperty(requestemailserver, emailHost);
+			Session session = Session.getDefaultInstance(properties);
+			MimeMessage msg = null;
+
+			try {
+				msg = new MimeMessage(session);
+				msg.setContent("", "text/html");
+				msg.setFrom(new InternetAddress(testEmailAddress + requestmaildomain));
+				msg.setSentDate(new Date());
+
+				String[] emailAddresses = requestadminemail.split(",");
+				int addressCount = emailAddresses.length;
+				// LOGGER.info("[INFO] Email address count: " + addressCount);
+
+				Address[] addresss_TO = new Address[addressCount];
+
+				if (requestadminemail.contains(",")) {
+					for (int i = 0; i < addressCount; i++) {
+						addresss_TO[i] = new InternetAddress(emailAddresses[i]);
+						// LOGGER.info("[INFO] Email address: " + emailAddresses[i]);
+					}
+				} else {
+					addresss_TO[0] = new InternetAddress(requestadminemail);
+				}
+
+				msg.addRecipients(Message.RecipientType.TO, addresss_TO);
+
+			} catch (MessagingException me) {
+				LOGGER.log(Level.WARNING, "Unable to create email message! ", me.getMessage());
+			}
+
+			return msg;
 		}
 
 	}
