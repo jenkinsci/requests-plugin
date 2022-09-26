@@ -1,7 +1,7 @@
 
 ## Version History
 
-Version 2.2.19 (September 22, 2022)
+Version 2.2.19 (September 26, 2022)
 
 -       Update POM dependencies
 -       Fix wrong user name in permission error messages
