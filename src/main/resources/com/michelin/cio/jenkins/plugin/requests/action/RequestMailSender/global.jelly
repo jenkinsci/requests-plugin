@@ -33,10 +33,13 @@
 		<f:entry title="${%EnableDeleteBuild}" field="enableDeleteBuild" >
   			<f:checkbox/>
 		</f:entry>
-		<f:entry title="${%EnableDeleteFolder}" field="enableDeleteFolder" >
+		<f:entry title="${%EnablePromotionDeleteBuild}" field="enablePromotionDeleteBuild" >
   			<f:checkbox/>
 		</f:entry>
 		<f:entry title="${%EnableUnlockBuild}" field="enableUnlockBuild" >
+  			<f:checkbox/>
+		</f:entry>
+		<f:entry title="${%EnableDeleteFolder}" field="enableDeleteFolder" >
   			<f:checkbox/>
 		</f:entry>
 		<f:entry title="${%EnableRenameJob}" field="enableRenameJob" >

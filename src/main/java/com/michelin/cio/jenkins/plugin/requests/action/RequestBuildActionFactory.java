@@ -50,14 +50,34 @@ public class RequestBuildActionFactory extends TransientActionFactory<Run> {
 		RequestMailSender.DescriptorEmailImpl descriptorEmailImpl = new RequestMailSender.DescriptorEmailImpl();
 		List<Action> adminActions = new ArrayList<Action>();
 
-		if (descriptorEmailImpl.isEnableDeleteBuild()) {
-			// LOGGER.info("ActionFactory Delete Build Request: ");
-			adminActions.add(new RequestDeleteBuildAction(target));
-		}
+		String promotionJobCheck = target.getFullDisplayName();
+		// LOGGER.info("Promotion Check: " + promotionJobCheck);
 
-		if (descriptorEmailImpl.isEnableUnlockBuild()) {
-			// LOGGER.info("ActionFactory Unlock Build Request: ");
-			adminActions.add(new RequestUnlockAction(target));
+		if (descriptorEmailImpl.isEnablePromotionDeleteBuild()) { // If enabled, means you want promotion builds to be deleted by a user:
+			// If it is a promotion build, do not need to show unlock option:
+			if (promotionJobCheck.contains(" » promotion » ")) {
+				if (descriptorEmailImpl.isEnableDeleteBuild()) {
+					adminActions.add(new RequestDeleteBuildAction(target));
+				}
+			} else {
+				if (descriptorEmailImpl.isEnableDeleteBuild()) {
+					adminActions.add(new RequestDeleteBuildAction(target));
+				}
+
+				if (descriptorEmailImpl.isEnableUnlockBuild()) {
+					adminActions.add(new RequestUnlockAction(target));
+				}
+			}
+		} else { // Not enabled, you DO NOT want a user to delete a promotion build:
+			if (!promotionJobCheck.contains(" » promotion » ")) {
+				if (descriptorEmailImpl.isEnableDeleteBuild()) {
+					adminActions.add(new RequestDeleteBuildAction(target));
+				}
+
+				if (descriptorEmailImpl.isEnableUnlockBuild()) {
+					adminActions.add(new RequestUnlockAction(target));
+				}
+			}
 		}
 
 		return adminActions;

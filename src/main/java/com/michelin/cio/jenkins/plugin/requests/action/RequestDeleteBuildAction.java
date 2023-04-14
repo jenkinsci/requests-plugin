@@ -78,7 +78,10 @@ public class RequestDeleteBuildAction implements Action {
 			String projectName = "";
 			StringBuffer stringBuffer = new StringBuffer();
 
-			// LOGGER.info("Delete Build Action: fullDisplayName " + fullDisplayName);
+			LOGGER.info("Delete Build Action: fullDisplayName: " + fullDisplayName);
+			LOGGER.info("Delete Build Action: build_Url: " + build_Url);
+			LOGGER.info("Delete Build Action: buildName: " + buildName);
+			LOGGER.info("Delete Build Action: buildNumber: " + buildNumber);
 
 			// Need to extract the folder name(s) and the job name:
 			if (fullDisplayName.contains(" » ")) {
@@ -91,26 +94,25 @@ public class RequestDeleteBuildAction implements Action {
 					stringBuffer.append(Folder_project_BuildList[i] + "/job/");
 				}
 
-				projectName = Folder_project_BuildList[folderCount - 1].split(" #")[0];
+				projectName = Folder_project_BuildList[folderCount - 1].split(buildName)[0];
 				// Cat in the job name
 				stringBuffer.append(projectName);
 				projectFullName = stringBuffer.toString();
 
+				LOGGER.info("Delete Build Action: Folder projectName: " + projectName);
+				LOGGER.info("Delete Build Action: Folder projectFullName: " + projectFullName);
+
 				// Need to extract the job name:
 			} else {
-				if (fullDisplayName.contains(" #")) {
-					projectFullName = fullDisplayName.split(" #")[0];
-				} else if (fullDisplayName.contains(" ")) {
-					projectFullName = fullDisplayName.split(" ")[0];
-				}
+				String[] projectNameList = fullDisplayName.split(buildName);
+				projectName = projectNameList[0];
 
-				projectName = projectFullName;
+				LOGGER.info("Delete Build Action: project name: " + projectName);
 			}
-
-			LOGGER.info("[DEBUG] Delete Build Action: " + projectName + " : " + projectFullName);
 
 			String jenkinsUrl = Jenkins.get().getRootUrl();
 			String buildUrl = jenkinsUrl + build_Url;
+			LOGGER.info("Delete Build Action: buildUrl: " + buildUrl);
 			String[] emailData = { buildName, username, "A Delete Build", buildUrl };
 			// LOGGER.info("[INFO] doCreateDeleteBuildRequest:");
 			plugin.addRequestPlusEmail(new DeleteBuildRequest("deleteBuild", username, projectName, projectFullName, Integer.toString(buildNumber)),

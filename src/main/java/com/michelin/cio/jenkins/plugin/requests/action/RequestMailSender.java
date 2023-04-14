@@ -263,6 +263,7 @@ public class RequestMailSender extends Builder {
 		private boolean enableDeleteJob;
 		private boolean enableDeleteBuild;
 		private boolean enableUnlockBuild;
+		private boolean enablePromotionDeleteBuild;
 		private boolean enableRenameJob;
 		private boolean enableRenameFolder;
 		private boolean enableDeleteFolder;
@@ -344,6 +345,10 @@ public class RequestMailSender extends Builder {
 			return enableUnlockBuild;
 		}
 
+		public boolean isEnablePromotionDeleteBuild() {
+			return enablePromotionDeleteBuild;
+		}
+
 		public boolean isEnableRenameJob() {
 			return enableRenameJob;
 		}
@@ -369,12 +374,19 @@ public class RequestMailSender extends Builder {
 			this.enableDeleteJob = enableDeleteJob;
 		}
 
+		@DataBoundSetter
 		public void setEnableDeleteBuild(boolean enableDeleteBuild) {
 			this.enableDeleteBuild = enableDeleteBuild;
 		}
 
+		@DataBoundSetter
 		public void setEnableUnlockBuild(boolean enableUnlockBuild) {
 			this.enableUnlockBuild = enableUnlockBuild;
+		}
+
+		@DataBoundSetter
+		public void setEnablePromotionDeleteBuild(boolean enablePromotionDeleteBuild) {
+			this.enablePromotionDeleteBuild = enablePromotionDeleteBuild;
 		}
 
 		@DataBoundSetter

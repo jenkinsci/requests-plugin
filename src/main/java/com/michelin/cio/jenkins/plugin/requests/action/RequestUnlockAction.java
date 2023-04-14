@@ -77,7 +77,10 @@ public class RequestUnlockAction implements Action {
 			String projectName = null;
 			StringBuffer stringBuffer = new StringBuffer();
 
-			LOGGER.info("Unlock Build Action: fullDisplayName " + fullDisplayName);
+			LOGGER.info("Unlock Build Action: fullDisplayName: " + fullDisplayName);
+			LOGGER.info("Unlock Build Action: build_Url: " + build_Url);
+			LOGGER.info("Unlock Build Action: buildName: " + buildName);
+			LOGGER.info("Unlock Build Action: buildNumber: " + buildNumber);
 
 			// Need to extract the folder name(s) and the job name:
 			if (fullDisplayName.contains(" » ")) {
@@ -90,23 +93,21 @@ public class RequestUnlockAction implements Action {
 					stringBuffer.append(Folder_project_BuildList[i] + "/job/");
 				}
 
-				projectName = Folder_project_BuildList[folderCount - 1].split(" #")[0];
+				projectName = Folder_project_BuildList[folderCount - 1].split(buildName)[0];
 				// Cat in the job name:
 				stringBuffer.append(projectName);
 				projectFullName = stringBuffer.toString();
 
+				LOGGER.info("Unlock Build Action: Folder projectName: " + projectName);
+				LOGGER.info("Unlock Build Action: Folder projectFullName: " + projectFullName);
+
 				// Need to extract the job name:
 			} else {
-				if (fullDisplayName.contains(" #")) {
-					projectFullName = fullDisplayName.split(" #")[0];
-				} else if (fullDisplayName.contains(" ")) {
-					projectFullName = fullDisplayName.split(" ")[0];
-				}
+				String[] projectNameList = fullDisplayName.split(buildName);
+				projectName = projectNameList[0];
 
-				projectName = projectFullName;
+				LOGGER.info("Unlock Build Action: project name: " + projectName);
 			}
-
-			LOGGER.info("Unlock Build Request: " + projectName + " - " + projectFullName);
 
 			String jenkinsUrl = Jenkins.get().getRootUrl();
 			String buildUrl = jenkinsUrl + build_Url;

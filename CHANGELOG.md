@@ -1,6 +1,11 @@
 
 ## Version History
 
+Version 2.2.20 (April 14, 2023)
+
+-       Fix Delete Builds and Unlocks Builds link issues when set build name was applied
+
+
 Version 2.2.19 (September 26, 2022)
 
 -       Update POM dependencies
