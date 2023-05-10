@@ -1,6 +1,11 @@
 
 ## Version History
 
+Version 2.2.21 (May 10, 2023)
+
+-		Fixed missing parameters from jenkins jelly script (caused requests to get discarded instead of applied) 
+
+
 Version 2.2.20 (April 14, 2023)
 
 -       Fix Delete Builds and Unlocks Builds link issues when set build name was applied

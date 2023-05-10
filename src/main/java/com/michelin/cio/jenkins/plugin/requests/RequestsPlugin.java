@@ -137,7 +137,12 @@ public class RequestsPlugin extends Plugin {
 					Request currentRequest = requests.get(index);
 					selectedIndexs.add(index);
 
-					if (StringUtils.isNotBlank(request.getParameter("apply"))) {
+					// LOGGER.info("[DEBUG] Request parameter testing for apply: " +
+					// request.hasParameter("apply"));
+					// LOGGER.info("[DEBUG] Request parameter testing for discard: " +
+					// request.hasParameter("discard"));
+
+					if (request.hasParameter("apply")) {
 						String requestType = currentRequest.getRequestType();
 
 						if (currentRequest.process(requestType)) {
@@ -149,9 +154,12 @@ public class RequestsPlugin extends Plugin {
 							errors.add(currentRequest.getErrorMessage().toString());
 							LOGGER.info("[WARNING] The request can not be processed: " + currentRequest.getMessage().toString());
 						}
-					} else {
+					} else if (request.hasParameter("discard")) {
 						requestsToRemove.add(currentRequest);
 						LOGGER.info("[INFO] The request has been discarded: " + currentRequest.getMessage().toString());
+					} else {
+						errors.add("The request paramater is not defined");
+						LOGGER.info("[WARNING] The request parameter is not defined");
 					}
 
 				} else {
