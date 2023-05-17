@@ -75,7 +75,6 @@ public class RequestUnlockAction implements Action {
 
 			String projectFullName = null;
 			String projectName = null;
-			StringBuffer stringBuffer = new StringBuffer();
 
 			LOGGER.info("Unlock Build Action: fullDisplayName: " + fullDisplayName);
 			LOGGER.info("Unlock Build Action: build_Url: " + build_Url);

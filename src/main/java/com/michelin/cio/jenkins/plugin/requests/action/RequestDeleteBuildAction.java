@@ -76,7 +76,6 @@ public class RequestDeleteBuildAction implements Action {
 
 			String projectFullName = "";
 			String projectName = "";
-			StringBuffer stringBuffer = new StringBuffer();
 
 			LOGGER.info("Delete Build Action: fullDisplayName: " + fullDisplayName);
 			LOGGER.info("Delete Build Action: build_Url: " + build_Url);
