@@ -1,6 +1,11 @@
 
 ## Version History
 
+Version 2.2.22 (May 17, 2023)
+
+-       Fixed Delete/Unlock builds Requests if a Folder is given a Display name
+
+
 Version 2.2.21 (May 10, 2023)
 
 -		Fixed missing parameters from jenkins jelly script (caused requests to get discarded instead of applied) 

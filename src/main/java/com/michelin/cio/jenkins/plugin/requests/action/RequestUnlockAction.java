@@ -84,27 +84,29 @@ public class RequestUnlockAction implements Action {
 
 			// Need to extract the folder name(s) and the job name:
 			if (fullDisplayName.contains(" » ")) {
-				String[] Folder_project_BuildList = null;
-				Folder_project_BuildList = fullDisplayName.split(" » ");
-				int folderCount = Folder_project_BuildList.length;
+				// Split off the build number from the build_Url:
+				// Then Split off the next item which is the project name:
+				// Then split off the next item which should be job:
+				// Then Split off the next item which is the Folder name and not display name:
+				String[] New_String_Names = null;
+				New_String_Names = build_Url.split("/");
+				int stringFolderCount = New_String_Names.length;
+				LOGGER.info("Delete Build Action: Folder build number: " + New_String_Names[stringFolderCount - 1]);
+				LOGGER.info("Delete Build Action: Folder project name: " + New_String_Names[stringFolderCount - 2]);
+				LOGGER.info("Delete Build Action: Folder folder name: " + New_String_Names[stringFolderCount - 4]);
 
-				// Cat together folder names with /job/ except for the last value:
-				for (int i = 0; i < folderCount - 1; i++) {
-					stringBuffer.append(Folder_project_BuildList[i] + "/job/");
-				}
-
-				projectName = Folder_project_BuildList[folderCount - 1].split(buildName)[0];
-				// Cat in the job name:
-				stringBuffer.append(projectName);
-				projectFullName = stringBuffer.toString();
-
-				LOGGER.info("Unlock Build Action: Folder projectName: " + projectName);
-				LOGGER.info("Unlock Build Action: Folder projectFullName: " + projectFullName);
+				projectName = New_String_Names[stringFolderCount - 4] + " " + New_String_Names[stringFolderCount - 2];
+				projectFullName = New_String_Names[stringFolderCount - 4] + "/job/" + New_String_Names[stringFolderCount - 2];
+				LOGGER.info("Delete Build Action: Folder projectName: " + projectName);
+				LOGGER.info("Delete Build Action: Folder projectFullName: " + projectFullName);
 
 				// Need to extract the job name:
 			} else {
 				String[] projectNameList = fullDisplayName.split(buildName);
-				projectName = projectNameList[0];
+				projectName = projectNameList[0].trim();
+				;
+				projectFullName = projectNameList[0].trim();
+				;
 
 				LOGGER.info("Unlock Build Action: project name: " + projectName);
 			}

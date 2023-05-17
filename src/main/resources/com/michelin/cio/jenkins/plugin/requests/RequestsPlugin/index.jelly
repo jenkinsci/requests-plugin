@@ -96,7 +96,7 @@
                                                  ${request.creationDate}   
                                         </td>
                                         <td>                                                   
-                                            <a href="${rootURL}/job/${request.projectFullName}">${request.projectFullName}</a>
+                                            <a href="${rootURL}/job/${request.projectFullName}">${request.project}</a>
                                         </td>
                                         <td>                                                   
                                             <a href="${rootURL}/job/${request.projectFullName}/config.xml">Config file</a>

@@ -60,11 +60,11 @@ public abstract class Request {
 	}
 
 	public String getProject() {
-		if (projectFullName.contains("/")) {
-			String[] projectList = projectFullName.split("/");
-			int nameCount = projectList.length;
-			project = projectList[nameCount - 1];
-		}
+		// if (projectFullName.contains("/")) {
+		// String[] projectList = projectFullName.split("/");
+		// int nameCount = projectList.length;
+		// project = projectList[nameCount - 1];
+		// }
 		return project;
 	}
 
