@@ -104,10 +104,11 @@ public class RequestUnlockAction implements Action {
 				String[] projectNameList = fullDisplayName.split(buildName);
 				projectName = projectNameList[0].trim();
 				;
-				projectFullName = projectNameList[0].trim();
+				projectFullName = projectName;
 				;
 
 				LOGGER.info("Unlock Build Action: project name: " + projectName);
+				LOGGER.info("Delete Build Action: projectFullName: " + projectFullName);
 			}
 
 			String jenkinsUrl = Jenkins.get().getRootUrl();

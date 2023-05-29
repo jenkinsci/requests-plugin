@@ -1,6 +1,11 @@
 
 ## Version History
 
+Version 2.2.23 (May 29, 2023)
+
+-       Fixed breakage in Delete/Unlock Build Requests links
+
+
 Version 2.2.22 (May 17, 2023)
 
 -       Fixed Delete/Unlock builds Requests if a Folder is given a Display name

@@ -104,8 +104,9 @@ public class RequestDeleteBuildAction implements Action {
 			} else {
 				String[] projectNameList = fullDisplayName.split(buildName);
 				projectName = projectNameList[0].trim();
-				projectFullName = projectNameList[0].trim();
+				projectFullName = projectName;
 				LOGGER.info("Delete Build Action: project name: " + projectName);
+				LOGGER.info("Delete Build Action: projectFullName: " + projectFullName);
 			}
 
 			String jenkinsUrl = Jenkins.get().getRootUrl();
