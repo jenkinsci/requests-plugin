@@ -38,13 +38,14 @@ public class DeleteBuildRequest extends Request {
 
 	private static final Logger LOGGER = Logger.getLogger(DeleteBuildRequest.class.getName());
 
-	public DeleteBuildRequest(String requestType, String username, String project, String projectFullName, String buildNumber) {
-		super(requestType, username, project, projectFullName, buildNumber);
+	public DeleteBuildRequest(String requestType, String username, String jobNameSpace, String buildNumber, String fullJobURL, String jobNameSlash, String jobNameJelly,
+			String rename) {
+		super(requestType, username, jobNameSpace, buildNumber, fullJobURL, jobNameSlash, jobNameJelly, rename);
 	}
 
 	@Override
 	public String getMessage() {
-		return Messages.DeleteBuildRequest_message(buildNumber + " for " + project);
+		return Messages.DeleteBuildRequest_message(buildNumber + " for " + jobNameJelly);
 	}
 
 	public boolean execute(Item item) {
@@ -56,7 +57,7 @@ public class DeleteBuildRequest extends Request {
 
 		try {
 			Jenkins jenkins = Jenkins.get();
-			LOGGER.info("[DEBUG] DeleteBuildRequest triggered - projectFullName: " + projectFullName);
+			LOGGER.info("[DEBUG] DeleteBuildRequest triggered - projectFullName: " + jobNameSlash);
 			String jenkinsURL = Jenkins.get().getRootUrl();
 
 			if (jenkinsURL == null) {
@@ -66,9 +67,7 @@ public class DeleteBuildRequest extends Request {
 			}
 
 			RequestsUtility requestsUtility = new RequestsUtility();
-			// projectFullName = requestsUtility.encodeValue(projectFullName);
-			projectFullName = projectFullName.replace(" ", "%20");
-			String urlString = jenkinsURL + "job/" + projectFullName + "/" + buildNumber + "/doDelete";
+			String urlString = fullJobURL + "/doDelete";
 			LOGGER.info("[INFO] Delete Build urlString: " + urlString);
 
 			try {
@@ -76,15 +75,14 @@ public class DeleteBuildRequest extends Request {
 
 			} catch (Exception e) {
 				errorMessage = e.getMessage().toString();
-				LOGGER.log(Level.SEVERE, "runPostMethod Error: Unable to Delete the build " + projectFullName + " : " + buildNumber + " : "
-						+ e.getMessage().toString());
+				LOGGER.log(Level.SEVERE, "runPostMethod Error: Unable to Delete the build " + jobNameSlash + " : " + buildNumber + " : " + e.getMessage().toString());
 
 				return false;
 			}
 
 			if (returnStatus.equals("success")) {
-				errorMessage = "Build number " + buildNumber + " has been properly Deleted for " + projectFullName;
-				LOGGER.log(Level.INFO, "Build {0} has been properly Deleted", projectFullName + ":" + buildNumber);
+				errorMessage = "Build number " + buildNumber + " has been properly Deleted for " + jobNameSlash;
+				LOGGER.log(Level.INFO, "Build {0} has been properly Deleted", jobNameSlash + ":" + buildNumber);
 				success = true;
 
 			} else if (returnStatus.contains("Forbidden")) {
@@ -94,20 +92,18 @@ public class DeleteBuildRequest extends Request {
 
 			} else if (returnStatus.contains("Bad Request")) {
 				errorMessage = "The DELETE Build request has failed. The Build trying to be deleted may be locked.";
-				LOGGER.log(Level.SEVERE,
-						"The Delete Build request has failed. The Build trying to be deleted may be locked. " + projectFullName + ":" + buildNumber);
+				LOGGER.log(Level.SEVERE, "The Delete Build request has failed. The Build trying to be deleted may be locked. " + jobNameSlash + ":" + buildNumber);
 				success = false;
 
 			} else {
-				errorMessage = "DELETE Build request has failed for " + projectFullName + ":" + buildNumber + " : " + returnStatus;
-				LOGGER.log(Level.SEVERE, "DELETE Build request has failed: ", projectFullName + ":" + buildNumber + " : " + returnStatus);
+				errorMessage = "DELETE Build request has failed for " + jobNameSlash + ":" + buildNumber + " : " + returnStatus;
+				LOGGER.log(Level.SEVERE, "DELETE Build request has failed: ", jobNameSlash + ":" + buildNumber + " : " + returnStatus);
 				success = false;
 			}
 
 		} catch (Exception e) {
 			errorMessage = e.getMessage().toString();
-			LOGGER.log(Level.SEVERE,
-					"Jenkins.get Error: Unable to Delete the build " + projectFullName + " : " + buildNumber + " : " + e.getMessage().toString());
+			LOGGER.log(Level.SEVERE, "Jenkins.get Error: Unable to Delete the build " + jobNameSlash + " : " + buildNumber + " : " + e.getMessage().toString());
 
 			success = false;
 		}

@@ -35,13 +35,14 @@ public class DeleteFolderRequest extends Request {
 
 	private static final Logger LOGGER = Logger.getLogger(DeleteFolderRequest.class.getName());
 
-	public DeleteFolderRequest(String requestType, String username, String project, String projectFullName, String buildNumber) {
-		super(requestType, username, project, projectFullName, buildNumber);
+	public DeleteFolderRequest(String requestType, String username, String jobNameSpace, String buildNumber, String fullJobURL, String jobNameSlash, String jobNameJelly,
+			String rename) {
+		super(requestType, username, jobNameSpace, buildNumber, fullJobURL, jobNameSlash, jobNameJelly, rename);
 	}
 
 	@Override
 	public String getMessage() {
-		return Messages.DeleteFolderRequest_message(project);
+		return Messages.DeleteFolderRequest_message(jobNameJelly);
 	}
 
 	@Override
@@ -53,12 +54,12 @@ public class DeleteFolderRequest extends Request {
 				try {
 					item.delete();
 					success = true;
-					errorMessage = "The Folder " + item.getFullName() + " has been properly Deleted";
-					LOGGER.log(Level.INFO, "The Folder {0} has been properly deleted", item.getFullName());
+					errorMessage = "The Folder " + jobNameSlash + " has been properly Deleted";
+					LOGGER.log(Level.INFO, "The Folder {0} has been properly deleted", jobNameSlash);
 
 				} catch (Exception e) {
 					errorMessage = e.getMessage().toString();
-					LOGGER.log(Level.SEVERE, "Unable to DELETE the Folder " + item.getFullName(), e);
+					LOGGER.log(Level.SEVERE, "Unable to DELETE the Folder " + jobNameSlash, e);
 					success = false;
 				}
 
@@ -70,7 +71,7 @@ public class DeleteFolderRequest extends Request {
 
 		} catch (Exception e) {
 			errorMessage = e.getMessage().toString();
-			LOGGER.log(Level.SEVERE, "Unable to DELETE the Folder " + projectFullName + ":" + buildNumber, e.getMessage().toString());
+			LOGGER.log(Level.SEVERE, "Unable to DELETE the Folder " + jobNameSlash + ":", e.getMessage().toString());
 
 			success = false;
 		}

@@ -75,12 +75,12 @@ public class RequestsUtility {
 			URI uri = URI.create(urlString);
 			HttpHost host = new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme());
 			CredentialsProvider credsProvider = new BasicCredentialsProvider();
-			credsProvider.setCredentials(new AuthScope(uri.getHost(), uri.getPort()),
-					new UsernamePasswordCredentials(username, password.getPlainText()));
+			credsProvider.setCredentials(new AuthScope(uri.getHost(), uri.getPort()), new UsernamePasswordCredentials(username, password.getPlainText()));
 			AuthCache authCache = new BasicAuthCache();
 			BasicScheme basicAuth = new BasicScheme();
 			authCache.put(host, basicAuth);
 			CloseableHttpClient httpClient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).build();
+
 			HttpPost httpPost = new HttpPost(uri);
 
 			// Add AuthCache to the execution context

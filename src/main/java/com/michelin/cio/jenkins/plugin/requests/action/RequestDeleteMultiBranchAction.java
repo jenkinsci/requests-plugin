@@ -68,8 +68,7 @@ public class RequestDeleteMultiBranchAction implements Action {
 	}
 
 	@POST
-	public HttpResponse doCreateDeleteMultiBranchRequest(StaplerRequest request, StaplerResponse response)
-			throws IOException, ServletException, MessagingException {
+	public HttpResponse doCreateDeleteMultiBranchRequest(StaplerRequest request, StaplerResponse response) throws IOException, ServletException, MessagingException {
 
 		try {
 			if (isIconDisplayed()) {
@@ -78,25 +77,25 @@ public class RequestDeleteMultiBranchAction implements Action {
 				if (plugin == null) {
 					return null;
 				}
-				String projectName = project.getFullName();
-				String projectFullName = project.getFullName();
-
-				// Check if a folder job type and if multiple layers of folders:
-				if (!projectFullName.contains("/job/") && projectFullName.contains("/")) {
-					RequestsUtility requestsUtility = new RequestsUtility();
-					projectFullName = requestsUtility.constructFolderJobName(projectFullName);
-				}
-
+				String jobName = project.getFullName();
+				String fullJobURL = "";
+				String jobNameSlash = jobName;
+				String jobNameJelly = "";
 				String[] emailData = { project.getName(), username, "A Delete Multi Branch", project.getAbsoluteUrl() };
 
-				if (projectName.contains("/")) {
-					String[] projectnameList = projectName.split("/");
+				if (jobName.contains("/")) {
+					String[] projectnameList = jobName.split("/");
 					int nameCount = projectnameList.length;
-					projectName = projectnameList[nameCount - 1];
+					jobName = projectnameList[nameCount - 1];
 				}
 
-				LOGGER.info("Delete Folder Request: " + projectName + " - " + projectFullName);
-				plugin.addRequestPlusEmail(new DeleteMultiBranchRequest("deleteMultiBranch", username, projectName, projectFullName, ""), emailData);
+				jobNameJelly = jobNameSlash;
+				if (jobNameJelly.contains("%20")) {
+					jobNameJelly = jobNameJelly.replace("%20", " ");
+				}
+				fullJobURL = project.getAbsoluteUrl();
+
+				plugin.addRequestPlusEmail(new DeleteMultiBranchRequest("deleteMultiBranch", username, jobNameSlash, "", fullJobURL, jobNameSlash, jobNameJelly, ""), emailData);
 			}
 
 		} catch (Exception e) {

@@ -96,10 +96,10 @@
                                                  ${request.creationDate}   
                                         </td>
                                         <td>                                                   
-                                            <a href="${rootURL}/job/${request.projectFullName}">${request.project}</a>
+                                            <a href="${request.fullJobURL}">${request.jobNameJelly}</a>
                                         </td>
                                         <td>                                                   
-                                            <a href="${rootURL}/job/${request.projectFullName}/config.xml">Config file</a>
+                                            <a href="${request.fullJobURL}/config.xml">Config file</a>
                                         </td>
                                     </tr>
                                 </j:forEach>

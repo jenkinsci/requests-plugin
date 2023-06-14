@@ -62,47 +62,35 @@ import jenkins.model.Jenkins;
 
 public class RequestsPlugin extends Plugin {
 
-	// The requests are unique (to avoid duplication problems like delete a job
-	// already deleted)
+	// The requests are unique (to avoid duplication problems like delete a job already deleted)
 	private List<Request> requests = new ArrayList<Request>();
 	private static final Logger LOGGER = Logger.getLogger(RequestsPlugin.class.getName());
 	private transient List<String> errors = new ArrayList<String>();
 
-	public void addRequest(final Request request) {
-		boolean alreadyRequested = false;
-
-		for (int i = 0; i < requests.size(); i++) {
-			String projectFullName = requests.get(i).getProjectFullName();
-			String buildNumber = requests.get(i).getBuildNumber();
-			String requestType = requests.get(i).getRequestType();
-
-			// Allows a delete project, delete build and unlock build for the
-			// same build but will not submit duplicate of the same request:
-			if (projectFullName.equals(request.getProjectFullName()) && buildNumber.equals(request.getBuildNumber())
-					&& requestType.equals(request.getRequestType())) {
-				alreadyRequested = true;
-				break;
-			}
-		}
-
-		if (!alreadyRequested) {
-			requests.add(request);
-			persistPendingRequests();
-		}
-	}
+	/*
+	 * public void addRequest(final Request request) { boolean alreadyRequested = false;
+	 * 
+	 * for (int i = 0; i < requests.size(); i++) { String projectFullName = requests.get(i).getProjectFullName(); String buildNumber =
+	 * requests.get(i).getBuildNumber(); String requestType = requests.get(i).getRequestType();
+	 * 
+	 * // Allows a delete project, delete build and unlock build for the // same build but will not submit duplicate of the same
+	 * request: if (projectFullName.equals(request.getProjectFullName()) && buildNumber.equals(request.getBuildNumber()) &&
+	 * requestType.equals(request.getRequestType())) { alreadyRequested = true; break; } }
+	 * 
+	 * if (!alreadyRequested) { requests.add(request); persistPendingRequests(); } }
+	 */
 
 	public void addRequestPlusEmail(final Request request, final String[] emailData) throws UnknownHostException, MessagingException {
 		boolean alreadyRequested = false;
 
 		for (int i = 0; i < requests.size(); i++) {
-			String projectFullName = requests.get(i).getProjectFullName();
+			// String projectFullName = requests.get(i).getProjectFullName();
+			String jobName = requests.get(i).getJobNameSlash();
 			String buildNumber = requests.get(i).getBuildNumber();
 			String requestType = requests.get(i).getRequestType();
 
-			// Allows a delete project, delete build and unlock build for the
-			// same build but will not submit duplicate of the same request:
-			if (projectFullName.equals(request.getProjectFullName()) && buildNumber.equals(request.getBuildNumber())
-					&& requestType.equals(request.getRequestType())) {
+			// Allows a delete project, delete build and unlock build for the same build but will not submit duplicate of the same request:
+			if (jobName.equals(request.getJobNameSlash()) && buildNumber.equals(request.getBuildNumber()) && requestType.equals(request.getRequestType())) {
 				alreadyRequested = true;
 				break;
 			}
@@ -137,11 +125,10 @@ public class RequestsPlugin extends Plugin {
 					Request currentRequest = requests.get(index);
 					selectedIndexs.add(index);
 
-					// LOGGER.info("[DEBUG] Request parameter testing for apply: " +
-					// request.hasParameter("apply"));
-					// LOGGER.info("[DEBUG] Request parameter testing for discard: " +
-					// request.hasParameter("discard"));
+					// LOGGER.info("[DEBUG] Request parameter testing for apply: " + request.hasParameter("apply"));
+					// LOGGER.info("[DEBUG] Request parameter testing for discard: " + request.hasParameter("discard"));
 
+					// The apply/discard parameters comes from the RequestsPlugin - index.jelly file (Pending Requests page)
 					if (request.hasParameter("apply")) {
 						String requestType = currentRequest.getRequestType();
 

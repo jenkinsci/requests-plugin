@@ -43,7 +43,6 @@ import org.kohsuke.stapler.verb.POST;
 import com.cloudbees.hudson.plugins.folder.Folder;
 import com.michelin.cio.jenkins.plugin.requests.RequestsPlugin;
 import com.michelin.cio.jenkins.plugin.requests.model.RenameFolderRequest;
-import com.michelin.cio.jenkins.plugin.requests.model.RequestsUtility;
 
 import hudson.Extension;
 import hudson.Functions;
@@ -65,40 +64,51 @@ public class RequestRenameFolderAction implements Action {
 	}
 
 	@POST
-	public HttpResponse doCreateRenameFolderRequest(StaplerRequest request, StaplerResponse response)
-			throws IOException, ServletException, MessagingException {
+	public HttpResponse doCreateRenameFolderRequest(StaplerRequest request, StaplerResponse response) throws IOException, ServletException, MessagingException {
 
 		try {
 			if (isIconDisplayed()) {
 				final String newName = request.getParameter("new-name");
 				final String username = request.getParameter("username");
+				String rename = "";
 
 				RequestsPlugin plugin = Jenkins.get().getPlugin(RequestsPlugin.class);
 				if (plugin == null) {
 					return null;
 				}
-				String projectName = project.getFullName();
-				String projectFullName = project.getFullName();
+				String jobName = project.getFullName();
+				String fullJobURL = "";
+				String jobNameSlash = jobName;
+				String jobNameJelly = "";
 
-				// Check if a folder job type:
-				if (!projectFullName.contains("/job/") && projectFullName.contains("/")) {
-					RequestsUtility requestsUtility = new RequestsUtility();
-					projectFullName = requestsUtility.constructFolderJobName(projectFullName);
-				}
-
-				if (projectName.contains("/")) {
-					String[] projectnameList = projectName.split("/");
+				if (jobName.contains("/")) {
+					String[] projectnameList = jobName.split("/");
 					int nameCount = projectnameList.length;
-					projectName = projectnameList[nameCount - 1];
+					jobName = projectnameList[nameCount - 1];
 				}
 
-				// LOGGER.info("Rename Folder Request: " + projectName + " - " +
-				// projectFullName);
-				String[] emailData = { projectName + " -> " + newName, username, "A Rename Folder", project.getAbsoluteUrl() };
+				jobNameJelly = jobNameSlash;
+				if (jobNameJelly.contains("%20")) {
+					jobNameJelly = jobNameJelly.replace("%20", " ");
+				}
 
-				plugin.addRequestPlusEmail(new RenameFolderRequest("renameFolder", username, projectName, projectFullName, newName), emailData);
-				LOGGER.log(Level.INFO, "The request to rename the folder {0} to {1} has been sent to the administrator",
-						new Object[] { project.getName(), newName });
+				// Get path to current job if multiple"
+				if (jobNameSlash.contains("/")) {
+					String[] nameArray = jobNameSlash.split("/");
+					int nameCount = nameArray.length;
+					StringBuilder stringBuilder1 = new StringBuilder();
+					for (int i = 0; i < nameCount - 1; i++) {
+						stringBuilder1.append(nameArray[i] + "/");
+					}
+					stringBuilder1.append(newName);
+					rename = stringBuilder1.toString();
+				}
+
+				fullJobURL = project.getAbsoluteUrl();
+				String[] emailData = { jobName + " -> " + newName, username, "A Rename Folder", project.getAbsoluteUrl() };
+
+				plugin.addRequestPlusEmail(new RenameFolderRequest("renameFolder", username, jobName, newName, fullJobURL, jobNameSlash, jobNameJelly, rename), emailData);
+				LOGGER.log(Level.INFO, "The request to rename the folder {0} to {1} has been sent to the administrator", new Object[] { project.getName(), newName });
 			}
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "[ERROR] Exception: " + e.getMessage());
@@ -138,13 +148,11 @@ public class RequestRenameFolderAction implements Action {
 	}
 
 	/*
-	 * Permission computing 1: The user has the permission 0: The user has not the
-	 * permission
+	 * Permission computing 1: The user has the permission 0: The user has not the permission
 	 *
 	 * Create | 1 | 0 | Delete | 0 | 1 | Configure | 0 | 0 |
 	 *
-	 * So, the action has to be enabled when: Create AND !Delete AND !Configure OR
-	 * Delete AND !Create AND !Configure
+	 * So, the action has to be enabled when: Create AND !Delete AND !Configure OR Delete AND !Create AND !Configure
 	 */
 
 	// If a Folder is created (Create access) by a user but does not have Configure

@@ -44,7 +44,6 @@ import com.cloudbees.hudson.plugins.folder.Folder;
 import com.cloudbees.hudson.plugins.folder.FolderProperty;
 import com.michelin.cio.jenkins.plugin.requests.RequestsPlugin;
 import com.michelin.cio.jenkins.plugin.requests.model.DeleteFolderRequest;
-import com.michelin.cio.jenkins.plugin.requests.model.RequestsUtility;
 
 import hudson.Extension;
 import hudson.Functions;
@@ -66,8 +65,7 @@ public class RequestDeleteFolderAction extends FolderProperty<Folder> implements
 	}
 
 	@POST
-	public HttpResponse doCreateDeleteFolderRequest(StaplerRequest request, StaplerResponse response)
-			throws IOException, ServletException, MessagingException {
+	public HttpResponse doCreateDeleteFolderRequest(StaplerRequest request, StaplerResponse response) throws IOException, ServletException, MessagingException {
 
 		try {
 			if (isIconDisplayed()) {
@@ -76,25 +74,26 @@ public class RequestDeleteFolderAction extends FolderProperty<Folder> implements
 				if (plugin == null) {
 					return null;
 				}
-				String projectName = project.getFullName();
-				String projectFullName = project.getFullName();
-
-				// Check if a folder job type and if multiple layers of folders:
-				if (!projectFullName.contains("/job/") && projectFullName.contains("/")) {
-					RequestsUtility requestsUtility = new RequestsUtility();
-					projectFullName = requestsUtility.constructFolderJobName(projectFullName);
-				}
-
+				String jobName = project.getFullName();
+				String fullJobURL = "";
+				String jobNameSlash = jobName;
+				String jobNameJelly = "";
 				String[] emailData = { project.getName(), username, "A Delete Folder", project.getAbsoluteUrl() };
 
-				if (projectName.contains("/")) {
-					String[] projectnameList = projectName.split("/");
+				if (jobName.contains("/")) {
+					String[] projectnameList = jobName.split("/");
 					int nameCount = projectnameList.length;
-					projectName = projectnameList[nameCount - 1];
+					jobName = projectnameList[nameCount - 1];
 				}
 
-				LOGGER.info("Delete Folder Request: " + projectName + " - " + projectFullName);
-				plugin.addRequestPlusEmail(new DeleteFolderRequest("deleteFolder", username, projectName, projectFullName, ""), emailData);
+				jobNameJelly = jobNameSlash;
+				if (jobNameJelly.contains("%20")) {
+					jobNameJelly = jobNameJelly.replace("%20", " ");
+				}
+
+				fullJobURL = project.getAbsoluteUrl();
+				LOGGER.info("Delete Folder Request fullJobURL: " + fullJobURL);
+				plugin.addRequestPlusEmail(new DeleteFolderRequest("deleteFolder", username, jobName, "", fullJobURL, jobNameSlash, jobNameJelly, ""), emailData);
 			}
 
 		} catch (Exception e) {
@@ -135,13 +134,11 @@ public class RequestDeleteFolderAction extends FolderProperty<Folder> implements
 	}
 
 	/*
-	 * Permission computing 1: The user has the permission 0: The user has not the
-	 * permission
+	 * Permission computing 1: The user has the permission 0: The user has not the permission
 	 *
 	 * Create | 1 | 0 | Delete | 0 | 1 | Configure | 0 | 0 |
 	 *
-	 * So, the action has to be enabled when: Create AND !Delete AND !Configure OR
-	 * Delete AND !Create AND !Configure
+	 * So, the action has to be enabled when: Create AND !Delete AND !Configure OR Delete AND !Create AND !Configure
 	 */
 	private boolean isIconDisplayed() {
 		boolean isDisplayed = false;

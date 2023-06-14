@@ -25,33 +25,27 @@
  */
 package com.michelin.cio.jenkins.plugin.requests.action;
 
-import hudson.Functions;
-
-import java.util.ArrayList;
-import java.util.List;
+import java.io.IOException;
 import java.util.logging.Level;
-import hudson.model.Item;
-import hudson.model.Job;
-import jenkins.model.Jenkins;
+import java.util.logging.Logger;
 
-import hudson.model.Action;
+import javax.mail.MessagingException;
+import javax.servlet.ServletException;
+
 import org.kohsuke.stapler.HttpRedirect;
 import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
-import org.kohsuke.stapler.interceptor.RequirePOST;
 import org.kohsuke.stapler.verb.POST;
 
 import com.michelin.cio.jenkins.plugin.requests.RequestsPlugin;
 import com.michelin.cio.jenkins.plugin.requests.model.DeleteJobRequest;
-import com.michelin.cio.jenkins.plugin.requests.model.RequestsUtility;
 
-import javax.mail.MessagingException;
-import javax.servlet.ServletException;
-import java.io.IOException;
-import java.util.logging.Logger;
-
-import static java.util.logging.Level.FINE;
+import hudson.Functions;
+import hudson.model.Action;
+import hudson.model.Item;
+import hudson.model.Job;
+import jenkins.model.Jenkins;
 
 // Represents the "Request for deletion" action appearing on a given job's page.
 // @author Daniel Petisme <daniel.petisme@gmail.com> <http://danielpetisme.blogspot.com/>
@@ -72,30 +66,34 @@ public class RequestDeleteJobAction implements Action {
 
 		try {
 			if (isIconDisplayed()) {
-				//errors.clear();
+				// errors.clear();
 				final String username = request.getParameter("username");
 				RequestsPlugin plugin = Jenkins.get().getPlugin(RequestsPlugin.class);
 				if (plugin == null) {
 					return null;
 				}
-				String projectName = project.getFullName();
-				String projectFullName = project.getFullName();
-
-				// Check if a folder job type and if multiple layers of folders:
-				if (!projectFullName.contains("/job/") && projectFullName.contains("/")) {
-					RequestsUtility requestsUtility = new RequestsUtility();
-					projectFullName = requestsUtility.constructFolderJobName(projectFullName);
-				}
-
+				String jobName = project.getFullName();
+				String fullJobURL = "";
+				String jobNameSlash = jobName;
+				String jobNameJelly = "";
+				LOGGER.info("Delete Job Request project.getFullName(): " + project.getFullName());
 				String[] emailData = { project.getName(), username, "A Delete Job", project.getAbsoluteUrl() };
 
-				if (projectName.contains("/")) {
-					String[] projectnameList = projectName.split("/");
+				if (jobName.contains("/")) {
+					String[] projectnameList = jobName.split("/");
 					int nameCount = projectnameList.length;
-					projectName = projectnameList[nameCount - 1];
+					jobName = projectnameList[nameCount - 1];
 				}
-				LOGGER.info("Delete Job Request: " + projectName + " - " + projectFullName);
-				plugin.addRequestPlusEmail(new DeleteJobRequest("deleteJob", username, projectName, projectFullName, ""), emailData);
+
+				fullJobURL = project.getAbsoluteUrl();
+				LOGGER.info("Delete Job Request fullJobURL: " + fullJobURL);
+
+				jobNameJelly = jobNameSlash;
+				if (jobNameJelly.contains("%20")) {
+					jobNameJelly = jobNameJelly.replace("%20", " ");
+				}
+
+				plugin.addRequestPlusEmail(new DeleteJobRequest("deleteJob", username, jobName, "", fullJobURL, jobNameSlash, jobNameJelly, ""), emailData);
 			}
 
 		} catch (Exception e) {
@@ -103,6 +101,8 @@ public class RequestDeleteJobAction implements Action {
 
 			return null;
 		}
+
+		LOGGER.info("Delete Job Request request.getContextPath()/project.getUrl(): " + request.getContextPath() + '/' + project.getUrl());
 
 		return new HttpRedirect(request.getContextPath() + '/' + project.getUrl());
 	}
@@ -142,7 +142,7 @@ public class RequestDeleteJobAction implements Action {
 	private boolean isIconDisplayed() {
 		boolean isDisplayed = false;
 		try {
-			//isDisplayed = hasConfigurePermission() && !hasDeletePermission();
+			// isDisplayed = hasConfigurePermission() && !hasDeletePermission();
 			isDisplayed = !hasDeletePermission();
 		} catch (Exception e) {
 			LOGGER.log(Level.WARNING, "Impossible to know if the icon has to be displayed", e);
@@ -151,9 +151,10 @@ public class RequestDeleteJobAction implements Action {
 		return isDisplayed;
 	}
 
-	//private boolean hasConfigurePermission() throws IOException, ServletException {
-	//	return Functions.hasPermission(project, Item.CONFIGURE);
-	//}
+	// private boolean hasConfigurePermission() throws IOException, ServletException
+	// {
+	// return Functions.hasPermission(project, Item.CONFIGURE);
+	// }
 
 	private boolean hasDeletePermission() throws IOException, ServletException {
 		return Functions.hasPermission(project, Item.DELETE);

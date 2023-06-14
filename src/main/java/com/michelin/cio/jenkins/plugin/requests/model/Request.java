@@ -25,6 +25,7 @@
 package com.michelin.cio.jenkins.plugin.requests.model;
 
 import java.util.Calendar;
+import java.util.logging.Logger;
 
 import org.apache.commons.lang.time.FastDateFormat;
 
@@ -39,59 +40,49 @@ public abstract class Request {
 
 	protected String requestType;
 	protected String username;
-	protected String project;
-	protected String projectFullName;
+	protected String jobNameSpace;
 	protected String buildNumber;
+	protected String fullJobURL;
+	protected String jobNameSlash;
+	protected String jobNameJelly;
+	protected String rename;
 	protected String errorMessage;
 	private String creationDate;
 
 	private static String dateFormat = "yyyy-MM-dd HH:mm:ss";
 	private static final FastDateFormat yyyymmdd = FastDateFormat.getInstance(dateFormat);
-	// private static final Logger LOGGER =
-	// Logger.getLogger(RequestsUtility.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(Request.class.getName());
 
-	public Request(String requestType, String username, String project, String projectFullName, String buildNumber) {
+	public Request(String requestType, String username, String jobNameSpaces, String buildNumber, String fullJobURL, String jobNameSlash, String jobNameJelly, String rename) {
 		this.requestType = requestType;
 		this.username = username;
-		this.project = project;
-		this.projectFullName = projectFullName;
+		this.jobNameSpace = jobNameSpaces;
 		this.buildNumber = buildNumber;
+		this.fullJobURL = fullJobURL;
+		this.jobNameSlash = jobNameSlash;
+		this.jobNameJelly = jobNameJelly;
+		this.rename = rename;
 		this.creationDate = yyyymmdd.format(Calendar.getInstance().getTime());
 	}
 
-	public String getProject() {
-		// if (projectFullName.contains("/")) {
-		// String[] projectList = projectFullName.split("/");
-		// int nameCount = projectList.length;
-		// project = projectList[nameCount - 1];
-		// }
-		return project;
+	public String getJobNameSpace() {
+		return jobNameSpace;
 	}
 
-	public String getProjectNameWithoutJobSeparator() {
-		String[] projectList = null;
-		String projectFullNameWithoutJobSeparator;
-		StringBuffer stringBuffer = new StringBuffer();
-
-		if (projectFullName.contains("/job/")) {
-			projectList = projectFullName.split("/job/");
-			int nameCount = projectList.length;
-			stringBuffer.append(projectList[0]);
-			for (int i = 1; i < nameCount; i++) {
-				stringBuffer.append("/" + projectList[i]);
-			}
-
-			projectFullNameWithoutJobSeparator = stringBuffer.toString();
-
-		} else {
-			projectFullNameWithoutJobSeparator = projectFullName;
-		}
-
-		return projectFullNameWithoutJobSeparator;
+	public String getJobNameSlash() {
+		return jobNameSlash;
 	}
 
-	public String getProjectFullName() {
-		return projectFullName;
+	public String getJobNameJelly() {
+		return jobNameJelly;
+	}
+
+	public String getRename() {
+		return rename;
+	}
+
+	public String getFullJobURL() {
+		return fullJobURL;
 	}
 
 	public String getRequestType() {
@@ -116,27 +107,36 @@ public abstract class Request {
 
 	public abstract String getMessage();
 
+	// Called from RequestsPlugin.java from the Pending Requests web page:
 	public boolean process(String requestType) {
 		boolean success = false;
-		String projectName = getProjectNameWithoutJobSeparator();
+		String jobNameSlash = getJobNameSlash();
+		LOGGER.info("Request process(): " + jobNameSlash);
 
 		try {
 
-			Item item = Jenkins.get().getItemByFullName(projectName);
+			Item item = Jenkins.get().getItemByFullName(jobNameSlash);
 
-			if (item != null) {
+			if (requestType.equalsIgnoreCase("unlockBuild") || requestType.equalsIgnoreCase("deleteBuild")) {
+				// Unlock and Delete Build Requests do not use the item object since they will use a URL in POST method:
 				success = execute(item);
+
 			} else {
-				if (requestType.equals("deleteJob") || requestType.equals("renameJob")) {
-					errorMessage = "The job " + projectName + " doesn't exist";
-				}
-				if (requestType.equals("deleteMultiBranch")) {
-					errorMessage = "The MultiBranch Pipeline folder " + projectName + " doesn't exist";
-				}
-				if (requestType.equals("deleteFolder") || requestType.equals("renameFolder")) {
-					errorMessage = "The folder " + projectName + " doesn't exist";
+
+				if (item != null) {
+					// This is called on the {requestType}Request.java file:
+					success = execute(item);
 				} else {
-					errorMessage = "The build for " + projectName + " doesn't exist";
+					// If the item object is null, no sense in trying to call the Request:
+					if (requestType.equals("deleteJob") || requestType.equals("renameJob")) {
+						errorMessage = "Unable to find the job " + jobNameSlash;
+					}
+					if (requestType.equals("deleteMultiBranch")) {
+						errorMessage = "Unable to find the MultiBranch Pipeline folder " + jobNameSlash;
+					}
+					if (requestType.equals("deleteFolder") || requestType.equals("renameFolder")) {
+						errorMessage = "Unable to find the folder " + jobNameSlash;
+					}
 				}
 			}
 

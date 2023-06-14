@@ -24,6 +24,8 @@
 package com.michelin.cio.jenkins.plugin.requests.action;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -52,18 +54,17 @@ public class RequestUnlockAction implements Action {
 	private String buildName;
 	private int buildNumber;
 	private String fullDisplayName;
-	private String build_Url;
+	private String shortBuildUrl;
 
 	public RequestUnlockAction(Run<?, ?> target) {
 		buildName = target.getDisplayName();
 		buildNumber = target.getNumber();
 		fullDisplayName = target.getFullDisplayName();
-		build_Url = target.getUrl();
+		shortBuildUrl = target.getUrl();
 	}
 
 	@POST
-	public HttpResponse doCreateUnlockRequest(StaplerRequest request, StaplerResponse response)
-			throws IOException, ServletException, MessagingException {
+	public HttpResponse doCreateUnlockRequest(StaplerRequest request, StaplerResponse response) throws IOException, ServletException, MessagingException {
 
 		if (isIconDisplayed()) {
 			final String username = request.getParameter("username");
@@ -74,51 +75,68 @@ public class RequestUnlockAction implements Action {
 			}
 
 			String projectFullName = null;
-			String projectName = null;
+			String jobNameSpace = null;
+			String fullJobURL = "";
+			String jobNameSlash = "";
+			String jobNameJelly = "";
 
-			LOGGER.info("Unlock Build Action: fullDisplayName: " + fullDisplayName);
-			LOGGER.info("Unlock Build Action: build_Url: " + build_Url);
+			LOGGER.info("Unlock Build Action: shortBuildUrl: " + shortBuildUrl);
 			LOGGER.info("Unlock Build Action: buildName: " + buildName);
 			LOGGER.info("Unlock Build Action: buildNumber: " + buildNumber);
 
-			// Need to extract the folder name(s) and the job name:
-			if (fullDisplayName.contains(" » ")) {
-				// Split off the build number from the build_Url:
-				// Then Split off the next item which is the project name:
-				// Then split off the next item which should be job:
-				// Then Split off the next item which is the Folder name and not display name:
-				String[] New_String_Names = null;
-				New_String_Names = build_Url.split("/");
-				int stringFolderCount = New_String_Names.length;
-				LOGGER.info("Delete Build Action: Folder build number: " + New_String_Names[stringFolderCount - 1]);
-				LOGGER.info("Delete Build Action: Folder project name: " + New_String_Names[stringFolderCount - 2]);
-				LOGGER.info("Delete Build Action: Folder folder name: " + New_String_Names[stringFolderCount - 4]);
+			// NOTE: Folders and Multibranch pipelines can set a Display name. The real names can only be obtained from the build_Url:
 
-				projectName = New_String_Names[stringFolderCount - 4] + " " + New_String_Names[stringFolderCount - 2];
-				projectFullName = New_String_Names[stringFolderCount - 4] + "/job/" + New_String_Names[stringFolderCount - 2];
-				LOGGER.info("Delete Build Action: Folder projectName: " + projectName);
-				LOGGER.info("Delete Build Action: Folder projectFullName: " + projectFullName);
+			StringBuilder stringBuilder1 = new StringBuilder();
+			StringBuilder stringBuilder3 = new StringBuilder();
+			String[] nameArray = shortBuildUrl.split("/");
+			ArrayList<String> nameList = new ArrayList<>();
+			nameList.addAll(Arrays.asList(nameArray));
 
-				// Need to extract the job name:
-			} else {
-				String[] projectNameList = fullDisplayName.split(buildName);
-				projectName = projectNameList[0].trim();
-				;
-				projectFullName = projectName;
-				;
+			// If build_Url starts with view, then remove first 2 elements (view and view_name):
+			// If build_Url starts with job, then remove first element:
+			// Ex: build_Url = "view/JOHN/job/FolderTest22/job/TestFolderJob1/5/";
+			if (nameList.get(0).equalsIgnoreCase("view")) {
+				nameList.remove(0);
+				nameList.remove(0);
+			}
 
-				LOGGER.info("Unlock Build Action: project name: " + projectName);
-				LOGGER.info("Delete Build Action: projectFullName: " + projectFullName);
+			if (nameList.get(0).equalsIgnoreCase("job")) {
+				nameList.remove(0);
+			}
+
+			int nameCount = nameList.size();
+
+			// Cat together folder names without "job":
+			for (int i = 0; i < nameCount - 1; i++) {
+				if (!nameList.get(i).equalsIgnoreCase("job")) {
+					if (i == (nameCount - 2)) {
+						stringBuilder1.append(nameList.get(i));
+						stringBuilder3.append(nameList.get(i));
+					} else {
+						stringBuilder1.append(nameList.get(i) + " ");
+						stringBuilder3.append(nameList.get(i) + "/");
+					}
+				}
+			}
+
+			jobNameSpace = stringBuilder1.toString();
+			jobNameSlash = stringBuilder3.toString();
+			LOGGER.info("Unlock Build Action: jobNameSpace - jobNameSlash: " + jobNameSpace + " - " + jobNameSlash);
+
+			jobNameJelly = jobNameSlash;
+			if (jobNameJelly.contains("%20")) {
+				jobNameJelly = jobNameJelly.replace("%20", " ");
 			}
 
 			String jenkinsUrl = Jenkins.get().getRootUrl();
-			String buildUrl = jenkinsUrl + build_Url;
-			String[] emailData = { buildName, username, "An Unlock Build", buildUrl };
-			plugin.addRequestPlusEmail(new UnlockRequest("unlockBuild", username, projectName, projectFullName, Integer.toString(buildNumber)),
+			fullJobURL = jenkinsUrl + shortBuildUrl;
+			LOGGER.info("Unlock Build Action: fullJobURL - jobNameJelly: " + fullJobURL + " - " + jobNameJelly);
+			String[] emailData = { buildName, username, "An Unlock Build", fullJobURL };
+			plugin.addRequestPlusEmail(new UnlockRequest("unlockBuild", username, jobNameSpace, Integer.toString(buildNumber), fullJobURL, jobNameSlash, jobNameJelly, ""),
 					emailData);
 		}
 
-		return new HttpRedirect(request.getContextPath() + '/' + build_Url);
+		return new HttpRedirect(request.getContextPath() + '/' + shortBuildUrl);
 	}
 
 	public String getDisplayName() {

@@ -37,13 +37,13 @@ public class UnlockRequest extends Request {
 
 	private static final Logger LOGGER = Logger.getLogger(UnlockRequest.class.getName());
 
-	public UnlockRequest(String requestType, String username, String project, String projectFullName, String buildNumber) {
-		super(requestType, username, project, projectFullName, buildNumber);
+	public UnlockRequest(String requestType, String username, String jobNameSpace, String buildNumber, String fullJobURL, String jobNameSlash, String jobNameJelly, String rename) {
+		super(requestType, username, jobNameSpace, buildNumber, fullJobURL, jobNameSlash, jobNameJelly, rename);
 	}
 
 	@Override
 	public String getMessage() {
-		return Messages.UnlockRequest_message(buildNumber + " for " + project);
+		return Messages.UnlockRequest_message(buildNumber + " for " + jobNameJelly);
 	}
 
 	public boolean execute(Item item) {
@@ -66,23 +66,23 @@ public class UnlockRequest extends Request {
 				throw new NullPointerException("Jenkins getRootUrl() is null");
 
 			RequestsUtility requestsUtility = new RequestsUtility();
-			// projectFullName = requestsUtility.encodeValue(projectFullName);
-			projectFullName = projectFullName.replace(" ", "%20");
-			String urlString = jenkinsURL + "job/" + projectFullName + "/" + buildNumber + "/toggleLogKeep";
+			String urlString = fullJobURL + "toggleLogKeep";
+
+			LOGGER.info("Unlock Request: urlString - jenkinsURL: " + urlString + " - " + jenkinsURL);
 
 			try {
 				returnStatus = requestsUtility.runPostMethod(jenkinsURL, urlString);
 
 			} catch (Exception e) {
 				errorMessage = "Unable to Unlock the build: " + e.getMessage();
-				LOGGER.log(Level.SEVERE, "Unable to Unlock the build " + projectFullName + ":" + buildNumber, e.getMessage().toString());
+				LOGGER.log(Level.SEVERE, "Unable to Unlock the build " + jobNameSlash + ":" + buildNumber, e.getMessage().toString());
 
 				return false;
 			}
 
 			if (returnStatus.equals("success")) {
-				errorMessage = "Build number " + buildNumber + " has been properly Unlocked for " + projectFullName;
-				LOGGER.log(Level.INFO, "Build {0} has been properly Unlocked", projectFullName + ":" + buildNumber);
+				errorMessage = "Build number " + buildNumber + " has been properly Unlocked for " + jobNameSlash;
+				LOGGER.log(Level.INFO, "Build {0} has been properly Unlocked", jobNameSlash + ":" + buildNumber);
 				success = true;
 
 			} else if (returnStatus.contains("Forbidden")) {
@@ -91,14 +91,14 @@ public class UnlockRequest extends Request {
 				success = false;
 
 			} else {
-				errorMessage = "UNLOCK Build request has failed for " + projectFullName + ":" + buildNumber + " : " + returnStatus.toString();
-				LOGGER.log(Level.INFO, "UNLOCK Build call has failed: ", projectFullName + ":" + buildNumber + " : " + returnStatus.toString());
+				errorMessage = "UNLOCK Build request has failed for " + jobNameSlash + ":" + buildNumber + " : " + returnStatus.toString();
+				LOGGER.log(Level.INFO, "UNLOCK Build call has failed: ", jobNameSlash + ":" + buildNumber + " : " + returnStatus.toString());
 
 				success = false;
 			}
 
 		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "[ERROR] Exception executing Unlock Request: " + projectFullName + ":" + buildNumber, e.getMessage().toString());
+			LOGGER.log(Level.SEVERE, "[ERROR] Exception executing Unlock Request: " + jobNameSlash + ":" + buildNumber, e.getMessage().toString());
 			return false;
 		}
 

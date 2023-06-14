@@ -35,13 +35,14 @@ public class DeleteMultiBranchRequest extends Request {
 
 	private static final Logger LOGGER = Logger.getLogger(DeleteMultiBranchRequest.class.getName());
 
-	public DeleteMultiBranchRequest(String requestType, String username, String project, String projectFullName, String buildNumber) {
-		super(requestType, username, project, projectFullName, buildNumber);
+	public DeleteMultiBranchRequest(String requestType, String username, String jobNameSpace, String buildNumber, String fullJobURL, String jobNameSlash, String jobNameJelly,
+			String rename) {
+		super(requestType, username, jobNameSpace, buildNumber, fullJobURL, jobNameSlash, jobNameJelly, rename);
 	}
 
 	@Override
 	public String getMessage() {
-		return Messages.DeleteMultiBranchRequest_message(project);
+		return Messages.DeleteMultiBranchRequest_message(jobNameJelly);
 	}
 
 	@Override
@@ -53,12 +54,12 @@ public class DeleteMultiBranchRequest extends Request {
 				try {
 					item.delete();
 					success = true;
-					errorMessage = "The Multi Branch Folder " + item.getFullName() + " has been properly Deleted";
-					LOGGER.log(Level.INFO, "The Multi Branch Folder {0} has been properly deleted", item.getFullName());
+					errorMessage = "The Multi Branch Folder " + jobNameSlash + " has been properly Deleted";
+					LOGGER.log(Level.INFO, "The Multi Branch Folder {0} has been properly deleted", jobNameSlash);
 
 				} catch (Exception e) {
 					errorMessage = e.getMessage().toString();
-					LOGGER.log(Level.SEVERE, "Unable to DELETE the Multi Branch Folder " + item.getFullName(), e);
+					LOGGER.log(Level.SEVERE, "Unable to DELETE the Multi Branch Folder " + jobNameSlash, e);
 					success = false;
 				}
 
@@ -70,7 +71,7 @@ public class DeleteMultiBranchRequest extends Request {
 
 		} catch (Exception e) {
 			errorMessage = e.getMessage().toString();
-			LOGGER.log(Level.SEVERE, "Unable to DELETE the Multi Branch Folder " + projectFullName + ":" + buildNumber, e.getMessage().toString());
+			LOGGER.log(Level.SEVERE, "Unable to DELETE the Multi Branch Folder " + jobNameSlash + ":" + buildNumber, e.getMessage().toString());
 
 			success = false;
 		}

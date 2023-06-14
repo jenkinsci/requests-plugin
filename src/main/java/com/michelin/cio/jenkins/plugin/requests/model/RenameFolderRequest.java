@@ -37,14 +37,15 @@ public class RenameFolderRequest extends Request {
 
 	private String newName;
 
-	public RenameFolderRequest(String requestType, String username, String project, String projectFullName, String newName) {
-		super(requestType, username, project, projectFullName, newName);
+	public RenameFolderRequest(String requestType, String username, String jobNameSpace, String newName, String fullJobURL, String jobNameSlash, String jobNameJelly,
+			String rename) {
+		super(requestType, username, jobNameSpace, newName, fullJobURL, jobNameSlash, jobNameJelly, rename);
 		this.newName = newName;
 	}
 
 	@Override
 	public String getMessage() {
-		return Messages.RenameFolderRequest_message(project, newName);
+		return Messages.RenameFolderRequest_message(jobNameJelly, rename);
 	}
 
 	public String getNewName() {
@@ -57,13 +58,11 @@ public class RenameFolderRequest extends Request {
 
 		try {
 			if ((Jenkins.get().hasPermission(Item.DELETE) && !Jenkins.get().hasPermission(Item.CREATE) && Jenkins.get().hasPermission(Item.CONFIGURE))
-					|| (!Jenkins.get().hasPermission(Item.DELETE) && Jenkins.get().hasPermission(Item.CREATE)
-							&& Jenkins.get().hasPermission(Item.CONFIGURE))
-					|| (Jenkins.get().hasPermission(Item.DELETE) && Jenkins.get().hasPermission(Item.CREATE)
-							&& Jenkins.get().hasPermission(Item.CONFIGURE))) {
+					|| (!Jenkins.get().hasPermission(Item.DELETE) && Jenkins.get().hasPermission(Item.CREATE) && Jenkins.get().hasPermission(Item.CONFIGURE))
+					|| (Jenkins.get().hasPermission(Item.DELETE) && Jenkins.get().hasPermission(Item.CREATE) && Jenkins.get().hasPermission(Item.CONFIGURE))) {
 				((Folder) item).renameTo(newName);
 				success = true;
-				LOGGER.log(Level.INFO, "The Folder {0} has been properly renamed in {1}", new Object[] { item.getName(), newName });
+				LOGGER.log(Level.INFO, "The Folder has successfully been renamed from " + jobNameSlash + " to " + rename);
 
 			} else {
 				errorMessage = "The current user does not have permission to RENAME the Folder";
