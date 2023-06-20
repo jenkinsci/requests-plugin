@@ -1,6 +1,12 @@
 
 ## Version History
 
+Version 3.0 (June 20, 2023)
+
+-       Rework Request object to better support Folders and Multibranch Pipeline Job types that affect all request types
+		This provides full job names in the Pending Requests web page and correct links to be processed
+
+
 Version 2.2.23 (May 29, 2023)
 
 -       Fixed breakage in Delete/Unlock Build Requests links
