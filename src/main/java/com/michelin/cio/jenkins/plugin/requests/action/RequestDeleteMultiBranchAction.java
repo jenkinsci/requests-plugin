@@ -95,7 +95,7 @@ public class RequestDeleteMultiBranchAction implements Action {
 				}
 				fullJobURL = project.getAbsoluteUrl();
 
-				plugin.addRequestPlusEmail(new DeleteMultiBranchRequest("deleteMultiBranch", username, jobNameSlash, "", fullJobURL, jobNameSlash, jobNameJelly, ""), emailData);
+				plugin.addRequestPlusEmail(new DeleteMultiBranchRequest("deleteMultiBranch", username, jobName, "", fullJobURL, jobNameSlash, jobNameJelly, ""), emailData);
 			}
 
 		} catch (Exception e) {

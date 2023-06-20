@@ -24,15 +24,10 @@
 
 package com.michelin.cio.jenkins.plugin.requests.model;
 
-import java.io.IOException;
-import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import hudson.model.AbstractItem;
 import hudson.model.Item;
-import hudson.model.ItemGroup;
-import hudson.model.Job;
 import jenkins.model.Jenkins;
 
 // Represents a renaming request sent by a user to the administrator.
@@ -76,7 +71,7 @@ public class RenameMultiBranchRequest extends Request {
 				// };
 				// renameMultiBranch.renameTo(rename);
 				// ((AbstractItem) item).renameTo(rename);
-				RenameMultiBranch renameMultiBranch = new RenameMultiBranch(item.getParent(), rename);
+				// RenameMultiBranch renameMultiBranch = new RenameMultiBranch(item.getParent(), rename);
 
 				// renameMultiBranch.renameTo(rename);
 
@@ -97,30 +92,19 @@ public class RenameMultiBranchRequest extends Request {
 
 	private static final Logger LOGGER = Logger.getLogger(RenameMultiBranchRequest.class.getName());
 
-	public class RenameMultiBranch extends AbstractItem {
-
-		protected RenameMultiBranch(ItemGroup parent, String name) {
-			super(parent, name);
-			// TODO Auto-generated constructor stub
-			try {
-				this.renameTo(name);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-		}
-
-		@Override
-		public Collection<? extends Job> getAllJobs() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		// public void renameTo(String rename) {
-		// this.renameTo(rename);
-		// LOGGER.info("[DEBUG] MultibranchPipeline rename: " + rename);
-		// }
-
-	}
+	/*
+	 * public class RenameMultiBranch extends AbstractItem {
+	 * 
+	 * protected RenameMultiBranch(ItemGroup parent, String name) { super(parent, name); // TODO Auto-generated constructor stub try {
+	 * this.renameTo(name); } catch (IOException e) { // TODO Auto-generated catch block e.printStackTrace(); }
+	 * 
+	 * }
+	 * 
+	 * @Override public Collection<? extends Job> getAllJobs() { // TODO Auto-generated method stub return null; }
+	 * 
+	 * // public void renameTo(String rename) { // this.renameTo(rename); // LOGGER.info("[DEBUG] MultibranchPipeline rename: " +
+	 * rename); // }
+	 * 
+	 * }
+	 */
 }
