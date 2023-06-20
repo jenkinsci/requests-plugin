@@ -16,7 +16,7 @@
 	<artifactId>requests</artifactId>
 	<packaging>hpi</packaging>
 	<name>requests-plugin</name>
-	<version>2.2.24-SNAPSHOT</version>
+	<version>3.0-SNAPSHOT</version>
 	<url>https://plugins.jenkins.io/requests/</url>
 
 	<scm>

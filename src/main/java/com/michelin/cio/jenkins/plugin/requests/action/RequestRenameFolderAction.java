@@ -102,6 +102,8 @@ public class RequestRenameFolderAction implements Action {
 					}
 					stringBuilder1.append(newName);
 					rename = stringBuilder1.toString();
+				} else {
+					rename = newName;
 				}
 
 				fullJobURL = project.getAbsoluteUrl();

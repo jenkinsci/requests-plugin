@@ -131,8 +131,8 @@ public abstract class Request {
 					if (requestType.equals("deleteJob") || requestType.equals("renameJob")) {
 						errorMessage = "Unable to find the job " + jobNameSlash;
 					}
-					if (requestType.equals("deleteMultiBranch")) {
-						errorMessage = "Unable to find the MultiBranch Pipeline folder " + jobNameSlash;
+					if (requestType.equals("deleteMultiBranch") || requestType.equals("renameJob")) {
+						errorMessage = "Unable to find the MultiBranch Pipeline job " + jobNameSlash;
 					}
 					if (requestType.equals("deleteFolder") || requestType.equals("renameFolder")) {
 						errorMessage = "Unable to find the folder " + jobNameSlash;

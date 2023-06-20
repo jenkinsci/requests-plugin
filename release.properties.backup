@@ -1,0 +1,26 @@
+#release configuration
+#Wed May 17 12:31:11 EDT 2023
+projectVersionPolicyId=default
+scm.branchCommitComment=@{prefix} prepare branch @{releaseLabel}
+project.rel.org.jenkins-ci.plugins\:requests=2.2.22
+pinExternals=false
+project.scm.org.jenkins-ci.plugins\:requests.connection=scm\:git\:git@github.com\:jenkinsci/requests-plugin.git
+pushChanges=true
+project.scm.org.jenkins-ci.plugins\:requests.tag=requests-2.2.22
+scm.rollbackCommitComment=@{prefix} rollback the release of @{releaseLabel}
+remoteTagging=true
+scm.commentPrefix=[maven-release-plugin] 
+releaseStrategyId=default
+project.scm.org.jenkins-ci.plugins\:requests.developerConnection=scm\:git\:git@github.com\:jenkinsci/requests-plugin.git
+project.dev.org.jenkins-ci.plugins\:requests=2.2.23-SNAPSHOT
+completedPhase=end-release
+scm.url=scm\:git\:git@github.com\:jenkinsci/requests-plugin.git
+scm.developmentCommitComment=@{prefix} prepare for next development iteration
+scm.tagNameFormat=@{project.artifactId}-@{project.version}
+exec.additionalArguments=
+project.scm.org.jenkins-ci.plugins\:requests.url=https\://github.com/jenkinsci/requests-plugin
+scm.tag=requests-2.2.22
+exec.snapshotReleasePluginAllowed=false
+preparationGoals=clean install
+scm.releaseCommitComment=@{prefix} prepare release @{releaseLabel}
+exec.pomFileName=pom.xml

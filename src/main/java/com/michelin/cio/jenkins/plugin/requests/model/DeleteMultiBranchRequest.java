@@ -54,24 +54,24 @@ public class DeleteMultiBranchRequest extends Request {
 				try {
 					item.delete();
 					success = true;
-					errorMessage = "The Multi Branch Folder " + jobNameSlash + " has been properly Deleted";
-					LOGGER.log(Level.INFO, "The Multi Branch Folder {0} has been properly deleted", jobNameSlash);
+					errorMessage = "The MultiBranch Pipeline " + jobNameSlash + " has been properly Deleted";
+					LOGGER.log(Level.INFO, "The MultiBranch Pipeline {0} has been properly deleted", jobNameSlash);
 
 				} catch (Exception e) {
 					errorMessage = e.getMessage().toString();
-					LOGGER.log(Level.SEVERE, "Unable to DELETE the Multi Branch Folder " + jobNameSlash, e);
+					LOGGER.log(Level.SEVERE, "Unable to DELETE the MultiBranch Pipeline " + jobNameSlash, e);
 					success = false;
 				}
 
 			} else {
-				errorMessage = "The current user does not have permission to DELETE the Multi Branch Folder";
-				LOGGER.log(Level.FINE, "The current user does not have permission to DELETE the Multi Branch Folder");
+				errorMessage = "The current user does not have permission to DELETE the MultiBranch Pipeline";
+				LOGGER.log(Level.FINE, "The current user does not have permission to DELETE the MultiBranch Pipeline");
 				success = false;
 			}
 
 		} catch (Exception e) {
 			errorMessage = e.getMessage().toString();
-			LOGGER.log(Level.SEVERE, "Unable to DELETE the Multi Branch Folder " + jobNameSlash + ":" + buildNumber, e.getMessage().toString());
+			LOGGER.log(Level.SEVERE, "Unable to DELETE the MultiBranch Pipeline " + jobNameSlash + ":" + buildNumber, e.getMessage().toString());
 
 			success = false;
 		}

@@ -54,13 +54,11 @@ public class RequestDeleteBuildAction implements Action {
 	public static final Logger LOGGER = Logger.getLogger(RequestDeleteBuildAction.class.getName());
 	private String buildName;
 	private int buildNumber;
-	private String fullDisplayName;
 	private String shortBuildUrl;
 
 	public RequestDeleteBuildAction(Run<?, ?> target) {
 		buildName = target.getDisplayName();
 		buildNumber = target.getNumber();
-		fullDisplayName = target.getFullDisplayName();
 		shortBuildUrl = target.getUrl();
 	}
 

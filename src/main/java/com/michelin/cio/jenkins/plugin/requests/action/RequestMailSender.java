@@ -182,15 +182,13 @@ public class RequestMailSender extends Builder {
 				msg.setSubject(String.format(jenkinsHostName + ": " + requestType + " Request has been submitted"));
 
 				// Email page content:
-				buf.append(
-						".......................................................................................................................\n\n");
+				buf.append(".......................................................................................................................\n\n");
 				buf.append(requestType + " request has been submitted for '" + itemName + "'.\n\n");
 				buf.append("Pending Request Page:\n");
 				buf.append(pendingRequestsLink + "\n\n\n");
 				buf.append("Project Page:\n");
 				buf.append(getProjectURL() + "\n");
-				buf.append(
-						".......................................................................................................................\n");
+				buf.append(".......................................................................................................................\n");
 				msg.setText(buf.toString());
 			}
 
@@ -268,6 +266,7 @@ public class RequestMailSender extends Builder {
 		private boolean enableRenameFolder;
 		private boolean enableDeleteFolder;
 		private boolean enableDeleteMultiBranch;
+		private boolean enableRenameMultiBranch;
 		private boolean enableEmails;
 
 		@DataBoundConstructor
@@ -369,6 +368,10 @@ public class RequestMailSender extends Builder {
 			return enableDeleteMultiBranch;
 		}
 
+		public boolean isEnableRenameMultiBranch() {
+			return enableRenameMultiBranch;
+		}
+
 		@DataBoundSetter
 		public void setEnableDeleteJob(boolean enableDeleteJob) {
 			this.enableDeleteJob = enableDeleteJob;
@@ -409,6 +412,11 @@ public class RequestMailSender extends Builder {
 			this.enableDeleteMultiBranch = enableDeleteMultiBranch;
 		}
 
+		@DataBoundSetter
+		public void setEnableRenameMultiBranch(boolean enableRenameMultiBranch) {
+			this.enableRenameMultiBranch = enableRenameMultiBranch;
+		}
+
 		public void setEnableEmails(boolean enableEmails) {
 			this.enableEmails = enableEmails;
 		}
@@ -424,8 +432,7 @@ public class RequestMailSender extends Builder {
 		}
 
 		@POST
-		public FormValidation doTestEmail(@QueryParameter("testEmailAddress") final String testEmailAddress)
-				throws MessagingException, UnknownHostException {
+		public FormValidation doTestEmail(@QueryParameter("testEmailAddress") final String testEmailAddress) throws MessagingException, UnknownHostException {
 			Jenkins.get().checkPermission(Jenkins.ADMINISTER);
 			String emailHost = getRequestemailhost();
 			String returnMessage = "Unable to create email message";
@@ -481,8 +488,7 @@ public class RequestMailSender extends Builder {
 		}
 
 		@POST
-		public FormValidation doTestEmailTEST(@QueryParameter("testEmailAddress") final String testEmailAddress)
-				throws MessagingException, UnknownHostException {
+		public FormValidation doTestEmailTEST(@QueryParameter("testEmailAddress") final String testEmailAddress) throws MessagingException, UnknownHostException {
 			MimeMessage msg = createEmptyMailTEST(testEmailAddress);
 			StringBuffer buf = new StringBuffer();
 
@@ -502,11 +508,9 @@ public class RequestMailSender extends Builder {
 					msg.setSubject(String.format(jenkinsHostName + ": Test Email - Jenkins Request Plugin"));
 
 					// Email page content:
-					buf.append(
-							".......................................................................................................................\n\n");
+					buf.append(".......................................................................................................................\n\n");
 					buf.append("This is a test email from the Jenkins Requests Plugin\n");
-					buf.append(
-							".......................................................................................................................\n");
+					buf.append(".......................................................................................................................\n");
 					msg.setText(buf.toString());
 				}
 

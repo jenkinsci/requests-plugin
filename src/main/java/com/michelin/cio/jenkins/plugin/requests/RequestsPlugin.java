@@ -48,6 +48,7 @@ import com.michelin.cio.jenkins.plugin.requests.model.DeleteJobRequest;
 import com.michelin.cio.jenkins.plugin.requests.model.DeleteMultiBranchRequest;
 import com.michelin.cio.jenkins.plugin.requests.model.RenameFolderRequest;
 import com.michelin.cio.jenkins.plugin.requests.model.RenameJobRequest;
+import com.michelin.cio.jenkins.plugin.requests.model.RenameMultiBranchRequest;
 import com.michelin.cio.jenkins.plugin.requests.model.Request;
 import com.michelin.cio.jenkins.plugin.requests.model.UnlockRequest;
 
@@ -61,7 +62,6 @@ import jenkins.model.Jenkins;
 // @author Daniel Petisme <daniel.petisme@gmail.com> <http://danielpetisme.blogspot.com/>, John Flynn <john.trixmot.flynn1@gmail.com>
 
 public class RequestsPlugin extends Plugin {
-
 	// The requests are unique (to avoid duplication problems like delete a job already deleted)
 	private List<Request> requests = new ArrayList<Request>();
 	private static final Logger LOGGER = Logger.getLogger(RequestsPlugin.class.getName());
@@ -98,19 +98,20 @@ public class RequestsPlugin extends Plugin {
 
 		if (!alreadyRequested) {
 			requests.add(request);
-
-			RequestMailSender mailSender = new RequestMailSender(emailData[0], emailData[1], emailData[2], emailData[3]);
+			final int element0 = 0;
+			final int element1 = 1;
+			final int element2 = 2;
+			final int element3 = 3;
+			RequestMailSender mailSender = new RequestMailSender(emailData[element0], emailData[element1], emailData[element2], emailData[element3]);
 			// LOGGER.info("[INFO] mailSender 1:");
 			mailSender.executeEmail();
 			// LOGGER.info("[INFO] mailSender 2:");
 			persistPendingRequests();
-		} else {
-			// LOGGER.info("[INFO] Don't Send Email:");
 		}
 	}
 
 	@RequirePOST
-	public HttpResponse doManageRequests(StaplerRequest request, StaplerResponse response) throws IOException, ServletException {
+	public HttpResponse doManageRequests(final StaplerRequest request, final StaplerResponse response) throws IOException, ServletException {
 		Jenkins.get().checkPermission(Jenkins.ADMINISTER);
 		errors.clear();
 		String[] selectedRequests = request.getParameterValues("selected");
@@ -215,6 +216,7 @@ public class RequestsPlugin extends Plugin {
 		Hudson.XSTREAM.alias("RenameFolderRequest", RenameFolderRequest.class);
 		Hudson.XSTREAM.alias("DeleteFolderRequest", DeleteFolderRequest.class);
 		Hudson.XSTREAM.alias("DeleteMultiBranchRequest", DeleteMultiBranchRequest.class);
+		Hudson.XSTREAM.alias("RenameMultiBranchRequest", RenameMultiBranchRequest.class);
 		Hudson.XSTREAM.alias("RequestsPlugin", RequestsPlugin.class);
 
 		load();

@@ -100,6 +100,8 @@ public class RequestRenameJobAction implements Action {
 					}
 					stringBuilder1.append(newName);
 					rename = stringBuilder1.toString();
+				} else {
+					rename = newName;
 				}
 
 				String[] emailData = { jobName + " -> " + newName, username, "A Rename Job", project.getAbsoluteUrl() };
