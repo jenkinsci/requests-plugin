@@ -1,6 +1,12 @@
 
 ## Version History
 
+Version 3.1 (August 11, 2023)
+
+-       Remove unnecessary javascript from jelly files
+-		Fix username in permission error message
+
+
 Version 3.0 (June 20, 2023)
 
 -       Rework Request object to better support Folders and Multibranch Pipeline Job types that affect all request types

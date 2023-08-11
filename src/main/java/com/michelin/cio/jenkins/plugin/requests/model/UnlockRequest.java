@@ -86,7 +86,7 @@ public class UnlockRequest extends Request {
 				success = true;
 
 			} else if (returnStatus.contains("Forbidden")) {
-				errorMessage = "The Admin User " + username + " does not have permission to Unlock the Build";
+				errorMessage = "The Admin User " + adminUser + " does not have permission to Unlock the Build";
 				LOGGER.log(Level.SEVERE, "The Admin User {0} does not have permission to Unlock the Build", new Object[] { adminUser });
 				success = false;
 

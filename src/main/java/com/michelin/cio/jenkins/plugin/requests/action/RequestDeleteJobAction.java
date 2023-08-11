@@ -70,13 +70,14 @@ public class RequestDeleteJobAction implements Action {
 				final String username = request.getParameter("username");
 				RequestsPlugin plugin = Jenkins.get().getPlugin(RequestsPlugin.class);
 				if (plugin == null) {
+					LOGGER.log(Level.SEVERE, "[ERROR] Jenkins.get().getPlugin(RequestsPlugin.class) is null: ");
 					return null;
 				}
 				String jobName = project.getFullName();
 				String fullJobURL = "";
 				String jobNameSlash = jobName;
 				String jobNameJelly = "";
-				LOGGER.info("Delete Job Request project.getFullName(): " + project.getFullName());
+				LOGGER.info("Delete Job Request project.getFullName(): " + jobName);
 				String[] emailData = { project.getName(), username, "A Delete Job", project.getAbsoluteUrl() };
 
 				if (jobName.contains("/")) {
@@ -93,11 +94,20 @@ public class RequestDeleteJobAction implements Action {
 					jobNameJelly = jobNameJelly.replace("%20", " ");
 				}
 
+				// CHECK for null values:
+				// -----------------------------------
+				// username =
+				// jobName = Good
+				// fullJobURL = Good
+				// jobNameSlash = Good
+				// jobNameJelly =
+				// emailData =
+
 				plugin.addRequestPlusEmail(new DeleteJobRequest("deleteJob", username, jobName, "", fullJobURL, jobNameSlash, jobNameJelly, ""), emailData);
 			}
 
 		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "[ERROR] Exception: " + e.getMessage());
+			LOGGER.log(Level.SEVERE, "[ERROR] doCreateDeleteJobRequest() Exception: " + e.getMessage());
 
 			return null;
 		}

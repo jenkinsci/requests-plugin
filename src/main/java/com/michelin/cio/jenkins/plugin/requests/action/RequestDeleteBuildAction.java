@@ -125,13 +125,14 @@ public class RequestDeleteBuildAction implements Action {
 			String jenkinsUrl = Jenkins.get().getRootUrl();
 			fullJobURL = jenkinsUrl + shortBuildUrl;
 
-			LOGGER.info("Delete Build Action: fullJobURL - jobNameJelly: " + fullJobURL + " - " + jobNameJelly);
 			String[] emailData = { buildName, username, "A Delete Build", fullJobURL };
 
 			jobNameJelly = jobNameSlash;
 			if (jobNameJelly.contains("%20")) {
 				jobNameJelly = jobNameJelly.replace("%20", " ");
 			}
+
+			LOGGER.info("Delete Build Action: fullJobURL - jobNameJelly: " + fullJobURL + " - " + jobNameJelly);
 
 			plugin.addRequestPlusEmail(new DeleteBuildRequest("deleteBuild", username, jobNameSpace, Integer.toString(buildNumber), fullJobURL, jobNameSlash, jobNameJelly, ""),
 					emailData);
