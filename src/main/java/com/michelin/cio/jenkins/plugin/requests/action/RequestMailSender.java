@@ -290,6 +290,7 @@ public class RequestMailSender extends Builder {
 				// Email page content:
 				buf.append(".......................................................................................................................\n\n");
 				buf.append(emailMessage + "\n");
+				buf.append(pendingRequestsLink + "\n\n\n");
 				buf.append(".......................................................................................................................\n");
 				msg.setText(buf.toString());
 			}
