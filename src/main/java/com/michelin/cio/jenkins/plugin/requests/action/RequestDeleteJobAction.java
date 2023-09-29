@@ -75,7 +75,8 @@ public class RequestDeleteJobAction implements Action {
 				}
 				String jobName = project.getFullName();
 				String fullJobURL = "";
-				String jobNameSlash = jobName;
+				String jobNameSlash = jobName.toString();
+				;
 				String jobNameJelly = "";
 				LOGGER.info("Delete Job Request project.getFullName(): " + jobName);
 				String[] emailData = { project.getName(), username, "A Delete Job", project.getAbsoluteUrl() };
@@ -89,7 +90,8 @@ public class RequestDeleteJobAction implements Action {
 				fullJobURL = project.getAbsoluteUrl();
 				LOGGER.info("Delete Job Request fullJobURL: " + fullJobURL);
 
-				jobNameJelly = jobNameSlash;
+				jobNameJelly = jobNameSlash.toString();
+				;
 				if (jobNameJelly.contains("%20")) {
 					jobNameJelly = jobNameJelly.replace("%20", " ");
 				}

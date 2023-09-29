@@ -82,12 +82,23 @@ public class RequestsPlugin extends Plugin {
 
 	public void addRequestPlusEmail(final Request request, final String[] emailData) throws UnknownHostException, MessagingException {
 		boolean alreadyRequested = false;
+		final int element0 = 0;
+		final int element1 = 1;
+		final int element2 = 2;
+		final int element3 = 3;
 
+		// Loop through all current open Requests:
 		for (int i = 0; i < requests.size(); i++) {
 			// String projectFullName = requests.get(i).getProjectFullName();
 			String jobName = requests.get(i).getJobNameSlash();
 			String buildNumber = requests.get(i).getBuildNumber();
 			String requestType = requests.get(i).getRequestType();
+
+			if (jobName == null | buildNumber == null | requestType == null) {
+				RequestMailSender mailSender = new RequestMailSender(emailData[element0], emailData[element1], emailData[element2], emailData[element3], "ERROR",
+						"ERROR: Bad data in Requests queue needs to be investigated and cleared.");
+				mailSender.executeEmail();
+			}
 
 			// Allows a delete project, delete build and unlock build for the same build but will not submit duplicate of the same request:
 			if (jobName.equals(request.getJobNameSlash()) && buildNumber.equals(request.getBuildNumber()) && requestType.equals(request.getRequestType())) {
@@ -98,14 +109,9 @@ public class RequestsPlugin extends Plugin {
 
 		if (!alreadyRequested) {
 			requests.add(request);
-			final int element0 = 0;
-			final int element1 = 1;
-			final int element2 = 2;
-			final int element3 = 3;
-			RequestMailSender mailSender = new RequestMailSender(emailData[element0], emailData[element1], emailData[element2], emailData[element3]);
-			// LOGGER.info("[INFO] mailSender 1:");
+
+			RequestMailSender mailSender = new RequestMailSender(emailData[element0], emailData[element1], emailData[element2], emailData[element3], "REQUEST", "");
 			mailSender.executeEmail();
-			// LOGGER.info("[INFO] mailSender 2:");
 			persistPendingRequests();
 		}
 	}

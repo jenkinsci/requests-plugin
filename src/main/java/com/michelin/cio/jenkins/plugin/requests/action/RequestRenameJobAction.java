@@ -76,7 +76,8 @@ public class RequestRenameJobAction implements Action {
 				}
 				String jobName = project.getFullName();
 				String fullJobURL = "";
-				String jobNameSlash = jobName;
+				String jobNameSlash = jobName.toString();
+				;
 				String jobNameJelly = "";
 
 				if (jobName.contains("/")) {
@@ -85,7 +86,8 @@ public class RequestRenameJobAction implements Action {
 					jobName = projectnameList[nameCount - 1];
 				}
 
-				jobNameJelly = jobNameSlash;
+				jobNameJelly = jobNameSlash.toString();
+				;
 				if (jobNameJelly.contains("%20")) {
 					jobNameJelly = jobNameJelly.replace("%20", " ");
 				}
@@ -101,7 +103,8 @@ public class RequestRenameJobAction implements Action {
 					stringBuilder1.append(newName);
 					rename = stringBuilder1.toString();
 				} else {
-					rename = newName;
+					rename = newName.toString();
+					;
 				}
 
 				String[] emailData = { jobName + " -> " + newName, username, "A Rename Job", project.getAbsoluteUrl() };

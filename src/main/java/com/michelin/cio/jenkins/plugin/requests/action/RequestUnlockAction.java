@@ -121,7 +121,7 @@ public class RequestUnlockAction implements Action {
 			jobNameSlash = stringBuilder3.toString();
 			LOGGER.info("Unlock Build Action: jobNameSpace - jobNameSlash: " + jobNameSpace + " - " + jobNameSlash);
 
-			jobNameJelly = jobNameSlash;
+			jobNameJelly = jobNameSlash.toString();
 			if (jobNameJelly.contains("%20")) {
 				jobNameJelly = jobNameJelly.replace("%20", " ");
 			}

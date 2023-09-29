@@ -76,7 +76,6 @@ public class RequestDeleteBuildAction implements Action {
 			String jobNameSpace = "";
 			String jobNameSlash = "";
 			String fullJobURL = "";
-			String jobNameJelly = "";
 
 			LOGGER.info("Delete Build Action: shortBuildUrl: " + shortBuildUrl);
 			LOGGER.info("Delete Build Action: buildName: " + buildName);
@@ -127,7 +126,7 @@ public class RequestDeleteBuildAction implements Action {
 
 			String[] emailData = { buildName, username, "A Delete Build", fullJobURL };
 
-			jobNameJelly = jobNameSlash;
+			String jobNameJelly = jobNameSlash.toString();
 			if (jobNameJelly.contains("%20")) {
 				jobNameJelly = jobNameJelly.replace("%20", " ");
 			}

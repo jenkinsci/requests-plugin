@@ -1,6 +1,13 @@
 
 ## Version History
 
+Version 3.2 (Sept 29, 2023)
+
+-       Dependabot pom dependency updates for security issues
+-		Pom dependency update required minimum jenkins version 2.387.3
+-		Fix nullexception with string, from v 3.0 rework
+
+
 Version 3.1 (August 11, 2023)
 
 -       Remove unnecessary javascript from jelly files

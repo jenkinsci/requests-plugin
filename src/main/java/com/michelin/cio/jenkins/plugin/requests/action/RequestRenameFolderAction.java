@@ -78,7 +78,8 @@ public class RequestRenameFolderAction implements Action {
 				}
 				String jobName = project.getFullName();
 				String fullJobURL = "";
-				String jobNameSlash = jobName;
+				String jobNameSlash = jobName.toString();
+				;
 				String jobNameJelly = "";
 
 				if (jobName.contains("/")) {
@@ -103,7 +104,8 @@ public class RequestRenameFolderAction implements Action {
 					stringBuilder1.append(newName);
 					rename = stringBuilder1.toString();
 				} else {
-					rename = newName;
+					rename = newName.toString();
+					;
 				}
 
 				fullJobURL = project.getAbsoluteUrl();

@@ -67,6 +67,8 @@ public class RequestMailSender extends Builder {
 	private final String userName;
 	private final String requestType;
 	private final String projectURL;
+	private final String emailType;
+	private final String emailMessage;
 	private String requestadminemail;
 	private String requestmaildomain;
 	private String requestemailserver;
@@ -74,11 +76,13 @@ public class RequestMailSender extends Builder {
 	private static final Logger LOGGER = Logger.getLogger(RequestMailSender.class.getName());
 
 	// @DataBoundConstructor
-	public RequestMailSender(String itemName, String userName, String requestType, String projectURL) {
+	public RequestMailSender(String itemName, String userName, String requestType, String projectURL, String emailType, String emailMessage) {
 		this.itemName = itemName;
 		this.userName = userName;
 		this.requestType = requestType;
 		this.projectURL = projectURL;
+		this.emailType = emailType;
+		this.emailMessage = emailMessage;
 	}
 
 	// Check if request admin value exits before trying to create the email:
@@ -140,7 +144,13 @@ public class RequestMailSender extends Builder {
 			return;
 		}
 
-		MimeMessage mail = createMail(itemName, userName, requestType);
+		MimeMessage mail = null;
+
+		if (emailType.equals("REQUEST")) {
+			mail = createMail(itemName, userName, requestType);
+		} else {
+			mail = createMailError(itemName, userName, requestType, emailMessage);
+		}
 
 		if (mail != null) {
 			Transport.send(mail);
@@ -237,6 +247,95 @@ public class RequestMailSender extends Builder {
 
 			msg.addRecipients(Message.RecipientType.TO, addresss_TO);
 			msg.addRecipients(Message.RecipientType.CC, addresss_CC);
+
+		} catch (MessagingException me) {
+			LOGGER.log(Level.WARNING, "Unable to create email message! ", me.getMessage());
+		}
+
+		return msg;
+	}
+
+	// Email for admins only:
+	private MimeMessage createMailError(String itemName, String userName, String requestType, String emailMessage) throws MessagingException, UnknownHostException {
+		String jenkinsURL = getProjectURL();
+		MimeMessage msg = createEmptyMailError();
+		StringBuffer buf = new StringBuffer();
+		String[] jenkinsURLArray;
+
+		try {
+
+			if (msg != null) {
+				String jenkinsHostName = InetAddress.getLocalHost().getHostName();
+
+				// Check to see if the hostname is an ip address:
+				if (Character.isLetter(jenkinsHostName.charAt(0))) {
+					String[] nameArray = jenkinsHostName.split("\\.");
+					jenkinsHostName = nameArray[0];
+					jenkinsHostName = jenkinsHostName.toUpperCase(Locale.ENGLISH);
+				}
+
+				// Get Jenkins URL from the projectURL:
+				if (projectURL.contains("/view/")) {
+					jenkinsURLArray = jenkinsURL.split("/view/");
+					// } else if (jenkinsURL.contains("/job/")) {
+				} else {
+					jenkinsURLArray = jenkinsURL.split("/job/");
+				}
+
+				String pendingRequestsLink = jenkinsURLArray[0] + "/plugin/requests/";
+
+				// Email Subject line:
+				msg.setSubject(String.format(jenkinsHostName + ": Request Plugin: Issue encountered"));
+
+				// Email page content:
+				buf.append(".......................................................................................................................\n\n");
+				buf.append(emailMessage + "\n");
+				buf.append(".......................................................................................................................\n");
+				msg.setText(buf.toString());
+			}
+
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "[ERROR] Exception: " + e.getMessage());
+
+			return null;
+		}
+
+		return msg;
+	}
+
+	// Email for admins only:
+	private MimeMessage createEmptyMailError() throws MessagingException {
+		String emailHost = getDescriptor().getRequestemailhost();
+		if (emailHost == null || requestemailserver.equals("")) {
+			emailHost = "localhost";
+		}
+		Properties properties = System.getProperties();
+		properties.setProperty(requestemailserver, emailHost);
+		Session session = Session.getDefaultInstance(properties);
+		MimeMessage msg = null;
+
+		try {
+			msg = new MimeMessage(session);
+			msg.setContent("", "text/html");
+			msg.setFrom(new InternetAddress(requestadminemail));
+			msg.setSentDate(new Date());
+
+			String[] emailAddresses = requestadminemail.split(",");
+			int addressCount = emailAddresses.length;
+			// LOGGER.info("[INFO] Email address count: " + addressCount);
+
+			Address[] addresss_TO = new Address[addressCount];
+
+			if (requestadminemail.contains(",")) {
+				for (int i = 0; i < addressCount; i++) {
+					addresss_TO[i] = new InternetAddress(emailAddresses[i]);
+					// LOGGER.info("[INFO] Email address: " + emailAddresses[i]);
+				}
+			} else {
+				addresss_TO[0] = new InternetAddress(requestadminemail);
+			}
+
+			msg.addRecipients(Message.RecipientType.TO, addresss_TO);
 
 		} catch (MessagingException me) {
 			LOGGER.log(Level.WARNING, "Unable to create email message! ", me.getMessage());
@@ -487,90 +586,58 @@ public class RequestMailSender extends Builder {
 			return FormValidation.ok(returnMessage);
 		}
 
-		@POST
-		public FormValidation doTestEmailTEST(@QueryParameter("testEmailAddress") final String testEmailAddress) throws MessagingException, UnknownHostException {
-			MimeMessage msg = createEmptyMailTEST(testEmailAddress);
-			StringBuffer buf = new StringBuffer();
-
-			try {
-
-				if (msg != null) {
-					String jenkinsHostName = InetAddress.getLocalHost().getHostName();
-
-					// Check to see if the hostname is an ip address:
-					if (Character.isLetter(jenkinsHostName.charAt(0))) {
-						String[] nameArray = jenkinsHostName.split("\\.");
-						jenkinsHostName = nameArray[0];
-						jenkinsHostName = jenkinsHostName.toUpperCase(Locale.ENGLISH);
-					}
-
-					// Email Subject line:
-					msg.setSubject(String.format(jenkinsHostName + ": Test Email - Jenkins Request Plugin"));
-
-					// Email page content:
-					buf.append(".......................................................................................................................\n\n");
-					buf.append("This is a test email from the Jenkins Requests Plugin\n");
-					buf.append(".......................................................................................................................\n");
-					msg.setText(buf.toString());
-				}
-
-			} catch (Exception e) {
-				LOGGER.log(Level.SEVERE, "[ERROR] Exception: " + e.getMessage());
-
-				return null;
-			}
-
-			try {
-				Transport.send(msg);
-				String returnMessage = "Email sent successfully";
-				return FormValidation.ok(returnMessage);
-
-			} catch (MessagingException me) {
-				LOGGER.log(Level.WARNING, "Unable to create email message! ", me.getMessage());
-				String returnMessage = "Email sent successfully";
-				return FormValidation.error(returnMessage);
-			}
-		}
-
-		private MimeMessage createEmptyMailTEST(String testEmailAddress) throws MessagingException {
-			String emailHost = getRequestemailhost();
-			if (emailHost == null || requestemailserver.equals("")) {
-				emailHost = "localhost";
-			}
-			Properties properties = System.getProperties();
-			properties.setProperty(requestemailserver, emailHost);
-			Session session = Session.getDefaultInstance(properties);
-			MimeMessage msg = null;
-
-			try {
-				msg = new MimeMessage(session);
-				msg.setContent("", "text/html");
-				msg.setFrom(new InternetAddress(testEmailAddress + requestmaildomain));
-				msg.setSentDate(new Date());
-
-				String[] emailAddresses = requestadminemail.split(",");
-				int addressCount = emailAddresses.length;
-				// LOGGER.info("[INFO] Email address count: " + addressCount);
-
-				Address[] addresss_TO = new Address[addressCount];
-
-				if (requestadminemail.contains(",")) {
-					for (int i = 0; i < addressCount; i++) {
-						addresss_TO[i] = new InternetAddress(emailAddresses[i]);
-						// LOGGER.info("[INFO] Email address: " + emailAddresses[i]);
-					}
-				} else {
-					addresss_TO[0] = new InternetAddress(requestadminemail);
-				}
-
-				msg.addRecipients(Message.RecipientType.TO, addresss_TO);
-
-			} catch (MessagingException me) {
-				LOGGER.log(Level.WARNING, "Unable to create email message! ", me.getMessage());
-			}
-
-			return msg;
-		}
+		/*
+		 * @POST public FormValidation doTestEmailTEST(@QueryParameter("testEmailAddress") final String testEmailAddress) throws
+		 * MessagingException, UnknownHostException { MimeMessage msg = createEmptyMailTEST(testEmailAddress); StringBuffer buf = new
+		 * StringBuffer();
+		 * 
+		 * try {
+		 * 
+		 * if (msg != null) { String jenkinsHostName = InetAddress.getLocalHost().getHostName();
+		 * 
+		 * // Check to see if the hostname is an ip address: if (Character.isLetter(jenkinsHostName.charAt(0))) { String[] nameArray =
+		 * jenkinsHostName.split("\\."); jenkinsHostName = nameArray[0]; jenkinsHostName = jenkinsHostName.toUpperCase(Locale.ENGLISH); }
+		 * 
+		 * // Email Subject line: msg.setSubject(String.format(jenkinsHostName + ": Test Email - Jenkins Request Plugin"));
+		 * 
+		 * // Email page content: buf.append(
+		 * ".......................................................................................................................\n\n");
+		 * buf.append("This is a test email from the Jenkins Requests Plugin\n"); buf.append(
+		 * ".......................................................................................................................\n");
+		 * msg.setText(buf.toString()); }
+		 * 
+		 * } catch (Exception e) { LOGGER.log(Level.SEVERE, "[ERROR] Exception: " + e.getMessage());
+		 * 
+		 * return null; }
+		 * 
+		 * try { Transport.send(msg); String returnMessage = "Email sent successfully"; return FormValidation.ok(returnMessage);
+		 * 
+		 * } catch (MessagingException me) { LOGGER.log(Level.WARNING, "Unable to create email message! ", me.getMessage()); String
+		 * returnMessage = "Email sent successfully"; return FormValidation.error(returnMessage); } }
+		 * 
+		 * private MimeMessage createEmptyMailTEST(String testEmailAddress) throws MessagingException { String emailHost =
+		 * getRequestemailhost(); if (emailHost == null || requestemailserver.equals("")) { emailHost = "localhost"; } Properties
+		 * properties = System.getProperties(); properties.setProperty(requestemailserver, emailHost); Session session =
+		 * Session.getDefaultInstance(properties); MimeMessage msg = null;
+		 * 
+		 * try { msg = new MimeMessage(session); msg.setContent("", "text/html"); msg.setFrom(new InternetAddress(testEmailAddress +
+		 * requestmaildomain)); msg.setSentDate(new Date());
+		 * 
+		 * String[] emailAddresses = requestadminemail.split(","); int addressCount = emailAddresses.length; //
+		 * LOGGER.info("[INFO] Email address count: " + addressCount);
+		 * 
+		 * Address[] addresss_TO = new Address[addressCount];
+		 * 
+		 * if (requestadminemail.contains(",")) { for (int i = 0; i < addressCount; i++) { addresss_TO[i] = new
+		 * InternetAddress(emailAddresses[i]); // LOGGER.info("[INFO] Email address: " + emailAddresses[i]); } } else { addresss_TO[0] =
+		 * new InternetAddress(requestadminemail); }
+		 * 
+		 * msg.addRecipients(Message.RecipientType.TO, addresss_TO);
+		 * 
+		 * } catch (MessagingException me) { LOGGER.log(Level.WARNING, "Unable to create email message! ", me.getMessage()); }
+		 * 
+		 * return msg; }
+		 */
 
 	}
 }

@@ -76,7 +76,8 @@ public class RequestDeleteFolderAction extends FolderProperty<Folder> implements
 				}
 				String jobName = project.getFullName();
 				String fullJobURL = "";
-				String jobNameSlash = jobName;
+				String jobNameSlash = jobName.toString();
+				;
 				String jobNameJelly = "";
 				String[] emailData = { project.getName(), username, "A Delete Folder", project.getAbsoluteUrl() };
 
@@ -86,7 +87,8 @@ public class RequestDeleteFolderAction extends FolderProperty<Folder> implements
 					jobName = projectnameList[nameCount - 1];
 				}
 
-				jobNameJelly = jobNameSlash;
+				jobNameJelly = jobNameSlash.toString();
+				;
 				if (jobNameJelly.contains("%20")) {
 					jobNameJelly = jobNameJelly.replace("%20", " ");
 				}

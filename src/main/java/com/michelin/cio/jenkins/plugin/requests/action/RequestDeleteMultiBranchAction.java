@@ -79,7 +79,8 @@ public class RequestDeleteMultiBranchAction implements Action {
 				}
 				String jobName = project.getFullName();
 				String fullJobURL = "";
-				String jobNameSlash = jobName;
+				String jobNameSlash = jobName.toString();
+				;
 				String jobNameJelly = "";
 				String[] emailData = { project.getName(), username, "A Delete Multi Branch", project.getAbsoluteUrl() };
 
@@ -89,7 +90,8 @@ public class RequestDeleteMultiBranchAction implements Action {
 					jobName = projectnameList[nameCount - 1];
 				}
 
-				jobNameJelly = jobNameSlash;
+				jobNameJelly = jobNameSlash.toString();
+				;
 				if (jobNameJelly.contains("%20")) {
 					jobNameJelly = jobNameJelly.replace("%20", " ");
 				}
