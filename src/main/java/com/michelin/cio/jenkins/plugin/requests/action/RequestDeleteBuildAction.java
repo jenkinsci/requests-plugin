@@ -136,7 +136,8 @@ public class RequestDeleteBuildAction implements Action {
 				plugin.addRequestPlusEmail(new DeleteBuildRequest("deleteBuild", username, jobNameSpace, Integer.toString(buildNumber), fullJobURL, jobNameSlash, jobNameJelly, ""),
 						emailData);
 			}
-
+		} catch (RuntimeException e) {
+			throw e;
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "[ERROR] doCreateDeleteJobRequest() Exception: " + e.getMessage());
 
