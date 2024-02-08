@@ -35,6 +35,7 @@ import javax.annotation.Nonnull;
 import javax.mail.MessagingException;
 import javax.servlet.ServletException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.kohsuke.stapler.HttpRedirect;
 import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.StaplerRequest;
@@ -59,30 +60,38 @@ import jenkins.model.TransientActionFactory;
 public class RequestDeleteMultiBranchAction implements Action {
 
 	private AbstractItem project;
-	// private AbstractItem project2;
 
 	public RequestDeleteMultiBranchAction(AbstractItem target) {
-		// project2 = (AbstractItem) target.getTarget();
-		// this.project = project2;
-		this.project = target;
+		project = target;
 	}
 
 	@POST
-	public HttpResponse doCreateDeleteMultiBranchRequest(StaplerRequest request, StaplerResponse response) throws IOException, ServletException, MessagingException {
+	public HttpResponse doCreateDeleteMultiBranchRequest(StaplerRequest staplerRequest, StaplerResponse response) throws IOException, MessagingException {
+		String username = " ";
 
 		try {
 			if (isIconDisplayed()) {
-				final String username = request.getParameter("username");
+				username = staplerRequest.getParameter("username");
+				String jobName = project.getFullName();
+
+				if (!StringUtils.isNotEmpty(jobName)) {
+					RequestMailSender mailSender = new RequestMailSender("deleteMultiBranch", username, "REQUEST", "", "ERROR",
+							"ERROR: Jenkins Project object is null.  Unable to submit the Delete MultiBranch Job Request.");
+					mailSender.executeEmail();
+
+					return null;
+				}
+
 				RequestsPlugin plugin = Jenkins.get().getPlugin(RequestsPlugin.class);
 				if (plugin == null) {
 					return null;
 				}
-				String jobName = project.getFullName();
+
 				String fullJobURL = "";
-				String jobNameSlash = jobName.toString();
+				String jobNameSlash = jobName;
 				;
 				String jobNameJelly = "";
-				String[] emailData = { project.getName(), username, "A Delete Multi Branch", project.getAbsoluteUrl() };
+				String[] emailData = { jobName, username, "A Delete Multi Branch", project.getAbsoluteUrl() };
 
 				if (jobName.contains("/")) {
 					String[] projectnameList = jobName.split("/");
@@ -90,23 +99,30 @@ public class RequestDeleteMultiBranchAction implements Action {
 					jobName = projectnameList[nameCount - 1];
 				}
 
-				jobNameJelly = jobNameSlash.toString();
-				;
+				jobNameJelly = jobNameSlash;
+
 				if (jobNameJelly.contains("%20")) {
 					jobNameJelly = jobNameJelly.replace("%20", " ");
 				}
 				fullJobURL = project.getAbsoluteUrl();
 
-				plugin.addRequestPlusEmail(new DeleteMultiBranchRequest("deleteMultiBranch", username, jobName, "", fullJobURL, jobNameSlash, jobNameJelly, ""), emailData);
+				LOGGER.info("Delete MBP Job Request jobName:" + jobName + ", fullJobURL:" + fullJobURL);
+				// LOGGER.info("[DEBUG] deleteMultiBranch: " + username + ":" + jobName + ":NA" + ":" + fullJobURL + ":" + jobNameSlash + ":" +
+				// jobNameJelly + ":NA");
+
+				plugin.addRequestPlusEmail(new DeleteMultiBranchRequest("deleteMultiBranch", username, jobName, "NA", fullJobURL, jobNameSlash, jobNameJelly, "NA"), emailData);
 			}
 
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "[ERROR] Exception: " + e.getMessage());
+			RequestMailSender mailSender = new RequestMailSender("deleteMultiBranch", username, "REQUEST", "", "ERROR",
+					"ERROR: Unable to submit the Delete MultiBranch Job Request. " + e.getMessage());
+			mailSender.executeEmail();
 
 			return null;
 		}
 
-		return new HttpRedirect(request.getContextPath() + '/' + project.getUrl());
+		return new HttpRedirect(staplerRequest.getContextPath() + '/' + project.getUrl());
 	}
 
 	public String getDisplayName() {
@@ -129,9 +145,6 @@ public class RequestDeleteMultiBranchAction implements Action {
 	}
 
 	public AbstractItem getProject() {
-		// Folder project2a = (Folder) project2.getTarget();
-		// return project2a;
-
 		return project;
 	}
 

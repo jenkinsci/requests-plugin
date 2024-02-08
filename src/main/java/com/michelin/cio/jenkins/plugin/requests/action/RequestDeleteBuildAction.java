@@ -64,77 +64,87 @@ public class RequestDeleteBuildAction implements Action {
 
 	@POST
 	public HttpResponse doCreateDeleteBuildRequest(StaplerRequest request, StaplerResponse response) throws IOException, ServletException, MessagingException {
+		String username = " ";
 
-		if (isIconDisplayed()) {
-			final String username = request.getParameter("username");
-			RequestsPlugin plugin = Jenkins.get().getPlugin(RequestsPlugin.class);
+		try {
+			if (isIconDisplayed()) {
+				username = request.getParameter("username");
+				RequestsPlugin plugin = Jenkins.get().getPlugin(RequestsPlugin.class);
 
-			if (plugin == null) {
-				return null;
-			}
+				if (plugin == null) {
+					return null;
+				}
 
-			String jobNameSpace = "";
-			String jobNameSlash = "";
-			String fullJobURL = "";
+				String jobNameSpace = "";
+				String jobNameSlash = "";
+				String fullJobURL = "";
 
-			LOGGER.info("Delete Build Action: shortBuildUrl: " + shortBuildUrl);
-			LOGGER.info("Delete Build Action: buildName: " + buildName);
-			LOGGER.info("Delete Build Action: buildNumber: " + buildNumber);
+				// LOGGER.info("Delete Build Action: shortBuildUrl: " + shortBuildUrl + "buildName: " + buildName + "buildNumber: " +
+				// buildNumber);
 
-			// NOTE: Folders and Multibranch pipelines can set a Display name. The real names can only be obtained from the build_Url:
+				// NOTE: Folders and Multibranch pipelines can set a Display name. The real names can only be obtained from the build_Url:
 
-			// Need to extract the folder name(s) and the job name:
-			StringBuilder stringBuilder1 = new StringBuilder();
-			StringBuilder stringBuilder3 = new StringBuilder();
-			String[] nameArray = shortBuildUrl.split("/");
-			ArrayList<String> nameList = new ArrayList<>();
-			nameList.addAll(Arrays.asList(nameArray));
+				// Need to extract the folder name(s) and the job name:
+				StringBuilder stringBuilder1 = new StringBuilder();
+				StringBuilder stringBuilder3 = new StringBuilder();
+				String[] nameArray = shortBuildUrl.split("/");
+				ArrayList<String> nameList = new ArrayList<>();
+				nameList.addAll(Arrays.asList(nameArray));
 
-			// If build_Url starts with view, then remove first 2 elements (view and view_name):
-			// If build_Url starts with job, then remove first element: Ex: build_Url = "view/JOHN/job/FolderTest22/job/TestFolderJob1/5/";
-			if (nameList.get(0).equalsIgnoreCase("view")) {
-				nameList.remove(0);
-				nameList.remove(0);
+				// If build_Url starts with view, then remove first 2 elements (view and view_name):
+				// If build_Url starts with job, then remove first element: Ex: build_Url = "view/JOHN/job/FolderTest22/job/TestFolderJob1/5/";
+				if (nameList.get(0).equalsIgnoreCase("view")) {
+					nameList.remove(0);
+					nameList.remove(0);
 
-			}
+				}
 
-			if (nameList.get(0).equalsIgnoreCase("job")) {
-				nameList.remove(0);
-			}
+				if (nameList.get(0).equalsIgnoreCase("job")) {
+					nameList.remove(0);
+				}
 
-			int nameCount = nameList.size();
+				int nameCount = nameList.size();
 
-			// Cat together folder names without "job":
-			for (int i = 0; i < nameCount - 1; i++) {
-				if (!nameList.get(i).equalsIgnoreCase("job")) {
-					if (i == (nameCount - 2)) {
-						stringBuilder1.append(nameList.get(i));
-						stringBuilder3.append(nameList.get(i));
-					} else {
-						stringBuilder1.append(nameList.get(i) + " ");
-						stringBuilder3.append(nameList.get(i) + "/");
+				// Cat together folder names without "job":
+				for (int i = 0; i < nameCount - 1; i++) {
+					if (!nameList.get(i).equalsIgnoreCase("job")) {
+						if (i == (nameCount - 2)) {
+							stringBuilder1.append(nameList.get(i));
+							stringBuilder3.append(nameList.get(i));
+						} else {
+							stringBuilder1.append(nameList.get(i) + " ");
+							stringBuilder3.append(nameList.get(i) + "/");
+						}
 					}
 				}
+
+				jobNameSpace = stringBuilder1.toString();
+				jobNameSlash = stringBuilder3.toString();
+
+				String jenkinsUrl = Jenkins.get().getRootUrl();
+				fullJobURL = jenkinsUrl + shortBuildUrl;
+
+				String[] emailData = { buildName, username, "A Delete Build", fullJobURL };
+
+				String jobNameJelly = jobNameSlash.toString();
+				if (jobNameJelly.contains("%20")) {
+					jobNameJelly = jobNameJelly.replace("%20", " ");
+				}
+
+				LOGGER.info("Delete Build Action: jobNameSpace - fullJobURL: " + jobNameSpace + " - " + fullJobURL);
+
+				plugin.addRequestPlusEmail(new DeleteBuildRequest("deleteBuild", username, jobNameSpace, Integer.toString(buildNumber), fullJobURL, jobNameSlash, jobNameJelly, ""),
+						emailData);
 			}
 
-			jobNameSpace = stringBuilder1.toString();
-			jobNameSlash = stringBuilder3.toString();
-			LOGGER.info("Delete Build Action: jobNameSpace - jobNameSlash: " + jobNameSpace + " - " + jobNameSlash);
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "[ERROR] doCreateDeleteJobRequest() Exception: " + e.getMessage());
 
-			String jenkinsUrl = Jenkins.get().getRootUrl();
-			fullJobURL = jenkinsUrl + shortBuildUrl;
+			RequestMailSender mailSender = new RequestMailSender("deleteBuild", username, "REQUEST", "", "ERROR",
+					"ERROR: Unable to submit the Delete Build Request. " + e.getMessage());
+			mailSender.executeEmail();
 
-			String[] emailData = { buildName, username, "A Delete Build", fullJobURL };
-
-			String jobNameJelly = jobNameSlash.toString();
-			if (jobNameJelly.contains("%20")) {
-				jobNameJelly = jobNameJelly.replace("%20", " ");
-			}
-
-			LOGGER.info("Delete Build Action: fullJobURL - jobNameJelly: " + fullJobURL + " - " + jobNameJelly);
-
-			plugin.addRequestPlusEmail(new DeleteBuildRequest("deleteBuild", username, jobNameSpace, Integer.toString(buildNumber), fullJobURL, jobNameSlash, jobNameJelly, ""),
-					emailData);
+			return null;
 		}
 
 		return new HttpRedirect(request.getContextPath() + '/' + shortBuildUrl);

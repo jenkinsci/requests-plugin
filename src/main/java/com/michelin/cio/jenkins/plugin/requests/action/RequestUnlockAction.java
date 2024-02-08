@@ -78,9 +78,8 @@ public class RequestUnlockAction implements Action {
 			String jobNameSlash = "";
 			String jobNameJelly = "";
 
-			LOGGER.info("Unlock Build Action: shortBuildUrl: " + shortBuildUrl);
-			LOGGER.info("Unlock Build Action: buildName: " + buildName);
-			LOGGER.info("Unlock Build Action: buildNumber: " + buildNumber);
+			// LOGGER.info("Unlock Build Action: shortBuildUrl: " + shortBuildUrl + "buildName: " + buildName + "buildNumber: " +
+			// buildNumber);
 
 			// NOTE: Folders and Multibranch pipelines can set a Display name. The real names can only be obtained from the build_Url:
 
@@ -119,18 +118,19 @@ public class RequestUnlockAction implements Action {
 
 			jobNameSpace = stringBuilder1.toString();
 			jobNameSlash = stringBuilder3.toString();
-			LOGGER.info("Unlock Build Action: jobNameSpace - jobNameSlash: " + jobNameSpace + " - " + jobNameSlash);
+			jobNameJelly = jobNameSlash;
 
-			jobNameJelly = jobNameSlash.toString();
 			if (jobNameJelly.contains("%20")) {
 				jobNameJelly = jobNameJelly.replace("%20", " ");
 			}
 
 			String jenkinsUrl = Jenkins.get().getRootUrl();
 			fullJobURL = jenkinsUrl + shortBuildUrl;
-			LOGGER.info("Unlock Build Action: fullJobURL - jobNameJelly: " + fullJobURL + " - " + jobNameJelly);
+
+			LOGGER.info("Unlock Build Action: jobNameSpace - fullJobURL: " + jobNameSpace + " - " + fullJobURL);
+
 			String[] emailData = { buildName, username, "An Unlock Build", fullJobURL };
-			plugin.addRequestPlusEmail(new UnlockRequest("unlockBuild", username, jobNameSpace, Integer.toString(buildNumber), fullJobURL, jobNameSlash, jobNameJelly, ""),
+			plugin.addRequestPlusEmail(new UnlockRequest("unlockBuild", username, jobNameSpace, Integer.toString(buildNumber), fullJobURL, jobNameSlash, jobNameJelly, "NA"),
 					emailData);
 		}
 

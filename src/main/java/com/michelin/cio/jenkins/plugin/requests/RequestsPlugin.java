@@ -34,7 +34,7 @@ import java.util.logging.Logger;
 import javax.mail.MessagingException;
 import javax.servlet.ServletException;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.kohsuke.stapler.HttpRedirect;
 import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.StaplerRequest;
@@ -54,7 +54,6 @@ import com.michelin.cio.jenkins.plugin.requests.model.UnlockRequest;
 
 import hudson.Extension;
 import hudson.Plugin;
-import hudson.model.Hudson;
 import hudson.model.ManagementLink;
 import jenkins.model.Jenkins;
 
@@ -63,22 +62,9 @@ import jenkins.model.Jenkins;
 
 public class RequestsPlugin extends Plugin {
 	// The requests are unique (to avoid duplication problems like delete a job already deleted)
-	private List<Request> requests = new ArrayList<Request>();
+	private List<Request> requests = new ArrayList<>();
 	private static final Logger LOGGER = Logger.getLogger(RequestsPlugin.class.getName());
-	private transient List<String> errors = new ArrayList<String>();
-
-	/*
-	 * public void addRequest(final Request request) { boolean alreadyRequested = false;
-	 * 
-	 * for (int i = 0; i < requests.size(); i++) { String projectFullName = requests.get(i).getProjectFullName(); String buildNumber =
-	 * requests.get(i).getBuildNumber(); String requestType = requests.get(i).getRequestType();
-	 * 
-	 * // Allows a delete project, delete build and unlock build for the // same build but will not submit duplicate of the same
-	 * request: if (projectFullName.equals(request.getProjectFullName()) && buildNumber.equals(request.getBuildNumber()) &&
-	 * requestType.equals(request.getRequestType())) { alreadyRequested = true; break; } }
-	 * 
-	 * if (!alreadyRequested) { requests.add(request); persistPendingRequests(); } }
-	 */
+	private List<String> errors = new ArrayList<>();
 
 	public void addRequestPlusEmail(final Request request, final String[] emailData) throws UnknownHostException, MessagingException {
 		boolean alreadyRequested = false;
@@ -89,15 +75,22 @@ public class RequestsPlugin extends Plugin {
 
 		// Loop through all current open Requests:
 		for (int i = 0; i < requests.size(); i++) {
-			// String projectFullName = requests.get(i).getProjectFullName();
+			String projectFullJobURL = requests.get(i).getFullJobURL();
 			String jobName = requests.get(i).getJobNameSlash();
 			String buildNumber = requests.get(i).getBuildNumber();
 			String requestType = requests.get(i).getRequestType();
 
-			if (jobName == null | buildNumber == null | requestType == null) {
+			// LOGGER.info("[DEBUG] Add Request values:[" + request.getJobNameSlash() + ":" + request.getBuildNumber() + ":" +
+			// request.getRequestType() + ":" + request.getFullJobURL()+ "]");
+
+			// StringUtils.isNotEmpty(jobNameJelly)
+			if (!StringUtils.isNotEmpty(request.getJobNameSlash()) || !StringUtils.isNotEmpty(request.getBuildNumber()) || !StringUtils.isNotEmpty(request.getRequestType())) {
 				RequestMailSender mailSender = new RequestMailSender(emailData[element0], emailData[element1], emailData[element2], emailData[element3], "ERROR",
-						"ERROR: Bad data in Requests queue needs to be investigated and cleared.");
+						"ERROR: Invalid data in Request.");
 				mailSender.executeEmail();
+				LOGGER.info("[ERROR] RequestsPlugin value is null:[" + jobName + ":" + buildNumber + ":" + requestType + ":" + projectFullJobURL + "]");
+
+				return;
 			}
 
 			// Allows a delete project, delete build and unlock build for the same build but will not submit duplicate of the same request:
@@ -121,9 +114,9 @@ public class RequestsPlugin extends Plugin {
 		Jenkins.get().checkPermission(Jenkins.ADMINISTER);
 		errors.clear();
 		String[] selectedRequests = request.getParameterValues("selected");
-		ArrayList<Integer> selectedIndexs = new ArrayList<Integer>();
+		ArrayList<Integer> selectedIndexs = new ArrayList<>();
 		// Store the request once they have been applied
-		List<Request> requestsToRemove = new ArrayList<Request>();
+		List<Request> requestsToRemove = new ArrayList<>();
 
 		if (selectedRequests != null && selectedRequests.length > 0) {
 			for (String sindex : selectedRequests) {
@@ -145,7 +138,7 @@ public class RequestsPlugin extends Plugin {
 
 						} else {
 							// Failed, show error message:
-							errors.add(currentRequest.getErrorMessage().toString());
+							errors.add(currentRequest.getErrorMessage());
 							LOGGER.info("[WARNING] The request can not be processed: " + currentRequest.getMessage().toString());
 						}
 					} else if (request.hasParameter("discard")) {
@@ -175,13 +168,13 @@ public class RequestsPlugin extends Plugin {
 	}
 
 	public List<Request> getRequests() {
-		List<Request> requests2 = new ArrayList<Request>();
+		List<Request> requests2 = new ArrayList<>();
 		requests2.addAll(requests);
 		return requests2;
 	}
 
 	public List<String> getErrors() {
-		List<String> errors2 = new ArrayList<String>();
+		List<String> errors2 = new ArrayList<>();
 		errors2.addAll(errors);
 		return errors2;
 	}
@@ -199,7 +192,7 @@ public class RequestsPlugin extends Plugin {
 		}
 	}
 
-	public void removeAllRequests(ArrayList<Integer> selectedIndexs) {
+	public void removeAllRequests(List<Integer> selectedIndexs) {
 		// Remove index's from requests starting with highest index first:
 		Collections.sort(selectedIndexs, Collections.reverseOrder());
 
@@ -215,15 +208,15 @@ public class RequestsPlugin extends Plugin {
 	public void start() throws Exception {
 		super.start();
 
-		Hudson.XSTREAM.alias("UnlockRequest", UnlockRequest.class);
-		Hudson.XSTREAM.alias("DeleteJobRequest", DeleteJobRequest.class);
-		Hudson.XSTREAM.alias("DeleteBuildRequest", DeleteBuildRequest.class);
-		Hudson.XSTREAM.alias("RenameJobRequest", RenameJobRequest.class);
-		Hudson.XSTREAM.alias("RenameFolderRequest", RenameFolderRequest.class);
-		Hudson.XSTREAM.alias("DeleteFolderRequest", DeleteFolderRequest.class);
-		Hudson.XSTREAM.alias("DeleteMultiBranchRequest", DeleteMultiBranchRequest.class);
-		Hudson.XSTREAM.alias("RenameMultiBranchRequest", RenameMultiBranchRequest.class);
-		Hudson.XSTREAM.alias("RequestsPlugin", RequestsPlugin.class);
+		Jenkins.XSTREAM.alias("UnlockRequest", UnlockRequest.class);
+		Jenkins.XSTREAM.alias("DeleteJobRequest", DeleteJobRequest.class);
+		Jenkins.XSTREAM.alias("DeleteBuildRequest", DeleteBuildRequest.class);
+		Jenkins.XSTREAM.alias("RenameJobRequest", RenameJobRequest.class);
+		Jenkins.XSTREAM.alias("RenameFolderRequest", RenameFolderRequest.class);
+		Jenkins.XSTREAM.alias("DeleteFolderRequest", DeleteFolderRequest.class);
+		Jenkins.XSTREAM.alias("DeleteMultiBranchRequest", DeleteMultiBranchRequest.class);
+		Jenkins.XSTREAM.alias("RenameMultiBranchRequest", RenameMultiBranchRequest.class);
+		Jenkins.XSTREAM.alias("RequestsPlugin", RequestsPlugin.class);
 
 		load();
 	}
@@ -236,18 +229,15 @@ public class RequestsPlugin extends Plugin {
 			return Messages.RequestManagementLink_Description();
 		}
 
+		@Override
 		public String getCategoryName() {
 			return "TOOLS";
 		}
 
 		@Override
 		public String getIconFileName() {
-			return "/images/48x48/clipboard.png";
+			return "monitor";
 		}
-
-		// public String getIconClassName() {
-		// return "icon-clipboard";
-		// }
 
 		public String getDisplayName() {
 			return Messages.RequestManagementLink_DisplayName();

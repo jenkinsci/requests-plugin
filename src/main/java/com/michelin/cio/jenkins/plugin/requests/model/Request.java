@@ -111,7 +111,7 @@ public abstract class Request {
 	public boolean process(String requestType) {
 		boolean success = false;
 		String jobNameSlash = getJobNameSlash();
-		LOGGER.info("Request process(): " + jobNameSlash);
+		// LOGGER.info("Request process(): " + jobNameSlash);
 
 		try {
 

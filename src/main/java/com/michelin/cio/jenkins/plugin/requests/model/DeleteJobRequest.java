@@ -27,6 +27,8 @@ package com.michelin.cio.jenkins.plugin.requests.model;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.commons.lang3.StringUtils;
+
 import hudson.model.Item;
 import jenkins.model.Jenkins;
 
@@ -44,37 +46,35 @@ public class DeleteJobRequest extends Request {
 
 	@Override
 	public String getMessage() {
-		return Messages.DeleteJobRequest_message(jobNameJelly);
+
+		LOGGER.info("[DEBUG] DeleteJobRequest Job Request values:[" + jobNameSpace + ":" + jobNameSlash + ":" + jobNameJelly + ":" + fullJobURL + "]");
+
+		if (StringUtils.isNotEmpty(jobNameJelly)) {
+			return Messages.DeleteJobRequest_message(jobNameJelly);
+		} else {
+			return Messages.DeleteJobRequest_message("'Job value is null'");
+		}
 	}
 
 	public boolean execute(Item item) {
 		boolean success = false;
 
-		try {
+		if (Jenkins.get().hasPermission(Item.DELETE)) {
+			try {
+				item.delete();
+				success = true;
+				errorMessage = "The Job " + jobNameSlash + " has been properly Deleted";
+				LOGGER.log(Level.INFO, "The Job {0} has been properly deleted", jobNameSlash);
 
-			if (Jenkins.get().hasPermission(Item.DELETE)) {
-				try {
-					item.delete();
-					success = true;
-					errorMessage = "The Job " + jobNameSlash + " has been properly Deleted";
-					LOGGER.log(Level.INFO, "The Job {0} has been properly deleted", jobNameSlash);
-
-				} catch (Exception e) {
-					errorMessage = e.getMessage().toString();
-					LOGGER.log(Level.SEVERE, "Unable to DELETE the Job " + jobNameSlash, e);
-					success = false;
-				}
-
-			} else {
-				errorMessage = "The current user does not have permission to DELETE the Job";
-				LOGGER.log(Level.FINE, "The current user does not have permission to DELETE the Job");
+			} catch (Exception e) {
+				errorMessage = e.getMessage();
+				LOGGER.log(Level.SEVERE, "Unable to DELETE the Job " + jobNameSlash, e);
 				success = false;
 			}
 
-		} catch (Exception e) {
-			errorMessage = e.getMessage().toString();
-			LOGGER.log(Level.SEVERE, "Jenkins.get Error: Unable to Delete the Job " + jobNameSlash + " : " + e.getMessage().toString());
-
+		} else {
+			errorMessage = "The current user does not have permission to DELETE the Job";
+			LOGGER.log(Level.FINE, "The current user does not have permission to DELETE the Job");
 			success = false;
 		}
 

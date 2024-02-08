@@ -32,6 +32,7 @@ import java.util.logging.Logger;
 import javax.mail.MessagingException;
 import javax.servlet.ServletException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.kohsuke.stapler.HttpRedirect;
 import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.StaplerRequest;
@@ -53,70 +54,98 @@ import jenkins.model.Jenkins;
 public class RequestDeleteJobAction implements Action {
 
 	private Job<?, ?> project;
-	private Job<?, ?> project2;
+	// private Job<?, ?> project2;
 	private static final Logger LOGGER = Logger.getLogger(RequestDeleteJobAction.class.getName());
+	private String jobName;
+	private String absoluteUrl;
+	private String jobURL;
 
 	public RequestDeleteJobAction(Job<?, ?> target) {
-		project2 = (Job<?, ?>) target.getTarget();
-		this.project = project2;
+
+		try {
+			project = (Job<?, ?>) target.getTarget();
+			jobName = target.getFullName();
+			absoluteUrl = target.getAbsoluteUrl();
+			jobURL = target.getUrl();
+
+		} catch (Exception e) {
+			LOGGER.info("[ERROR] Unable to get Jenkins Job object information: " + e);
+		}
 	}
 
 	@POST
-	public HttpResponse doCreateDeleteJobRequest(StaplerRequest request, StaplerResponse response) throws IOException, ServletException, MessagingException {
+	public HttpResponse doCreateDeleteJobRequest(StaplerRequest staplerRequest, StaplerResponse response) throws IOException, ServletException, MessagingException {
+		String username = " ";
 
 		try {
 			if (isIconDisplayed()) {
 				// errors.clear();
-				final String username = request.getParameter("username");
+				username = staplerRequest.getParameter("username");
 				RequestsPlugin plugin = Jenkins.get().getPlugin(RequestsPlugin.class);
+
 				if (plugin == null) {
 					LOGGER.log(Level.SEVERE, "[ERROR] Jenkins.get().getPlugin(RequestsPlugin.class) is null: ");
 					return null;
 				}
-				String jobName = project.getFullName();
-				String fullJobURL = "";
-				String jobNameSlash = jobName.toString();
-				;
-				String jobNameJelly = "";
-				LOGGER.info("Delete Job Request project.getFullName(): " + jobName);
-				String[] emailData = { project.getName(), username, "A Delete Job", project.getAbsoluteUrl() };
 
+				if (!StringUtils.isNotEmpty(jobName)) {
+					RequestMailSender mailSender = new RequestMailSender("deleteJob", username, "REQUEST", "", "ERROR",
+							"ERROR: Jenkins Project object is null.  Unable to submit the Delete Job Request.");
+					mailSender.executeEmail();
+					LOGGER.info("[ERROR] doCreateDeleteJobRequest value is null:[" + jobName + ":" + jobURL + ":" + absoluteUrl + "]");
+
+					return null;
+				}
+
+				String fullJobURL = "";
+				String jobNameSlash = jobName;
+				String jobNameJelly = "";
+				String[] emailData = { jobName, username, "A Delete Job", absoluteUrl };
+
+				// Check if the project name includes folder name, if so grab the last name in the string:
 				if (jobName.contains("/")) {
 					String[] projectnameList = jobName.split("/");
 					int nameCount = projectnameList.length;
 					jobName = projectnameList[nameCount - 1];
 				}
 
-				fullJobURL = project.getAbsoluteUrl();
-				LOGGER.info("Delete Job Request fullJobURL: " + fullJobURL);
+				fullJobURL = absoluteUrl;
+				jobNameJelly = jobNameSlash;
 
-				jobNameJelly = jobNameSlash.toString();
-				;
 				if (jobNameJelly.contains("%20")) {
 					jobNameJelly = jobNameJelly.replace("%20", " ");
 				}
 
-				// CHECK for null values:
-				// -----------------------------------
-				// username =
-				// jobName = Good
-				// fullJobURL = Good
-				// jobNameSlash = Good
-				// jobNameJelly =
-				// emailData =
+				LOGGER.info("Delete Job Request project.getFullName(): " + jobName);
+				// LOGGER.info("[DEBUG] deleteJob: " + username + ":" + jobName + ":NA" + ":" + fullJobURL + ":" + jobNameSlash + ":" +
+				// jobNameJelly + ":NA");
 
-				plugin.addRequestPlusEmail(new DeleteJobRequest("deleteJob", username, jobName, "", fullJobURL, jobNameSlash, jobNameJelly, ""), emailData);
+				// -----------------------------------
+				// 1. requestType = "deleteJob"
+				// 2. username = user name
+				// 3. jobNameSpaces =
+				// 4. buildNumber = N/A
+				// 5. fullJobURL =
+				// 6. jobNameSlash = 'Includes the folder name if applicable - for string messages'
+				// 7. jobNameJelly = 'name used only for jelly file without %20 for spaces'
+				// 8. rename = N/A
+
+				plugin.addRequestPlusEmail(new DeleteJobRequest("deleteJob", username, jobName, "NA", fullJobURL, jobNameSlash, jobNameJelly, "NA"), emailData);
 			}
 
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "[ERROR] doCreateDeleteJobRequest() Exception: " + e.getMessage());
 
+			RequestMailSender mailSender = new RequestMailSender("deleteJob", username, "REQUEST", "", "ERROR",
+					"ERROR: Unable to submit the Delete Job Request. " + e.getMessage());
+			mailSender.executeEmail();
+
 			return null;
 		}
 
-		LOGGER.info("Delete Job Request request.getContextPath()/project.getUrl(): " + request.getContextPath() + '/' + project.getUrl());
+		// LOGGER.info("Delete Job Request request.getContextPath()/project.getUrl(): " + staplerRequest.getContextPath() + '/' + jobURL);
 
-		return new HttpRedirect(request.getContextPath() + '/' + project.getUrl());
+		return new HttpRedirect(staplerRequest.getContextPath() + '/' + jobURL);
 	}
 
 	public String getDisplayName() {
@@ -139,9 +168,9 @@ public class RequestDeleteJobAction implements Action {
 	}
 
 	public Job<?, ?> getProject() {
-		Job<?, ?> project2a;
-		project2a = (Job<?, ?>) project2.getTarget();
-		return project2a;
+		// Job<?, ?> project2a;
+		// project2a = (Job<?, ?>) project2.getTarget();
+		return project;
 	}
 
 	public String getUrlName() {

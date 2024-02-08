@@ -61,7 +61,7 @@
                             <thead class="fixedHeader">
                                 <tr>
                                     <th class="first_column">${%requests.plugin.requests.header.select}<br />                                    
-                                    <input type="checkbox" onclick="toogleAll()" id="checkbox_reference"/>
+                                    <input type="checkbox" id="checkboxAll" onclick="toggle(this)" />
                                     </th>
                                     <th class="name_column">${%requests.plugin.requests.header.request}</th>                                       
                                     <th class="name_column">${%requests.plugin.requests.header.requester}</th>

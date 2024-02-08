@@ -95,7 +95,7 @@ public class RequestDeleteFolderAction extends FolderProperty<Folder> implements
 
 				fullJobURL = project.getAbsoluteUrl();
 				LOGGER.info("Delete Folder Request fullJobURL: " + fullJobURL);
-				plugin.addRequestPlusEmail(new DeleteFolderRequest("deleteFolder", username, jobName, "", fullJobURL, jobNameSlash, jobNameJelly, ""), emailData);
+				plugin.addRequestPlusEmail(new DeleteFolderRequest("deleteFolder", username, jobName, "NA", fullJobURL, jobNameSlash, jobNameJelly, "NA"), emailData);
 			}
 
 		} catch (Exception e) {

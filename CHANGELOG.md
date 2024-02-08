@@ -1,6 +1,12 @@
 
 ## Version History
 
+Version 3.3 (Feb 08, 2024)
+
+-       Fixed issue with Manage Jenkins icon for Pending Request icon not found - JENKINS-72673
+-       Fixed issue with null values - JENKINS-72572
+-       Fixed issue with select all requests in Pending Request page
+
 Version 3.2 (Sept 29, 2023)
 
 -       Dependabot pom dependency updates for security issues
@@ -11,7 +17,7 @@ Version 3.2 (Sept 29, 2023)
 Version 3.1 (August 11, 2023)
 
 -       Remove unnecessary javascript from jelly files
--		Fix username in permission error message
+-		Fixed username in permission error message
 
 
 Version 3.0 (June 20, 2023)
