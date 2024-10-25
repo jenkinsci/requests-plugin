@@ -29,7 +29,7 @@
     <l:layout permission="${app.ADMINISTER}">
         <st:include it="${app}" page="sidepanel.jelly"/>
         <link rel="stylesheet" href="${rootURL}/plugin/requests/CSS/requests.css" type="text/css" />
-        <script type="text/javascript" src="${rootURL}/plugin/requests/js/requests-plugin.js"></script>
+        
         <l:main-panel>            
             <h1>${%requests.plugin.title}</h1>
             <j:choose>
@@ -61,7 +61,7 @@
                             <thead class="fixedHeader">
                                 <tr>
                                     <th class="first_column">${%requests.plugin.requests.header.select}<br />                                    
-                                    <input type="checkbox" id="checkboxAll" onclick="toggle(this)" />
+                                    <input type="checkbox" id="checkboxAll"  />
                                     </th>
                                     <th class="name_column">${%requests.plugin.requests.header.request}</th>                                       
                                     <th class="name_column">${%requests.plugin.requests.header.requester}</th>
@@ -112,5 +112,6 @@
             </j:choose>
 
         </l:main-panel>
+        <script type="text/javascript" src="${rootURL}/plugin/requests/js/requests-plugin.js"></script>
     </l:layout>
 </j:jelly>

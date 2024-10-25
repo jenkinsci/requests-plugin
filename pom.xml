@@ -9,7 +9,7 @@
 	</parent>
 	
 	<properties>
-		<jenkins.version>2.387.3</jenkins.version>
+		<jenkins.version>2.414.3</jenkins.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 

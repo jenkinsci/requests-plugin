@@ -1,6 +1,12 @@
 
 ## Version History
 
+Version 3.4 (Oct 25, 2024)
+
+-       POM update for jenkins.version = 2.414.3
+-		Replaced inline event handler for select all checkboxes
+
+
 Version 3.3 (Feb 08, 2024)
 
 -       Fixed issue with Manage Jenkins icon for Pending Request icon not found - JENKINS-72673
