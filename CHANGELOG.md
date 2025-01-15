@@ -1,6 +1,11 @@
 
 ## Version History
 
+Version 3.5 (, 2025)
+
+- 	Use jenkins.baseline in pom.xml
+
+   
 Version 3.4 (Oct 25, 2024)
 
 -       POM update for jenkins.version = 2.414.3
