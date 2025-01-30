@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.jenkins-ci.plugins</groupId>
 		<artifactId>plugin</artifactId>
-		<version>4.47</version>
+		<version>4.51</version>
 		<relativePath />
 	</parent>
 	
@@ -45,6 +45,11 @@
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
+				<groupId>org.kohsuke.stapler</groupId>
+				<artifactId>stapler</artifactId>
+				<version>1785.1787.v44b_5610a_7c4a_</version>
+			</dependency>
+			<dependency>
 				<groupId>io.jenkins.tools.bom</groupId>
 				<artifactId>bom-${jenkins.baseline}.x</artifactId>
 				<version>2982.vdce2153031a_0</version>
@@ -65,17 +70,14 @@
 		<dependency>
 			<groupId>commons-lang</groupId>
 			<artifactId>commons-lang</artifactId>
-			<version>2.6</version>
 		</dependency>
 		<dependency>
 			<groupId>org.kohsuke.stapler</groupId>
 			<artifactId>stapler</artifactId>
-			<version>1730.v43d2c7b_11a_27</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jenkins-ci.plugins</groupId>
 			<artifactId>cloudbees-folder</artifactId>
-			<version>6.848.ve3b_fd7839a_81</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
 		<dependency>
