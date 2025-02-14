@@ -91,12 +91,4 @@
             <version>3.14.0</version>
 </dependency>
 	</dependencies>
-	<developers>
-		<developer>
-			<id>johnflynn</id>
-			<name>John Flynn</name>
-			<email>john.trixmot.flynn@gmail.com</email>
-			<timezone>-5</timezone>
-		</developer>
-	</developers>
 </project>
