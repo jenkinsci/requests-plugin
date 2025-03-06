@@ -1,9 +1,10 @@
 
 ## Version History
 
-Version 3.5 (, 2025)
+Version 3.5 (Mar 05, 2025)
 
 - 	Use jenkins.baseline in pom.xml
+-	PR#10 Upgrade to latest LTS core version supporting Java 8 for pom.xml
 
    
 Version 3.4 (Oct 25, 2024)
