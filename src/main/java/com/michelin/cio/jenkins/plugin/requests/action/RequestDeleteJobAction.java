@@ -30,13 +30,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.mail.MessagingException;
-import javax.servlet.ServletException;
+import jakarta.servlet.ServletException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.kohsuke.stapler.HttpRedirect;
 import org.kohsuke.stapler.HttpResponse;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
+import org.kohsuke.stapler.StaplerRequest2;
+import org.kohsuke.stapler.StaplerResponse2;
 import org.kohsuke.stapler.verb.POST;
 
 import com.michelin.cio.jenkins.plugin.requests.RequestsPlugin;
@@ -74,7 +74,7 @@ public class RequestDeleteJobAction implements Action {
 	}
 
 	@POST
-	public HttpResponse doCreateDeleteJobRequest(StaplerRequest staplerRequest, StaplerResponse response) throws IOException, ServletException, MessagingException {
+	public HttpResponse doCreateDeleteJobRequest(StaplerRequest2 staplerRequest, StaplerResponse2 response) throws IOException, ServletException, MessagingException {
 		String username = " ";
 
 		try {
