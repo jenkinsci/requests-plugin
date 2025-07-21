@@ -33,12 +33,12 @@ import java.util.logging.Logger;
 
 import javax.annotation.Nonnull;
 import javax.mail.MessagingException;
-import javax.servlet.ServletException;
+import jakarta.servlet.ServletException;
 
 import org.kohsuke.stapler.HttpRedirect;
 import org.kohsuke.stapler.HttpResponse;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
+import org.kohsuke.stapler.StaplerRequest2;
+import org.kohsuke.stapler.StaplerResponse2;
 import org.kohsuke.stapler.verb.POST;
 
 import com.michelin.cio.jenkins.plugin.requests.RequestsPlugin;
@@ -64,7 +64,7 @@ public class RequestRenameMultiBranchAction implements Action {
 	}
 
 	@POST
-	public HttpResponse doCreateRenameMultiBranchRequest(StaplerRequest request, StaplerResponse response) throws IOException, ServletException, MessagingException {
+	public HttpResponse doCreateRenameMultiBranchRequest(StaplerRequest2 request, StaplerResponse2 response) throws IOException, ServletException, MessagingException {
 
 		try {
 			if (isIconDisplayed()) {

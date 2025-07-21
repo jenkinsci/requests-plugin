@@ -32,13 +32,13 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.mail.MessagingException;
-import javax.servlet.ServletException;
+import jakarta.servlet.ServletException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.kohsuke.stapler.HttpRedirect;
 import org.kohsuke.stapler.HttpResponse;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
+import org.kohsuke.stapler.StaplerRequest2;
+import org.kohsuke.stapler.StaplerResponse2;
 import org.kohsuke.stapler.interceptor.RequirePOST;
 
 import com.michelin.cio.jenkins.plugin.requests.action.RequestMailSender;
@@ -110,7 +110,7 @@ public class RequestsPlugin extends Plugin {
 	}
 
 	@RequirePOST
-	public HttpResponse doManageRequests(final StaplerRequest request, final StaplerResponse response) throws IOException, ServletException {
+	public HttpResponse doManageRequests(final StaplerRequest2 request, final StaplerResponse2 response) throws IOException, ServletException {
 		Jenkins.get().checkPermission(Jenkins.ADMINISTER);
 		errors.clear();
 		String[] selectedRequests = request.getParameterValues("selected");
