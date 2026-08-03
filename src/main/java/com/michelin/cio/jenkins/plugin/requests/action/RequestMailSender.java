@@ -42,11 +42,11 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerRequest2;
 import org.kohsuke.stapler.verb.POST;
 
 import hudson.Extension;
@@ -378,7 +378,7 @@ public class RequestMailSender extends Builder {
 		// Runs when the global settings are submitted to save configuration
 		// changes:
 		@Override
-		public boolean configure(StaplerRequest req, JSONObject json) throws FormException {
+		public boolean configure(StaplerRequest2 req, JSONObject json) throws FormException {
 			req.bindJSON(this, json.getJSONObject("globalRequests"));
 			save();
 			return true;
