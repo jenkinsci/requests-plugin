@@ -27,7 +27,7 @@ package com.michelin.cio.jenkins.plugin.requests.model;
 import java.util.Calendar;
 import java.util.logging.Logger;
 
-import org.apache.commons.lang.time.FastDateFormat;
+import org.apache.commons.lang3.time.FastDateFormat;
 
 import hudson.model.Item;
 import jenkins.model.Jenkins;
