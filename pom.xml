@@ -62,11 +62,6 @@
 			<artifactId>mail</artifactId>
 			<version>1.5.0-b01</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/commons-lang/commons-lang -->
-		<!--<dependency>
-			<groupId>commons-lang</groupId>
-			<artifactId>commons-lang</artifactId>
-		</dependency> -->
 		<dependency>
 			<groupId>org.jenkins-ci.plugins</groupId>
 			<artifactId>cloudbees-folder</artifactId>
@@ -83,5 +78,9 @@
             <artifactId>commons-lang3</artifactId>
             <version>3.20.0</version>
 </dependency>
+<dependency>
+			<groupId>io.jenkins.plugins</groupId>
+			<artifactId>commons-lang3-api</artifactId>
+		</dependency>
 	</dependencies>
 </project>
