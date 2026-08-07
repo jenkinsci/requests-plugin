@@ -4,14 +4,15 @@
 	<parent>
 		<groupId>org.jenkins-ci.plugins</groupId>
 		<artifactId>plugin</artifactId>
-		<version>4.88</version>
+		<version>5.28</version>
 		<relativePath />
 	</parent>
 	
 	<properties>
 		<!-- https://www.jenkins.io/doc/developer/plugin-development/choosing-jenkins-baseline/ -->
-		<jenkins.baseline>2.462</jenkins.baseline>
+		<jenkins.baseline>2.492</jenkins.baseline>
 		<jenkins.version>${jenkins.baseline}.3</jenkins.version>
+		<cloudbees-folder.version>6.848.ve3b_fd7839a_81</cloudbees-folder.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
@@ -45,11 +46,6 @@
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-				<groupId>org.kohsuke.stapler</groupId>
-				<artifactId>stapler</artifactId>
-				<version>1785.1787.v44b_5610a_7c4a_</version>
-			</dependency>
-			<dependency>
 				<groupId>io.jenkins.tools.bom</groupId>
 				<artifactId>bom-${jenkins.baseline}.x</artifactId>
 				<version>4228.v0a_71308d905b_</version>
@@ -67,28 +63,25 @@
 			<version>1.5.0-b01</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/commons-lang/commons-lang -->
-		<dependency>
+		<!--<dependency>
 			<groupId>commons-lang</groupId>
 			<artifactId>commons-lang</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.kohsuke.stapler</groupId>
-			<artifactId>stapler</artifactId>
-		</dependency>
+		</dependency> -->
 		<dependency>
 			<groupId>org.jenkins-ci.plugins</groupId>
 			<artifactId>cloudbees-folder</artifactId>
+			<version>${cloudbees-folder.version}</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
-			<version>4.5.13</version>
+			<version>4.5.14</version>
 		</dependency>
 		<dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.18.0</version>
+            <version>3.20.0</version>
 </dependency>
 	</dependencies>
 </project>
