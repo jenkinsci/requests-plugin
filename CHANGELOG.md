@@ -1,6 +1,12 @@
 
 ## Version History
 
+Version 3.6 (Aug 12, 2026)
+
+-   Migrate to Commons Lang3
+-   Upgrade plugin to JDK21
+
+
 Version 3.5 (Mar 05, 2025)
 
 - 	Use jenkins.baseline in pom.xml
